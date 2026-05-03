@@ -331,7 +331,7 @@
 	.encounter-header {
 		width: 100%;
 		padding: 16px;
-		background: linear-gradient(135deg, var(--clinic-color)08 0%, white 100%);
+		background: linear-gradient(135deg, color-mix(in srgb, var(--clinic-color) 8%, white) 0%, white 100%);
 		border: none;
 		cursor: pointer;
 		display: flex;
@@ -342,7 +342,7 @@
 	}
 	
 	.encounter-header:hover {
-		background: linear-gradient(135deg, var(--clinic-color)12 0%, white 100%);
+		background: linear-gradient(135deg, color-mix(in srgb, var(--clinic-color) 12%, white) 0%, white 100%);
 	}
 	
 	.encounter-main-info {

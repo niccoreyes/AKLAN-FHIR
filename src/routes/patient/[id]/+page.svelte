@@ -5,6 +5,7 @@
 	import { fhirClient } from '$services/fhir-client.js';
 	import { APP_NAME, CLINICS, VITAL_SIGNS_LOINC_CODES } from '$constants';
 	import { appStore } from '$stores/appStore.svelte.js';
+	import AppHeader from '$components/AppHeader.svelte';
 	import EncounterCard from '$components/EncounterCard.svelte';
 	import ObservationCard from '$components/ObservationCard.svelte';
 
@@ -207,13 +208,13 @@
 </svelte:head>
 
 <div class="patient-detail">
-	<!-- Header -->
-	<header class="top-bar">
-		<div class="logo">
-			<a href="/patient/search" class="back-link">← Back to Patients</a>
-			<h1>{APP_NAME}</h1>
-		</div>
-	</header>
+	<!-- App Header with clinic switcher -->
+	<AppHeader active="clinical" />
+	
+	<!-- Back Navigation -->
+	<div class="back-nav">
+		<a href="/patient/search" class="back-link">← Back to Patients</a>
+	</div>
 
 	{#if isLoading}
 		<div class="loading-state">
@@ -810,5 +811,68 @@
 		color: #6B7280;
 		margin: 8px 0 0 0;
 		font-style: italic;
+	}
+
+	/* Back Navigation */
+	.back-nav {
+		padding: 12px 24px;
+		background: #F8FAFC;
+		border-bottom: 1px solid #E2E8F0;
+	}
+
+	.back-nav .back-link {
+		color: #64748B;
+		text-decoration: none;
+		font-size: 14px;
+		font-weight: 500;
+		transition: color 0.2s;
+	}
+
+	.back-nav .back-link:hover {
+		color: #2563EB;
+	}
+
+	/* Missing button styles */
+	.btn-edit-patient {
+		padding: 10px 20px;
+		background: #FEF3C7;
+		color: #92400E;
+		border: 1px solid #FCD34D;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-edit-patient:hover {
+		background: #FDE68A;
+	}
+
+	.btn-delete-patient {
+		padding: 10px 20px;
+		background: #FEF2F2;
+		color: #DC2626;
+		border: 1px solid #FECACA;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-delete-patient:hover {
+		background: #FECACA;
+	}
+
+	.btn-delete-patient:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	/* Remove old top-bar styles since we use AppHeader now */
+	.top-bar {
+		display: none;
 	}
 </style>
