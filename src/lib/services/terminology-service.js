@@ -1,222 +1,184 @@
-import { FHIR_CONFIG } from '$constants';
+import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
 
 /**
- * Terminology Service - Fetches codes dynamically from tx.fhirlab.net
- * Gracefully falls back to hardcoded values when server codes are unavailable.
+ * Service for interacting with the FHIR terminology server (tx.fhirlab.net)
  */
-export class TerminologyService {
+class TerminologyService {
 	constructor() {
 		this.baseUrl = FHIR_CONFIG.txBaseUrl;
 		this.cache = new Map();
-		this.cacheTTL = 300000; // 5 minutes
+		this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
 	}
 
 	/**
-	 * Lookup a code to get display name and properties.
-	 * Silently falls back to the code itself as display if lookup fails.
+	 * Make a request to the terminology server
 	 */
-	async lookupCode(system, code) {
-		const cacheKey = `lookup:${system}:${code}`;
-		const cached = this.getFromCache(cacheKey);
-		if (cached) return cached;
+	async request(endpoint, options = {}) {
+		const url = `${this.baseUrl}${endpoint}`;
+		const response = await fetch(url, {
+			headers: {
+				'Accept': 'application/fhir+json',
+				'Content-Type': 'application/fhir+json',
+				...options.headers
+			},
+			...options
+		});
 
-		try {
-			const url = `${this.baseUrl}/CodeSystem/$lookup?system=${encodeURIComponent(system)}&code=${encodeURIComponent(code)}`;
-			const response = await fetch(url, {
-				headers: { 'Accept': 'application/fhir+json' }
-			});
-
-			if (!response.ok) {
-				// Server does not have this code system or code — silently fail
-				const fallback = {
-					system,
-					code,
-					display: code,
-					valid: false
-				};
-				this.setCache(cacheKey, fallback);
-				return fallback;
-			}
-
-			const result = await response.json();
-			let display = code;
-			let properties = {};
-
-			if (result.parameter) {
-				for (const param of result.parameter) {
-					if (param.name === 'display' && param.valueString) {
-						display = param.valueString;
-					}
-					if (param.name === 'property' && param.part) {
-						const propName = param.part.find(p => p.name === 'code')?.valueCode;
-						const propValue = param.part.find(p => p.name === 'value')?.valueString;
-						if (propName && propValue) {
-							properties[propName] = propValue;
-						}
-					}
-				}
-			}
-
-			const lookupResult = { system, code, display, properties, valid: true };
-			this.setCache(cacheKey, lookupResult);
-			return lookupResult;
-		} catch (error) {
-			// Network or unexpected error — silently fallback
-			const fallback = { system, code, display: code, valid: false };
-			this.setCache(cacheKey, fallback);
-			return fallback;
+		if (!response.ok) {
+			const error = await response.text();
+			throw new Error(`Terminology server error: ${response.status} - ${error}`);
 		}
+
+		return response.json();
 	}
 
 	/**
-	 * Search for codes by name/display using ValueSet $expand.
-	 * Silently returns empty array on failure.
+	 * Get cached data or fetch from server
 	 */
-	async searchCodes(vsUrl, query) {
-		const cacheKey = `search:${vsUrl}:${query}`;
-		const cached = this.getFromCache(cacheKey);
-		if (cached) return cached;
-
-		try {
-			const url = `${this.baseUrl}/ValueSet/$expand?url=${encodeURIComponent(vsUrl)}&filter=${encodeURIComponent(query)}&count=20`;
-			const response = await fetch(url, {
-				headers: { 'Accept': 'application/fhir+json' }
-			});
-
-			if (!response.ok) {
-				this.setCache(cacheKey, []);
-				return [];
-			}
-
-			const result = await response.json();
-			const codes = [];
-			if (result.expansion && result.expansion.contains) {
-				for (const item of result.expansion.contains) {
-					codes.push({
-						system: item.system || vsUrl,
-						code: item.code,
-						display: item.display,
-						description: item.definition || item.display
-					});
-				}
-			}
-
-			this.setCache(cacheKey, codes);
-			return codes;
-		} catch (error) {
-			this.setCache(cacheKey, []);
-			return [];
-		}
-	}
-
-	/**
-	 * Get vital signs LOINC codes.
-	 * These are well-known LOINC codes that tx.fhirlab.net supports.
-	 */
-	async getVitalSignCodes() {
-		const vitalSignCodes = [
-			{ system: 'http://loinc.org', code: '85354-9', display: 'Blood pressure panel' },
-			{ system: 'http://loinc.org', code: '8480-6', display: 'Systolic blood pressure' },
-			{ system: 'http://loinc.org', code: '8462-4', display: 'Diastolic blood pressure' },
-			{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' },
-			{ system: 'http://loinc.org', code: '9279-1', display: 'Respiratory rate' },
-			{ system: 'http://loinc.org', code: '8310-5', display: 'Body temperature' },
-			{ system: 'http://loinc.org', code: '2708-6', display: 'Oxygen saturation' },
-			{ system: 'http://loinc.org', code: '29463-7', display: 'Body weight' },
-			{ system: 'http://loinc.org', code: '8302-2', display: 'Body height' },
-			{ system: 'http://loinc.org', code: '39156-5', display: 'BMI' }
-		];
-
-		// Enrich with server display names (LOINC is available on tx.fhirlab.net)
-		const enriched = [];
-		for (const vital of vitalSignCodes) {
-			const details = await this.lookupCode(vital.system, vital.code);
-			enriched.push({
-				...vital,
-				fullDisplay: details.valid ? details.display : vital.display,
-				valid: details.valid
-			});
-		}
-		return enriched;
-	}
-
-	/**
-	 * Get common condition codes using SNOMED CT (available on tx.fhirlab.net).
-	 * ICD-10 is NOT available on this server so it is excluded.
-	 */
-	async getCommonConditionCodes() {
-		const conditionCodes = [
-			{ system: 'http://snomed.info/sct', code: '38341003', display: 'Hypertensive disorder' },
-			{ system: 'http://snomed.info/sct', code: '44054006', display: 'Diabetes mellitus type 2' },
-			{ system: 'http://snomed.info/sct', code: '195967001', display: 'Asthma' },
-			{ system: 'http://snomed.info/sct', code: '59621000', display: 'Hypertension' },
-			{ system: 'http://snomed.info/sct', code: '53741008', display: 'Coronary artery disease' },
-			{ system: 'http://snomed.info/sct', code: '13645005', display: 'Chronic obstructive lung disease' }
-		];
-
-		const enriched = [];
-		for (const condition of conditionCodes) {
-			const details = await this.lookupCode(condition.system, condition.code);
-			enriched.push({
-				...condition,
-				fullDisplay: details.valid ? details.display : condition.display,
-				valid: details.valid
-			});
-		}
-		return enriched;
-	}
-
-	/**
-	 * Get common medication codes using SNOMED CT pharmaceutical product ValueSet.
-	 * RxNorm is NOT available on tx.fhirlab.net; SNOMED medications ARE.
-	 */
-	async getCommonMedicationCodes() {
-		const drugNames = ['Amlodipine', 'Metformin', 'Losartan', 'Hydrochlorothiazide', 'Aspirin', 'Atorvastatin', 'Paracetamol', 'Ibuprofen'];
-		const snomedPharmaceuticalVS = 'http://snomed.info/sct?fhir_vs=isa/373873005';
-		const results = [];
-
-		for (const name of drugNames) {
-			const codes = await this.searchCodes(snomedPharmaceuticalVS, name);
-			if (codes.length > 0) {
-				results.push({
-					system: codes[0].system,
-					code: codes[0].code,
-					display: codes[0].display,
-					valid: true
-				});
-			}
+	async getCachedOrFetch(key, fetchFn) {
+		const cached = this.cache.get(key);
+		if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
+			return cached.data;
 		}
 
-		return results;
-	}
-
-	/**
-	 * Validate if a code exists in a code system.
-	 */
-	async validateCode(system, code) {
-		const result = await this.lookupCode(system, code);
-		return result.valid;
-	}
-
-	/* Cache helpers */
-	getFromCache(key) {
-		const item = this.cache.get(key);
-		if (!item) return null;
-		if (Date.now() - item.timestamp > this.cacheTTL) {
-			this.cache.delete(key);
-			return null;
-		}
-		return item.data;
-	}
-
-	setCache(key, data) {
+		const data = await fetchFn();
 		this.cache.set(key, { data, timestamp: Date.now() });
+		return data;
 	}
 
+	/**
+	 * Clear the cache
+	 */
 	clearCache() {
 		this.cache.clear();
 	}
+
+	/**
+	 * Expand a ValueSet to get all codes
+	 * @param {string} valueSetUrl - The canonical URL of the ValueSet
+	 * @returns {Promise<Array>} Array of concept objects with code and display
+	 */
+	async expandValueSet(valueSetUrl) {
+		const cacheKey = `expand:${valueSetUrl}`;
+		
+		return this.getCachedOrFetch(cacheKey, async () => {
+			try {
+				// Try to expand the ValueSet
+				const response = await this.request(`/ValueSet/$expand?url=${encodeURIComponent(valueSetUrl)}&_count=100`);
+				
+				if (response.expansion && response.expansion.contains) {
+					return response.expansion.contains.map(concept => ({
+						code: concept.code,
+						display: concept.display,
+						system: concept.system
+					}));
+				}
+				return [];
+			} catch (error) {
+				console.warn(`Failed to expand ValueSet ${valueSetUrl}:`, error);
+				// Fallback: try to get the ValueSet definition and extract concepts from compose
+				return this.getValueSetConcepts(valueSetUrl);
+			}
+		});
+	}
+
+	/**
+	 * Get concepts from a ValueSet definition (fallback when $expand fails)
+	 * @param {string} valueSetUrl - The canonical URL of the ValueSet
+	 * @returns {Promise<Array>} Array of concept objects
+	 */
+	async getValueSetConcepts(valueSetUrl) {
+		const cacheKey = `concepts:${valueSetUrl}`;
+		
+		return this.getCachedOrFetch(cacheKey, async () => {
+			try {
+				const response = await this.request(`/ValueSet?url=${encodeURIComponent(valueSetUrl)}&_count=1`);
+				
+				if (response.entry && response.entry.length > 0) {
+					const valueSet = response.entry[0].resource;
+					const concepts = [];
+					
+					// Extract concepts from compose.include
+					if (valueSet.compose && valueSet.compose.include) {
+						for (const include of valueSet.compose.include) {
+							if (include.concept) {
+								for (const concept of include.concept) {
+									concepts.push({
+										code: concept.code,
+										display: concept.display,
+										system: include.system
+									});
+								}
+							}
+						}
+					}
+					
+					return concepts;
+				}
+				return [];
+			} catch (error) {
+				console.error(`Failed to get ValueSet concepts for ${valueSetUrl}:`, error);
+				return [];
+			}
+		});
+	}
+
+	/**
+	 * Validate a code against a ValueSet
+	 * @param {string} code - The code to validate
+	 * @param {string} system - The code system
+	 * @param {string} valueSetUrl - The ValueSet URL to validate against
+	 * @returns {Promise<boolean>} Whether the code is valid
+	 */
+	async validateCode(code, system, valueSetUrl) {
+		try {
+			const response = await this.request(
+				`/ValueSet/$validate-code?url=${encodeURIComponent(valueSetUrl)}&code=${encodeURIComponent(code)}&system=${encodeURIComponent(system)}`
+			);
+			
+			if (response.parameter) {
+				const resultParam = response.parameter.find(p => p.name === 'result');
+				return resultParam?.valueBoolean === true;
+			}
+			return false;
+		} catch (error) {
+			console.warn(`Code validation failed for ${code}:`, error);
+			return false;
+		}
+	}
+
+	/**
+	 * Look up a code to get its display name
+	 * @param {string} code - The code to look up
+	 * @param {string} system - The code system
+	 * @returns {Promise<Object>} The code details including display
+	 */
+	async lookupCode(code, system) {
+		const cacheKey = `lookup:${system}:${code}`;
+		
+		return this.getCachedOrFetch(cacheKey, async () => {
+			try {
+				const response = await this.request(
+					`/CodeSystem/$lookup?system=${encodeURIComponent(system)}&code=${encodeURIComponent(code)}`
+				);
+				
+				const result = { code, system };
+				
+				if (response.parameter) {
+					const displayParam = response.parameter.find(p => p.name === 'display');
+					if (displayParam) {
+						result.display = displayParam.valueString;
+					}
+				}
+				
+				return result;
+			} catch (error) {
+				console.warn(`Code lookup failed for ${code}:`, error);
+				return { code, system, display: code };
+			}
+		});
+	}
 }
 
-// Export singleton
+// Export singleton instance
 export const terminologyService = new TerminologyService();

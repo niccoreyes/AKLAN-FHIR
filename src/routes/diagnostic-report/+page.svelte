@@ -3,13 +3,21 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { appStore } from '$stores/appStore.svelte.js';
+	import { 
+		labTestCodesStore, 
+		labUnitsStore, 
+		getDefaultUnitForLoincCode,
+		DEFAULT_LAB_PANELS,
+		DEFAULT_LAB_COMPONENTS,
+		DEFAULT_UCUM_UNITS
+	} from '$stores/terminologyStore.js';
 	import { CLINICS, CLINIC_CAPABILITIES, LOINC_CODES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 
 	// Get return URL from query params
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
 
-	onMount(() => {
+	onMount(async () => {
 		// Check URL params directly for immediate config check
 		const url = browser ? new URL(window.location.href) : null;
 		const hasUrlConfig = url && (url.searchParams.get('w') || url.searchParams.get('u') || url.searchParams.get('c'));
@@ -29,10 +37,21 @@
 		// Check for order param
 		const orderId = $page.url.searchParams.get('order');
 		const patient = $page.url.searchParams.get('patient');
-		if (orderId) linkedOrderId = orderId;
-		if (patient) {
+		if (orderId) {
+			linkedOrderId = orderId;
+			// Load and prefill from ServiceRequest
+			await loadServiceRequestAndPrefill(orderId);
+		}
+		if (patient && !patientId) {
 			patientId = patient;
-			loadPatient(patient);
+			await loadPatient(patient);
+			patientSearchQuery = patientName;
+		}
+
+		// Fetch terminology data if not already loaded
+		if (browser) {
+			await labTestCodesStore.fetch();
+			await labUnitsStore.fetch();
 		}
 	});
 
@@ -48,28 +67,58 @@
 	let error = $state(null);
 	let success = $state(false);
 
+	// Subscribe to terminology stores
+	let labTestData = $state(DEFAULT_LAB_COMPONENTS);
+	let ucumUnits = $state(DEFAULT_UCUM_UNITS);
+
+	$effect(() => {
+		const unsubscribeCodes = labTestCodesStore.subscribe(state => {
+			if (state.panels && Object.keys(state.panels).length > 0) {
+				labTestData = state.panels;
+			}
+		});
+
+		const unsubscribeUnits = labUnitsStore.subscribe(state => {
+			if (state.units && state.units.length > 0) {
+				ucumUnits = state.units;
+			}
+		});
+
+		return () => {
+			unsubscribeCodes();
+			unsubscribeUnits();
+		};
+	});
+
+	// Report types with corrected LOINC codes from tx.fhirlab.net
 	const reportTypes = [
-		{ code: LOINC_CODES.bloodPressurePanel, display: 'Blood Pressure' },
-		{ code: LOINC_CODES.bloodGlucose, display: 'Blood Glucose' },
-		{ code: '24331-1', display: 'Complete Blood Count' },
-		{ code: '24325-3', display: 'Lipid Panel' },
-		{ code: '24357-6', display: 'Urinalysis' },
-		{ code: '24330-3', display: 'Liver Function' },
-		{ code: 'custom', display: 'Custom Report' }
+		{ code: LOINC_CODES.bloodPressurePanel, display: 'Blood Pressure', category: 'vitals' },
+		{ code: LOINC_CODES.bloodGlucose, display: 'Blood Glucose', category: 'vitals' },
+		{ code: DEFAULT_LAB_PANELS.cbc.code, display: 'Complete Blood Count', category: 'laboratory' },
+		{ code: DEFAULT_LAB_PANELS.lipid.code, display: 'Lipid Panel', category: 'laboratory' },
+		{ code: DEFAULT_LAB_PANELS.urinalysis.code, display: 'Urinalysis', category: 'laboratory' },
+		{ code: DEFAULT_LAB_PANELS.liver.code, display: 'Liver Function', category: 'laboratory' },
+		{ code: 'custom', display: 'Custom Report', category: 'custom' }
 	];
 
-	const commonUnits = {
-		[LOINC_CODES.systolicBP]: 'mmHg',
-		[LOINC_CODES.diastolicBP]: 'mmHg',
-		[LOINC_CODES.bloodGlucose]: 'mg/dL',
-		[LOINC_CODES.heartRate]: 'bpm',
-		'8867-4': 'bpm',
-		'9279-1': 'breaths/min',
-		'8310-5': '°C',
-		'2708-6': '%',
-		'29463-7': 'kg',
-		'8302-2': 'cm'
-	};
+	// Get available LOINC codes based on selected report type
+	const availableLoincCodes = $derived(() => {
+		if (!reportType || reportType === 'custom') {
+			// Return all lab components for custom reports
+			return Object.values(labTestData).flat();
+		}
+		
+		// Check if it's a lab panel
+		if (labTestData[reportType]) {
+			return labTestData[reportType];
+		}
+		
+		// For vitals or other single tests
+		return [];
+	});
+
+	// Track which results are showing the custom unit input
+	let customUnitIndices = $state(new Set());
 
 	async function loadPatient(id) {
 		try {
@@ -80,12 +129,138 @@
 		}
 	}
 
+	// Map LOINC codes to report types
+	const loincToReportType = {
+		// CBC
+		'58410-2': DEFAULT_LAB_PANELS.cbc.code,
+		'6690-2': DEFAULT_LAB_PANELS.cbc.code,
+		'789-8': DEFAULT_LAB_PANELS.cbc.code,
+		'718-7': DEFAULT_LAB_PANELS.cbc.code,
+		'4544-3': DEFAULT_LAB_PANELS.cbc.code,
+		'777-3': DEFAULT_LAB_PANELS.cbc.code,
+		'787-2': DEFAULT_LAB_PANELS.cbc.code,
+		'785-6': DEFAULT_LAB_PANELS.cbc.code,
+		// Lipid
+		'24331-1': DEFAULT_LAB_PANELS.lipid.code,
+		'2093-3': DEFAULT_LAB_PANELS.lipid.code,
+		'13457-7': DEFAULT_LAB_PANELS.lipid.code,
+		'2085-9': DEFAULT_LAB_PANELS.lipid.code,
+		'2571-8': DEFAULT_LAB_PANELS.lipid.code,
+		// Liver
+		'24325-3': DEFAULT_LAB_PANELS.liver.code,
+		'1742-6': DEFAULT_LAB_PANELS.liver.code,
+		'1920-8': DEFAULT_LAB_PANELS.liver.code,
+		'6768-6': DEFAULT_LAB_PANELS.liver.code,
+		'1975-2': DEFAULT_LAB_PANELS.liver.code,
+		// Urinalysis
+		'24357-6': DEFAULT_LAB_PANELS.urinalysis.code,
+		'5769-0': DEFAULT_LAB_PANELS.urinalysis.code,
+		'5770-8': DEFAULT_LAB_PANELS.urinalysis.code,
+		'5792-2': DEFAULT_LAB_PANELS.urinalysis.code,
+		'5802-9': DEFAULT_LAB_PANELS.urinalysis.code,
+		'5811-0': DEFAULT_LAB_PANELS.urinalysis.code,
+		'5794-8': DEFAULT_LAB_PANELS.urinalysis.code
+	};
+
+	// Load ServiceRequest and prefill form
+	async function loadServiceRequestAndPrefill(orderId) {
+		try {
+			const order = await fhirClient.read('ServiceRequest', orderId);
+			
+			// Prefill patient if not already set
+			if (!patientId && order.subject?.reference) {
+				const patientRef = order.subject.reference;
+				if (patientRef.startsWith('Patient/')) {
+					patientId = patientRef.replace('Patient/', '');
+					await loadPatient(patientId);
+					patientSearchQuery = patientName;
+				}
+			}
+
+			// Determine report type from order code
+			let orderLoinc = null;
+			if (order.code?.coding?.[0]?.code) {
+				orderLoinc = order.code.coding[0].code;
+			} else if (order.code?.coding?.[0]?.system === 'http://loinc.org') {
+				orderLoinc = order.code.coding[0].code;
+			}
+
+			if (orderLoinc) {
+				// Check if it's a panel code directly
+				if (labTestData[orderLoinc]) {
+					reportType = orderLoinc;
+				} else if (loincToReportType[orderLoinc]) {
+					// Map individual test to panel
+					reportType = loincToReportType[orderLoinc];
+				} else {
+					// Try to find matching report type by display name
+					const orderDisplay = order.code?.text || order.code?.coding?.[0]?.display || '';
+					const matchedType = reportTypes.find(rt => 
+						orderDisplay.toLowerCase().includes(rt.display.toLowerCase())
+					);
+					if (matchedType) {
+						reportType = matchedType.code;
+					}
+				}
+
+				// Prefill results with component tests for the selected panel
+				if (reportType && labTestData[reportType]) {
+					const components = labTestData[reportType];
+					results = components.map(comp => ({
+						loinc: comp.code,
+						value: '',
+						unit: comp.unit || ''
+					}));
+				}
+			}
+
+			console.log(`[DiagnosticReport] Prefilled from ServiceRequest ${orderId}:`, {
+				patientId,
+				reportType,
+				results: results.length
+			});
+		} catch (e) {
+			console.error('[DiagnosticReport] Failed to load ServiceRequest:', e);
+		}
+	}
+
 	function addResult() {
 		results = [...results, { loinc: '', value: '', unit: '' }];
 	}
 
 	function removeResult(idx) {
 		results = results.filter((_, i) => i !== idx);
+		// Remove from custom unit indices if present
+		customUnitIndices.delete(idx);
+		customUnitIndices = new Set(customUnitIndices);
+	}
+
+	// Auto-fill unit when LOINC code changes
+	function onLoincChange(result, idx) {
+		const defaultUnit = getDefaultUnitForLoincCode(result.loinc, labTestData);
+		if (defaultUnit && !result.unit) {
+			result.unit = defaultUnit;
+			results = [...results]; // Trigger reactivity
+		}
+	}
+
+	// Toggle between dropdown and custom unit input
+	function toggleCustomUnit(idx) {
+		if (customUnitIndices.has(idx)) {
+			customUnitIndices.delete(idx);
+		} else {
+			customUnitIndices.add(idx);
+		}
+		customUnitIndices = new Set(customUnitIndices);
+	}
+
+	// Get observation category based on report type
+	function getObservationCategory() {
+		const rt = reportTypes.find(t => t.code === reportType);
+		if (rt?.category === 'laboratory') {
+			return [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'laboratory' }] }];
+		}
+		return [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs' }] }];
 	}
 
 	async function submitReport() {
@@ -116,7 +291,7 @@
 				const obs = {
 					resourceType: 'Observation',
 					status: 'final',
-					category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'laboratory' }] }],
+					category: getObservationCategory(),
 					code: { coding: [{ system: 'http://loinc.org', code: r.loinc }] },
 					subject: { reference: `Patient/${patientId}` },
 					performer: [{ reference: `Practitioner/${appStore.practitionerId}` }],
@@ -261,7 +436,14 @@
 					<!-- Linked Order -->
 					{#if linkedOrderId}
 						<div class="linked-order">
-							<span>🔗 Linked to Order: {linkedOrderId}</span>
+							<div class="linked-order-header">
+								<span class="linked-order-icon">🔗</span>
+								<span class="linked-order-title">Fulfilling Order</span>
+							</div>
+							<div class="linked-order-id">{linkedOrderId}</div>
+							{#if reportType}
+								<div class="linked-order-prefilled">✓ Form prefilled with ordered tests</div>
+							{/if}
 						</div>
 					{/if}
 
@@ -278,14 +460,22 @@
 
 					<!-- Results -->
 					<div class="results-section">
-						<label>Results</label>
+						<label>
+							Results
+							{#if reportType && reportType !== 'custom'}
+								<span class="hint">Showing tests for selected panel</span>
+							{:else if reportType === 'custom'}
+								<span class="hint">Showing all available tests</span>
+							{/if}
+						</label>
 						{#each results as result, i}
 							<div class="result-row">
 								<input 
 									type="text" 
 									placeholder="LOINC code"
 									bind:value={result.loinc}
-									list="loincs"
+									list="loincs-{reportType || 'all'}"
+									onchange={() => onLoincChange(result, i)}
 									style="flex: 2"
 								/>
 								<input 
@@ -294,12 +484,34 @@
 									bind:value={result.value}
 									style="flex: 1"
 								/>
-								<input 
-									type="text" 
-									placeholder="Unit"
-									bind:value={result.unit}
-									style="flex: 1"
-								/>
+								<div class="unit-field" style="flex: 1.5">
+									{#if customUnitIndices.has(i)}
+										<!-- Custom unit input with datalist -->
+										<input 
+											type="text" 
+											placeholder="Custom unit"
+											bind:value={result.unit}
+											list="ucum-units"
+											class="unit-input"
+										/>
+									{:else}
+										<!-- Dropdown with common units -->
+										<select bind:value={result.unit} class="unit-select">
+											<option value="">Select unit...</option>
+											{#each ucumUnits as u}
+												<option value={u.code}>{u.display}</option>
+											{/each}
+										</select>
+									{/if}
+									<button 
+										type="button" 
+										class="unit-toggle-btn"
+										onclick={() => toggleCustomUnit(i)}
+										title={customUnitIndices.has(i) ? "Use dropdown" : "Type custom unit"}
+									>
+										{customUnitIndices.has(i) ? '▼' : '✎'}
+									</button>
+								</div>
 								{#if results.length > 1}
 									<button type="button" class="remove-btn" onclick={() => removeResult(i)}>×</button>
 								{/if}
@@ -308,13 +520,28 @@
 						<button type="button" class="add-btn" onclick={addResult}>+ Add Result</button>
 					</div>
 
-					<datalist id="loincs">
-						<option value={LOINC_CODES.systolicBP}>Systolic BP</option>
-						<option value={LOINC_CODES.diastolicBP}>Diastolic BP</option>
-						<option value={LOINC_CODES.heartRate}>Heart Rate</option>
-						<option value={LOINC_CODES.bloodGlucose}>Blood Glucose</option>
-						<option value={LOINC_CODES.bodyTemperature}>Temperature</option>
-						<option value={LOINC_CODES.oxygenSaturation}>O2 Sat</option>
+					<!-- Dynamic LOINC datalists based on report type -->
+					{#if reportType && labTestData[reportType]}
+						<!-- Panel-specific datalist -->
+						<datalist id="loincs-{reportType}">
+							{#each labTestData[reportType] as test}
+								<option value={test.code}>{test.display} - {test.fullDisplay}</option>
+							{/each}
+						</datalist>
+					{:else}
+						<!-- All lab tests datalist for custom reports -->
+						<datalist id="loincs-all">
+							{#each Object.values(labTestData).flat() as test}
+								<option value={test.code}>{test.display} - {test.fullDisplay}</option>
+							{/each}
+						</datalist>
+					{/if}
+
+					<!-- UCUM units datalist -->
+					<datalist id="ucum-units">
+						{#each ucumUnits as u}
+							<option value={u.code}>{u.display}</option>
+						{/each}
 					</datalist>
 
 					<!-- Conclusion -->
@@ -433,12 +660,43 @@
 	}
 
 	.linked-order {
-		padding: 10px;
-		background: #F0FDF4;
+		padding: 12px;
+		background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+		border: 1px solid #86EFAC;
 		border-radius: 8px;
-		font-size: 13px;
-		color: #15803D;
 		margin-bottom: 16px;
+	}
+
+	.linked-order-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 4px;
+	}
+
+	.linked-order-icon {
+		font-size: 16px;
+	}
+
+	.linked-order-title {
+		font-size: 13px;
+		font-weight: 600;
+		color: #166534;
+	}
+
+	.linked-order-id {
+		font-size: 12px;
+		color: #15803D;
+		font-family: monospace;
+		margin-left: 24px;
+	}
+
+	.linked-order-prefilled {
+		font-size: 11px;
+		color: #16A34A;
+		margin-top: 6px;
+		margin-left: 24px;
+		font-weight: 500;
 	}
 
 	.results-section {
@@ -446,18 +704,81 @@
 	}
 
 	.results-section label {
-		display: block;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		font-size: 13px;
 		font-weight: 600;
 		color: #374151;
 		margin-bottom: 8px;
 	}
 
+	.hint {
+		font-size: 11px;
+		font-weight: 400;
+		color: #6B7280;
+		background: #F3F4F6;
+		padding: 2px 6px;
+		border-radius: 4px;
+	}
+
 	.result-row {
 		display: flex;
 		gap: 8px;
 		margin-bottom: 8px;
+		align-items: stretch;
+	}
+
+	.result-row input {
+		padding: 10px;
+		border: 1px solid #E5E7EB;
+		border-radius: 6px;
+		font-size: 13px;
+	}
+
+	.unit-field {
+		display: flex;
+		gap: 4px;
 		align-items: center;
+	}
+
+	.unit-select {
+		flex: 1;
+		padding: 10px;
+		border: 1px solid #E5E7EB;
+		border-radius: 6px;
+		font-size: 13px;
+		background: white;
+		cursor: pointer;
+	}
+
+	.unit-select:focus {
+		outline: none;
+		border-color: var(--clinic-color);
+	}
+
+	.unit-input {
+		flex: 1;
+	}
+
+	.unit-toggle-btn {
+		width: 28px;
+		height: 28px;
+		border-radius: 4px;
+		border: 1px solid #E5E7EB;
+		background: #F9FAFB;
+		color: #6B7280;
+		font-size: 12px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.unit-toggle-btn:hover {
+		background: #F3F4F6;
+		color: #374151;
 	}
 
 	.remove-btn {
@@ -469,6 +790,7 @@
 		color: #B91C1C;
 		font-size: 18px;
 		cursor: pointer;
+		flex-shrink: 0;
 	}
 
 	.add-btn {

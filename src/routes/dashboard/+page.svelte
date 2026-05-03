@@ -60,14 +60,16 @@
 				fhirClient.search('Encounter', { _tag: appStore.workshopCode, _summary: 'count' }),
 				fhirClient.search('ServiceRequest', { _tag: appStore.workshopCode, _summary: 'count' }),
 				fhirClient.search('MedicationRequest', { _tag: appStore.workshopCode, _summary: 'count' }),
-				fhirClient.search('DiagnosticReport', { _tag: appStore.workshopCode, _summary: 'count' })
+				fhirClient.search('DiagnosticReport', { _tag: appStore.workshopCode, _summary: 'count' }),
+				fhirClient.search('MedicationDispense', { _tag: appStore.workshopCode, _summary: 'count' })
 			]);
 			inboxCounts = {
 				patient: results[0].total || 0,
 				encounter: results[1].total || 0,
 				serviceRequest: results[2].total || 0,
 				medicationRequest: results[3].total || 0,
-				diagnosticReport: results[4].total || 0
+				diagnosticReport: results[4].total || 0,
+				medicationDispense: results[5].total || 0
 			};
 		} catch (e) {
 			console.error('Failed to load inbox counts:', e);
@@ -202,6 +204,12 @@
 							<a href="/inbox?tab=reports" class="stat-card">
 								<span class="stat-number">{inboxCounts.diagnosticReport}</span>
 								<span class="stat-label">Lab Reports</span>
+							</a>
+						{/if}
+						{#if inboxCounts.medicationDispense !== undefined}
+							<a href="/inbox?tab=dispensed" class="stat-card">
+								<span class="stat-number">{inboxCounts.medicationDispense}</span>
+								<span class="stat-label">Dispensed</span>
 							</a>
 						{/if}
 					{/if}

@@ -122,18 +122,24 @@
 			const patientId = patient.id;
 			
 			// Fetch related resources in parallel
-			const [encounters, observations, conditions, medications] = await Promise.all([
+			const [encounters, observations, conditions, medications, diagnosticReports, serviceRequests, medicationDispenses] = await Promise.all([
 				fhirClient.search('Encounter', { patient: `Patient/${patientId}`, _count: '10' }).catch(() => ({ entry: [] })),
 				fhirClient.search('Observation', { patient: `Patient/${patientId}`, _count: '10', _sort: '-date' }).catch(() => ({ entry: [] })),
 				fhirClient.search('Condition', { patient: `Patient/${patientId}`, _count: '10' }).catch(() => ({ entry: [] })),
-				fhirClient.search('MedicationRequest', { patient: `Patient/${patientId}`, _count: '10', status: 'active' }).catch(() => ({ entry: [] }))
+				fhirClient.search('MedicationRequest', { patient: `Patient/${patientId}`, _count: '10' }).catch(() => ({ entry: [] })),
+				fhirClient.search('DiagnosticReport', { patient: `Patient/${patientId}`, _count: '10', _sort: '-date' }).catch(() => ({ entry: [] })),
+				fhirClient.search('ServiceRequest', { patient: `Patient/${patientId}`, _count: '10' }).catch(() => ({ entry: [] })),
+				fhirClient.search('MedicationDispense', { patient: `Patient/${patientId}`, _count: '10' }).catch(() => ({ entry: [] }))
 			]);
 			
 			selectedPatientResources = {
 				encounters: encounters.entry?.map(e => e.resource) || [],
 				observations: observations.entry?.map(e => e.resource) || [],
 				conditions: conditions.entry?.map(e => e.resource) || [],
-				medications: medications.entry?.map(e => e.resource) || []
+				medications: medications.entry?.map(e => e.resource) || [],
+				diagnosticReports: diagnosticReports.entry?.map(e => e.resource) || [],
+				serviceRequests: serviceRequests.entry?.map(e => e.resource) || [],
+				medicationDispenses: medicationDispenses.entry?.map(e => e.resource) || []
 			};
 		} catch (e) {
 			console.error('Error fetching patient resources:', e);
@@ -372,7 +378,7 @@
 						<h3>Patient Summary</h3>
 						<p>Select a patient from the list to view their International Patient Summary</p>
 						<div class="empty-hint">
-							💡 The summary includes conditions, vital signs, medications, and encounters
+							💡 The summary includes conditions, vital signs, medications, dispensed meds, lab orders, lab reports, and encounters
 						</div>
 					</div>
 				{:else}
@@ -482,6 +488,114 @@
 												<span class="code-label">RxNorm: {med.medicationCodeableConcept?.coding?.[0]?.code}</span>
 											{/if}
 										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Dispensed Medications -->
+					{#if selectedPatientResources.medicationDispenses?.length > 0}
+						<div class="section-card">
+							<h3>💉 Dispensed Medications ({selectedPatientResources.medicationDispenses.length})</h3>
+							<div class="medications-list">
+								{#each selectedPatientResources.medicationDispenses as dispense}
+									<div class="medication-item dispensed">
+										<div class="med-name">
+											{dispense.medicationCodeableConcept?.text || dispense.medicationCodeableConcept?.coding?.[0]?.display || 'Unknown'}
+										</div>
+										<div class="med-meta">
+											<span class="badge badge-dispensed">dispensed</span>
+											{#if dispense.quantity}
+												<span class="quantity-label">Qty: {dispense.quantity.value} {dispense.quantity.unit}</span>
+											{/if}
+										</div>
+										{#if dispense.whenHandedOver}
+											<div class="dispense-date">
+												🕒 {new Date(dispense.whenHandedOver).toLocaleDateString()}
+											</div>
+										{/if}
+										{#if dispense.performer?.[0]?.actor?.display}
+											<div class="dispense-location">
+												🏥 {dispense.performer[0].actor.display}
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Lab Orders / Service Requests -->
+					{#if selectedPatientResources.serviceRequests?.length > 0}
+						<div class="section-card">
+							<h3>🧪 Lab Orders ({selectedPatientResources.serviceRequests.length})</h3>
+							<div class="orders-list">
+								{#each selectedPatientResources.serviceRequests as order}
+									<div class="order-item">
+										<div class="order-header">
+											<div class="order-name">
+												{order.code?.text || order.code?.coding?.[0]?.display || 'Lab Order'}
+											</div>
+											<span class="badge badge-{order.status}">{order.status}</span>
+										</div>
+										<div class="order-meta">
+											{#if order.code?.coding?.[0]?.code}
+												<span class="code-label">LOINC: {order.code?.coding?.[0]?.code}</span>
+											{/if}
+											{#if order.authoredOn}
+												<span class="order-date">🕒 {new Date(order.authoredOn).toLocaleDateString()}</span>
+											{/if}
+										</div>
+										{#if order.requester?.[0]?.display}
+											<div class="order-requester">
+												👤 Ordered by: {order.requester[0].display}
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Diagnostic Reports -->
+					{#if selectedPatientResources.diagnosticReports?.length > 0}
+						<div class="section-card">
+							<h3>📄 Lab Reports ({selectedPatientResources.diagnosticReports.length})</h3>
+							<div class="reports-list">
+								{#each selectedPatientResources.diagnosticReports as report}
+									<div class="report-item">
+										<div class="report-header">
+											<div class="report-name">
+												{report.code?.text || report.code?.coding?.[0]?.display || 'Lab Report'}
+											</div>
+											<span class="badge badge-{report.status}">{report.status}</span>
+										</div>
+										{#if report.result && report.result.length > 0}
+											<div class="report-results">
+												{#each report.result as resultRef}
+													<div class="result-chip">🔬 {resultRef.display || resultRef.reference}</div>
+												{/each}
+											</div>
+										{/if}
+										<div class="report-meta">
+											{#if report.code?.coding?.[0]?.code}
+												<span class="code-label">LOINC: {report.code?.coding?.[0]?.code}</span>
+											{/if}
+											{#if report.effectiveDateTime}
+												<span class="report-date">🕒 {new Date(report.effectiveDateTime).toLocaleDateString()}</span>
+											{/if}
+										</div>
+										{#if report.performer?.[0]?.display}
+											<div class="report-performer">
+												🏥 Reported by: {report.performer[0].display}
+											</div>
+										{/if}
+										{#if report.conclusion}
+											<div class="report-conclusion">
+												💡 {report.conclusion}
+											</div>
+										{/if}
 									</div>
 								{/each}
 							</div>
@@ -1160,6 +1274,118 @@
 		align-items: center;
 	}
 
+	/* Lab Orders */
+	.orders-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.order-item {
+		padding: 12px;
+		background: white;
+		border-radius: 8px;
+		border: 1px solid #E2E8F0;
+	}
+
+	.order-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 6px;
+	}
+
+	.order-name {
+		font-weight: 600;
+		color: #1E293B;
+	}
+
+	.order-meta {
+		display: flex;
+		gap: 12px;
+		font-size: 12px;
+		color: #64748B;
+		margin-bottom: 4px;
+	}
+
+	.order-date {
+		color: #94A3B8;
+	}
+
+	.order-requester {
+		font-size: 12px;
+		color: #64748B;
+		margin-top: 4px;
+	}
+
+	/* Lab Reports */
+	.reports-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.report-item {
+		padding: 12px;
+		background: white;
+		border-radius: 8px;
+		border: 1px solid #E2E8F0;
+	}
+
+	.report-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 8px;
+	}
+
+	.report-name {
+		font-weight: 600;
+		color: #1E293B;
+	}
+
+	.report-results {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 8px;
+	}
+
+	.result-chip {
+		font-size: 11px;
+		background: #F1F5F9;
+		color: #475569;
+		padding: 3px 8px;
+		border-radius: 12px;
+	}
+
+	.report-meta {
+		display: flex;
+		gap: 12px;
+		font-size: 12px;
+		color: #64748B;
+		margin-bottom: 4px;
+	}
+
+	.report-date {
+		color: #94A3B8;
+	}
+
+	.report-performer {
+		font-size: 12px;
+		color: #64748B;
+		margin-top: 4px;
+	}
+
+	.report-conclusion {
+		font-size: 13px;
+		color: #1E40AF;
+		background: #EFF6FF;
+		padding: 8px 10px;
+		border-radius: 6px;
+		margin-top: 8px;
+	}
+
 	/* Encounters */
 	.encounters-timeline {
 		display: flex;
@@ -1216,6 +1442,33 @@
 	.badge-unknown {
 		background: #F1F5F9;
 		color: #64748B;
+	}
+
+	.badge-dispensed {
+		background: #D1FAE5;
+		color: #065F46;
+	}
+
+	.medication-item.dispensed {
+		border-left: 3px solid #10B981;
+	}
+
+	.quantity-label {
+		font-size: 11px;
+		color: #059669;
+		font-weight: 500;
+	}
+
+	.dispense-date {
+		font-size: 11px;
+		color: #64748B;
+		margin-top: 4px;
+	}
+
+	.dispense-location {
+		font-size: 11px;
+		color: #64748B;
+		margin-top: 2px;
 	}
 
 	/* Code Labels */

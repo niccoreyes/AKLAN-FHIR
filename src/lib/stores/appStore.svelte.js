@@ -56,13 +56,16 @@ export function createAppStore() {
 	let view = $state(initialParams.view);
 	
 	// UI state
-	let isLoading = $state(false);
+		let isLoading = $state(false);
 	let error = $state(null);
 	let notifications = $state([]);
 	let groupFilterEnabled = $state(true); // Default: show only group data
 	
 	// Participant record (Practitioner resource)
 	let practitionerId = $state(null);
+	
+	// Track if welcome message has been shown to prevent duplicates
+	let hasShownWelcome = $state(false);
 
 	// Derived values
 	const clinic = $derived(CLINICS.find(c => c.id === clinicId) || null);
@@ -185,11 +188,15 @@ export function createAppStore() {
 				// Save registration state to sessionStorage
 				saveRegistrationState();
 				
-				addNotification({
-					type: 'info',
-					message: `Welcome back!`,
-					duration: 1500
-				});
+				// Only show welcome message once per session
+				if (!hasShownWelcome) {
+					hasShownWelcome = true;
+					addNotification({
+						type: 'info',
+						message: `Welcome back!`,
+						duration: 1500
+					});
+				}
 			} else {
 				// No existing practitioner found - create new one
 				console.log(`[Practitioner] No existing practitioner found with name "${userName}", creating new one...`);
@@ -350,6 +357,7 @@ export function createAppStore() {
 		practitionerId = null;
 		notifications = [];
 		error = null;
+		hasShownWelcome = false;
 		
 		// Navigate to home
 		window.location.href = '/';

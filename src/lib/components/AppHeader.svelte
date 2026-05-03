@@ -11,11 +11,12 @@
 	let showClinicSwitcher = $state(false);
 	let showUserMenu = $state(false);
 	let isRegistering = $state(false);
+	let hasRegistered = $state(false);
 
 	// Auto-register participant when configured but no practitionerId
 	// This handles clinic switching where practitionerId is lost
 	$effect(() => {
-		if (browser && appStore.isConfigured && !appStore.practitionerId && !appStore.isLoading && !isRegistering) {
+		if (browser && appStore.isConfigured && !appStore.practitionerId && !appStore.isLoading && !isRegistering && !hasRegistered) {
 			// Don't auto-register if we're on the workshop page (manual registration)
 			if (window.location.pathname === '/workshop') return;
 			
@@ -23,6 +24,7 @@
 			isRegistering = true;
 			appStore.registerParticipant().then(() => {
 				isRegistering = false;
+				hasRegistered = true;
 			}).catch(() => {
 				isRegistering = false;
 			});
