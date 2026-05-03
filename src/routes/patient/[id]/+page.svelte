@@ -357,7 +357,7 @@
 						{@const encounterServiceRequests = serviceRequests.filter(sr => sr.encounter?.reference === `Encounter/${encounter.id}`)}
 						{@const encounterReports = diagnosticReports.filter(rep => rep.encounter?.reference === `Encounter/${encounter.id}`)}
 						
-						<EncounterCard 
+						<EncounterCard
 							{encounter}
 							observations={encounterObservations}
 							medications={encounterMedications}
@@ -365,6 +365,15 @@
 							diagnosticReports={encounterReports}
 							patientId={patient.id}
 							clinicColor={clinicColor}
+							onDelete={() => {
+								// Refresh patient data after encounter deletion
+								appStore.addNotification({
+									type: 'success',
+									message: 'Visit and linked resources deleted',
+									duration: 2000
+								});
+								loadPatientData();
+							}}
 						/>
 					{/each}
 				</div>

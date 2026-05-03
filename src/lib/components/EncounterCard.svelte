@@ -38,6 +38,49 @@
 	
 	// State
 	let isExpanded = $state(false);
+	let isDeleting = $state(false);
+
+	// Recursive delete: delete encounter and all dependent resources
+	async function deleteEncounter() {
+		if (!confirm(`Delete this visit and ALL ${getResourceCount()} linked resources?\n\nThis cannot be undone.`)) {
+			return;
+		}
+
+		isDeleting = true;
+
+		try {
+			// Delete all dependent resources first
+			const resourcesToDelete = [
+				...observations.map(o => ({ type: 'Observation', id: o.id })),
+				...medications.map(m => ({ type: 'MedicationRequest', id: m.id })),
+				...serviceRequests.map(s => ({ type: 'ServiceRequest', id: s.id })),
+				...diagnosticReports.map(d => ({ type: 'DiagnosticReport', id: d.id }))
+			];
+
+			// Delete each resource sequentially
+			for (const res of resourcesToDelete) {
+				try {
+					await fhirClient.delete(res.type, res.id);
+				} catch (e) {
+					console.warn(`Failed to delete ${res.type}/${res.id}:`, e);
+				}
+			}
+
+			// Delete the encounter last
+			await fhirClient.delete('Encounter', encounterId);
+
+			// Notify parent of successful deletion
+			onDelete?.();
+		} catch (e) {
+			alert('Failed to delete encounter: ' + (e.message || 'Unknown error'));
+		} finally {
+			isDeleting = false;
+		}
+	}
+
+	function getResourceCount() {
+		return observations.length + medications.length + serviceRequests.length + diagnosticReports.length;
+	}
 	
 	// Derived values
 	let encounterId = $derived(encounter?.id || '');
@@ -217,8 +260,24 @@
 				</div>
 			</div>
 			
-			<div class="expand-icon" class:expanded={isExpanded}>
-				{isExpanded ? '▼' : '▶'}
+			<div class="header-actions">
+				{#if isExpanded}
+					<button
+						type="button"
+						class="btn-delete-encounter"
+						onclick={(e) => {
+							e.stopPropagation();
+							deleteEncounter();
+						}}
+						disabled={isDeleting}
+						title={getResourceCount() > 0 ? `Delete visit and ${getResourceCount()} linked resources` : 'Delete visit'}
+					>
+						{isDeleting ? '⏳' : '🗑️'}
+					</button>
+				{/if}
+				<div class="expand-icon" class:expanded={isExpanded}>
+					{isExpanded ? '▼' : '▶'}
+				</div>
 			</div>
 		</button>
 		
@@ -419,14 +478,41 @@
 		align-items: center;
 		gap: 4px;
 	}
-	
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.btn-delete-encounter {
+		background: none;
+		border: none;
+		font-size: 16px;
+		cursor: pointer;
+		padding: 4px 8px;
+		border-radius: 4px;
+		transition: all 0.2s;
+		opacity: 0.7;
+	}
+
+	.btn-delete-encounter:hover {
+		background: #FEE2E2;
+		opacity: 1;
+	}
+
+	.btn-delete-encounter:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
 	.expand-icon {
 		font-size: 14px;
 		color: #9CA3AF;
 		padding: 4px;
 		transition: transform 0.2s;
 	}
-	
+
 	.expand-icon.expanded {
 		transform: rotate(0deg);
 	}
