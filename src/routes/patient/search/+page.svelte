@@ -19,10 +19,12 @@
   let nextPageUrl = $state(null);
   let hasMore = $state(false);
 
-  // Redirect if not configured (use replaceState to avoid back-button issues)
+  // Check configuration on mount
   onMount(async () => {
     if (browser && !appStore.isConfigured) {
-      window.location.replace('/workshop');
+      // Show setup prompt instead of redirecting
+      isLoading = false;
+      hasSearched = true;
       return;
     }
     
@@ -203,7 +205,17 @@
     </div>
   {/if}
 
-  {#if hasSearched}
+  {#if !appStore.isConfigured}
+    <div class="setup-prompt">
+      <div class="setup-icon">🎓</div>
+      <h3>Join a Workshop</h3>
+      <p>You need to join a workshop to view the patient list.</p>
+      <a href="/workshop" class="btn-primary">
+        Enter Workshop
+      </a>
+      <p class="setup-hint">Or you can view patients on the <a href="/">public viewer</a></p>
+    </div>
+  {:else if hasSearched}
     <div class="results-section">
       <div class="results-header">
         <h2>👥 Patient Deck ({appStore.workshopCode})</h2>
@@ -658,16 +670,39 @@
     margin-bottom: 6px;
   }
 
-  .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: currentColor;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  .setup-prompt {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border: 2px solid #BFDBFE;
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
   }
 
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  .setup-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
   }
+
+  .setup-prompt h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1E40AF;
+    margin: 0 0 12px 0;
+  }
+
+  .setup-prompt p {
+    color: #475569;
+    margin: 0 0 24px 0;
+  }
+
+  .setup-hint {
+    font-size: 14px;
+    margin-top: 16px;
+  }
+
+  .setup-hint a {
+    color: #2563EB;
+    text-decoration: underline;
+  }
+
 </style>

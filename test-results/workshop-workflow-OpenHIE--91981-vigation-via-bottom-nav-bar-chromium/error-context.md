@@ -50,7 +50,7 @@ Call log:
         - link "← Back to Dashboard" [ref=e24] [cursor=pointer]:
           - /url: /dashboard
         - heading "🔍 Find Patient" [level=1] [ref=e25]
-        - paragraph [ref=e26]: "Showing all 7 patients from workshop: AK26-A"
+        - paragraph [ref=e26]: "Showing all 11 patients from workshop: AK26-A"
       - generic [ref=e27]:
         - generic [ref=e28]:
           - textbox "Filter patients by name (or leave empty to show all)..." [ref=e29]
@@ -61,17 +61,17 @@ Call log:
       - generic [ref=e35]:
         - generic [ref=e36]:
           - heading "👥 Patient Deck (AK26-A)" [level=2] [ref=e37]
-          - generic [ref=e38]: 7 of 7 patients
+          - generic [ref=e38]: 11 of 11 patients
         - generic [ref=e39]:
           - generic [ref=e40]:
             - generic [ref=e41]:
               - generic [ref=e42]: 👩
               - generic [ref=e43]:
-                - heading "Test1777794937695 Workflow" [level=3] [ref=e44]
+                - heading "Test1777795520695 Workflow" [level=3] [ref=e44]
                 - generic [ref=e45]:
                   - generic [ref=e47]: 40 years • female
                   - generic [ref=e48]: 🏷️ AK26-A
-                - generic [ref=e49]: "ID: 2033"
+                - generic [ref=e49]: "ID: 2037"
             - generic [ref=e50]:
               - button "👁️ View" [ref=e51] [cursor=pointer]
               - button "📋 Visit" [ref=e52] [cursor=pointer]
@@ -80,11 +80,11 @@ Call log:
             - generic [ref=e55]:
               - generic [ref=e56]: 👩
               - generic [ref=e57]:
-                - heading "Test1777794933074 Workflow" [level=3] [ref=e58]
+                - heading "Test1777795513002 Workflow" [level=3] [ref=e58]
                 - generic [ref=e59]:
                   - generic [ref=e61]: 40 years • female
                   - generic [ref=e62]: 🏷️ AK26-A
-                - generic [ref=e63]: "ID: 2032"
+                - generic [ref=e63]: "ID: 2036"
             - generic [ref=e64]:
               - button "👁️ View" [ref=e65] [cursor=pointer]
               - button "📋 Visit" [ref=e66] [cursor=pointer]
@@ -93,11 +93,11 @@ Call log:
             - generic [ref=e69]:
               - generic [ref=e70]: 👩
               - generic [ref=e71]:
-                - heading "Test1777794896652 Workflow" [level=3] [ref=e72]
+                - heading "Test1777795143689 Workflow" [level=3] [ref=e72]
                 - generic [ref=e73]:
                   - generic [ref=e75]: 40 years • female
                   - generic [ref=e76]: 🏷️ AK26-A
-                - generic [ref=e77]: "ID: 2031"
+                - generic [ref=e77]: "ID: 2035"
             - generic [ref=e78]:
               - button "👁️ View" [ref=e79] [cursor=pointer]
               - button "📋 Visit" [ref=e80] [cursor=pointer]
@@ -106,11 +106,11 @@ Call log:
             - generic [ref=e83]:
               - generic [ref=e84]: 👩
               - generic [ref=e85]:
-                - heading "Test1777794891619 Workflow" [level=3] [ref=e86]
+                - heading "Test1777795138620 Workflow" [level=3] [ref=e86]
                 - generic [ref=e87]:
                   - generic [ref=e89]: 40 years • female
                   - generic [ref=e90]: 🏷️ AK26-A
-                - generic [ref=e91]: "ID: 2030"
+                - generic [ref=e91]: "ID: 2034"
             - generic [ref=e92]:
               - button "👁️ View" [ref=e93] [cursor=pointer]
               - button "📋 Visit" [ref=e94] [cursor=pointer]
@@ -119,11 +119,11 @@ Call log:
             - generic [ref=e97]:
               - generic [ref=e98]: 👩
               - generic [ref=e99]:
-                - heading "Test1777794796533 Workflow" [level=3] [ref=e100]
+                - heading "Test1777794937695 Workflow" [level=3] [ref=e100]
                 - generic [ref=e101]:
                   - generic [ref=e103]: 40 years • female
                   - generic [ref=e104]: 🏷️ AK26-A
-                - generic [ref=e105]: "ID: 2029"
+                - generic [ref=e105]: "ID: 2033"
             - generic [ref=e106]:
               - button "👁️ View" [ref=e107] [cursor=pointer]
               - button "📋 Visit" [ref=e108] [cursor=pointer]
@@ -132,29 +132,81 @@ Call log:
             - generic [ref=e111]:
               - generic [ref=e112]: 👩
               - generic [ref=e113]:
-                - heading "Test1777794791416 Workflow" [level=3] [ref=e114]
+                - heading "Test1777794933074 Workflow" [level=3] [ref=e114]
                 - generic [ref=e115]:
                   - generic [ref=e117]: 40 years • female
                   - generic [ref=e118]: 🏷️ AK26-A
-                - generic [ref=e119]: "ID: 2028"
+                - generic [ref=e119]: "ID: 2032"
             - generic [ref=e120]:
               - button "👁️ View" [ref=e121] [cursor=pointer]
               - button "📋 Visit" [ref=e122] [cursor=pointer]
               - button "🩺 Vitals" [ref=e123] [cursor=pointer]
           - generic [ref=e124]:
             - generic [ref=e125]:
-              - generic [ref=e126]: 👨
+              - generic [ref=e126]: 👩
               - generic [ref=e127]:
-                - heading "Roger Rogerson" [level=3] [ref=e128]
+                - heading "Test1777794896652 Workflow" [level=3] [ref=e128]
                 - generic [ref=e129]:
-                  - generic [ref=e131]: 0 years • male
+                  - generic [ref=e131]: 40 years • female
                   - generic [ref=e132]: 🏷️ AK26-A
-                - generic [ref=e133]: "ID: 2027"
+                - generic [ref=e133]: "ID: 2031"
             - generic [ref=e134]:
               - button "👁️ View" [ref=e135] [cursor=pointer]
               - button "📋 Visit" [ref=e136] [cursor=pointer]
               - button "🩺 Vitals" [ref=e137] [cursor=pointer]
-  - generic [ref=e138]: Join Workshop - OpenHIE Mock EHR
+          - generic [ref=e138]:
+            - generic [ref=e139]:
+              - generic [ref=e140]: 👩
+              - generic [ref=e141]:
+                - heading "Test1777794891619 Workflow" [level=3] [ref=e142]
+                - generic [ref=e143]:
+                  - generic [ref=e145]: 40 years • female
+                  - generic [ref=e146]: 🏷️ AK26-A
+                - generic [ref=e147]: "ID: 2030"
+            - generic [ref=e148]:
+              - button "👁️ View" [ref=e149] [cursor=pointer]
+              - button "📋 Visit" [ref=e150] [cursor=pointer]
+              - button "🩺 Vitals" [ref=e151] [cursor=pointer]
+          - generic [ref=e152]:
+            - generic [ref=e153]:
+              - generic [ref=e154]: 👩
+              - generic [ref=e155]:
+                - heading "Test1777794796533 Workflow" [level=3] [ref=e156]
+                - generic [ref=e157]:
+                  - generic [ref=e159]: 40 years • female
+                  - generic [ref=e160]: 🏷️ AK26-A
+                - generic [ref=e161]: "ID: 2029"
+            - generic [ref=e162]:
+              - button "👁️ View" [ref=e163] [cursor=pointer]
+              - button "📋 Visit" [ref=e164] [cursor=pointer]
+              - button "🩺 Vitals" [ref=e165] [cursor=pointer]
+          - generic [ref=e166]:
+            - generic [ref=e167]:
+              - generic [ref=e168]: 👩
+              - generic [ref=e169]:
+                - heading "Test1777794791416 Workflow" [level=3] [ref=e170]
+                - generic [ref=e171]:
+                  - generic [ref=e173]: 40 years • female
+                  - generic [ref=e174]: 🏷️ AK26-A
+                - generic [ref=e175]: "ID: 2028"
+            - generic [ref=e176]:
+              - button "👁️ View" [ref=e177] [cursor=pointer]
+              - button "📋 Visit" [ref=e178] [cursor=pointer]
+              - button "🩺 Vitals" [ref=e179] [cursor=pointer]
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - generic [ref=e182]: 👨
+              - generic [ref=e183]:
+                - heading "Roger Rogerson" [level=3] [ref=e184]
+                - generic [ref=e185]:
+                  - generic [ref=e187]: 0 years • male
+                  - generic [ref=e188]: 🏷️ AK26-A
+                - generic [ref=e189]: "ID: 2027"
+            - generic [ref=e190]:
+              - button "👁️ View" [ref=e191] [cursor=pointer]
+              - button "📋 Visit" [ref=e192] [cursor=pointer]
+              - button "🩺 Vitals" [ref=e193] [cursor=pointer]
+  - generic [ref=e194]: Join Workshop - OpenHIE Mock EHR
 ```
 
 # Test source
