@@ -1,18 +1,9 @@
 <script>
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { appStore } from '$stores/appStore.svelte.js';
-	import { terminologyStore } from '$stores/terminologyStore.svelte.js';
 	import { fhirClient } from '$services/fhir-client.js';
 	import { FHIR_CONFIG } from '$constants';
-
-	// Redirect if not configured
-	onMount(() => {
-		if (browser && !appStore.isConfigured) {
-			goto('/');
-		}
-	});
+	import AppHeader from '$components/AppHeader.svelte';
 
 	// Form state
 	let method = $state('GET');
@@ -127,20 +118,23 @@
 	}
 </script>
 
-{#if appStore.isConfigured}
-	<div class="developer-page">
-		<header class="dev-header">
-			<h1>🔧 Developer Mode</h1>
-			<p>Test FHIR API calls directly</p>
-			<button class="back-button" on:click={() => appStore.toggleView()}>
-				← Back to Clinical View
-			</button>
-		</header>
+<svelte:head>
+	<title>Technical Dashboard | OpenHIE Mock EHR</title>
+</svelte:head>
 
-		<div class="dev-content">
+<div class="developer-page">
+	<AppHeader active="developer" />
+
+	<div class="content-area">
+		<div class="page-title">
+			<h2>🔧 Developer Mode</h2>
+			<p>Test FHIR API calls directly against the public FHIR server</p>
+		</div>
+
+		<div class="panels-container">
 			<!-- Request Builder -->
-			<div class="request-panel">
-				<h2>Request Builder</h2>
+			<div class="panel">
+				<h3>Request Builder</h3>
 				
 				<!-- Method & Resource -->
 				<div class="form-row">
@@ -193,7 +187,7 @@
 							class="json-input"
 							rows="10"
 						></textarea>
-						<button class="format-btn" on:click={() => requestBody = prettifyJSON(requestBody)}>
+						<button class="format-btn" onclick={() => requestBody = prettifyJSON(requestBody)}>
 							Format JSON
 						</button>
 					</div>
@@ -201,22 +195,16 @@
 
 				<!-- Sample Requests -->
 				<div class="samples">
-					<label>Quick Samples:</label>
-					<button class="sample-btn" on:click={() => loadSample('searchPatient')}>
-						Search Patient
-					</button>
-					<button class="sample-btn" on:click={() => loadSample('createPatient')}>
-						Create Patient
-					</button>
-					<button class="sample-btn" on:click={() => loadSample('terminologyLookup')}>
-						Terminology Lookup
-					</button>
+					<span class="samples-label">Quick Samples:</span>
+					<button class="sample-btn" onclick={() => loadSample('searchPatient')}>Search Patient</button>
+					<button class="sample-btn" onclick={() => loadSample('createPatient')}>Create Patient</button>
+					<button class="sample-btn" onclick={() => loadSample('terminologyLookup')}>Terminology Lookup</button>
 				</div>
 
 				<!-- Send Button -->
 				<button 
 					class="send-btn"
-					on:click={executeRequest}
+					onclick={executeRequest}
 					disabled={isLoading}
 				>
 					{#if isLoading}
@@ -235,8 +223,8 @@
 
 			<!-- Response Panel -->
 			{#if response}
-				<div class="response-panel">
-					<h2>Response</h2>
+				<div class="panel">
+					<h3>Response</h3>
 					<div class="response-meta">
 						<span class="status-badge status-{Math.floor(response.status / 100)}xx">
 							{response.status} {response.statusText}
@@ -245,124 +233,117 @@
 						<span class="timestamp">{new Date(response.timestamp).toLocaleTimeString()}</span>
 					</div>
 					
-					<pre class="response-body">{JSON.stringify(response.data, null, 2)}</pre>
+					<pre class="json-display">{JSON.stringify(response.data, null, 2)}</pre>
 				</div>
 			{/if}
 
 			<!-- History -->
 			{#if history.length > 0}
-				<div class="history-panel">
-					<h2>Recent Requests</h2>
-					{#each history as item}
-						<div class="history-item">
-							<span class="history-method">{item.method}</span>
-							<span class="history-url">{item.url}</span>
-							<span class="history-status status-{Math.floor(item.status / 100)}xx">
-								{item.status}
-							</span>
-							<span class="history-duration">{item.duration}ms</span>
-						</div>
-					{/each}
+				<div class="panel">
+					<h3>Recent Requests</h3>
+					<div class="history-list">
+						{#each history as item}
+							<div class="history-item">
+								<span class="history-method">{item.method}</span>
+								<span class="history-url">{item.url}</span>
+								<span class="history-status status-{Math.floor(item.status / 100)}xx">{item.status}</span>
+								<span class="history-duration">{item.duration}ms</span>
+							</div>
+						{/each}
+					</div>
 				</div>
 			{/if}
 		</div>
 	</div>
-{:else}
-	<div class="loading">
-		<p>Redirecting to setup...</p>
-	</div>
-{/if}
+</div>
 
 <style>
 	.developer-page {
 		min-height: 100vh;
-		background: #1F2937;
-		color: #F9FAFB;
+		background: #F8FAFC;
 	}
 
-	.dev-header {
-		padding: 16px;
-		background: #111827;
-		border-bottom: 1px solid #374151;
+	.content-area {
+		padding: 24px;
+		max-width: 1000px;
+		margin: 0 auto;
 	}
 
-	.dev-header h1 {
+	.page-title {
+		margin-bottom: 24px;
+	}
+
+	.page-title h2 {
 		margin: 0 0 4px 0;
 		font-size: 20px;
+		color: #1E293B;
 	}
 
-	.dev-header p {
+	.page-title p {
 		margin: 0;
 		font-size: 14px;
-		color: #9CA3AF;
+		color: #64748B;
 	}
 
-	.back-button {
-		margin-top: 12px;
-		padding: 8px 16px;
-		background: #374151;
-		border: none;
-		border-radius: 6px;
-		color: white;
-		cursor: pointer;
-		font-size: 14px;
-	}
-
-	.dev-content {
-		padding: 16px;
+	.panels-container {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 20px;
 	}
 
-	.request-panel,
-	.response-panel,
-	.history-panel {
-		background: #111827;
-		border-radius: 8px;
-		padding: 16px;
+	.panel {
+		background: white;
+		border: 1px solid #E2E8F0;
+		border-radius: 12px;
+		padding: 20px;
 	}
 
-	.request-panel h2,
-	.response-panel h2,
-	.history-panel h2 {
+	.panel h3 {
 		margin: 0 0 16px 0;
-		font-size: 16px;
+		font-size: 14px;
+		font-weight: 600;
+		color: #475569;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
 	.form-row {
 		display: flex;
-		gap: 8px;
+		gap: 10px;
 		margin-bottom: 16px;
 		flex-wrap: wrap;
 	}
 
 	.method-select {
 		padding: 10px 16px;
-		background: #374151;
-		border: 1px solid #4B5563;
-		border-radius: 6px;
-		color: white;
+		background: #F8FAFC;
+		border: 1px solid #E2E8F0;
+		border-radius: 8px;
+		color: #1E293B;
 		font-family: monospace;
+		font-size: 14px;
+		font-weight: 600;
 	}
 
 	.resource-select {
 		padding: 10px 16px;
-		background: #374151;
-		border: 1px solid #4B5563;
-		border-radius: 6px;
-		color: white;
+		background: white;
+		border: 1px solid #E2E8F0;
+		border-radius: 8px;
+		color: #1E293B;
 		flex: 1;
+		font-size: 14px;
 	}
 
 	.id-input,
 	.full-width-input {
 		padding: 10px 16px;
-		background: #374151;
-		border: 1px solid #4B5563;
-		border-radius: 6px;
-		color: white;
+		background: white;
+		border: 1px solid #E2E8F0;
+		border-radius: 8px;
+		color: #1E293B;
 		font-family: monospace;
+		font-size: 14px;
 	}
 
 	.id-input {
@@ -380,17 +361,18 @@
 	.form-group label {
 		display: block;
 		margin-bottom: 6px;
-		font-size: 14px;
-		color: #9CA3AF;
+		font-size: 13px;
+		font-weight: 500;
+		color: #475569;
 	}
 
 	.json-input {
 		width: 100%;
 		padding: 12px;
-		background: #1F2937;
-		border: 1px solid #4B5563;
-		border-radius: 6px;
-		color: #E5E7EB;
+		background: #F8FAFC;
+		border: 1px solid #E2E8F0;
+		border-radius: 8px;
+		color: #1E293B;
 		font-family: monospace;
 		font-size: 13px;
 		resize: vertical;
@@ -399,12 +381,17 @@
 	.format-btn {
 		margin-top: 8px;
 		padding: 6px 12px;
-		background: #4B5563;
-		border: none;
-		border-radius: 4px;
-		color: white;
+		background: #F1F5F9;
+		border: 1px solid #E2E8F0;
+		border-radius: 6px;
+		color: #475569;
 		font-size: 12px;
 		cursor: pointer;
+		font-weight: 500;
+	}
+
+	.format-btn:hover {
+		background: #E2E8F0;
 	}
 
 	.samples {
@@ -415,31 +402,35 @@
 		margin-bottom: 16px;
 	}
 
-	.samples label {
-		font-size: 14px;
-		color: #9CA3AF;
+	.samples-label {
+		font-size: 13px;
+		color: #64748B;
+		font-weight: 500;
 	}
 
 	.sample-btn {
 		padding: 6px 12px;
-		background: #374151;
-		border: 1px solid #4B5563;
-		border-radius: 4px;
-		color: white;
+		background: #F8FAFC;
+		border: 1px solid #E2E8F0;
+		border-radius: 6px;
+		color: #475569;
 		font-size: 12px;
 		cursor: pointer;
+		font-weight: 500;
 	}
 
 	.sample-btn:hover {
-		background: #4B5563;
+		background: #EFF6FF;
+		border-color: #2563EB;
+		color: #2563EB;
 	}
 
 	.send-btn {
 		width: 100%;
 		padding: 14px 24px;
-		background: #059669;
+		background: #2563EB;
 		border: none;
-		border-radius: 6px;
+		border-radius: 8px;
 		color: white;
 		font-size: 16px;
 		font-weight: 600;
@@ -448,10 +439,11 @@
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
+		box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 	}
 
 	.send-btn:hover:not(:disabled) {
-		background: #047857;
+		background: #1D4ED8;
 	}
 
 	.send-btn:disabled {
@@ -471,9 +463,9 @@
 	.error-message {
 		margin-top: 12px;
 		padding: 12px;
-		background: #FEE2E2;
+		background: #FEF2F2;
 		border: 1px solid #FECACA;
-		border-radius: 6px;
+		border-radius: 8px;
 		color: #DC2626;
 		font-size: 14px;
 	}
@@ -487,89 +479,84 @@
 	}
 
 	.status-badge {
-		padding: 4px 8px;
-		border-radius: 4px;
+		padding: 4px 10px;
+		border-radius: 6px;
 		font-size: 12px;
-		font-weight: 600;
+		font-weight: 700;
 	}
 
 	.status-2xx {
-		background: #D1FAE5;
-		color: #047857;
+		background: #DCFCE7;
+		color: #166534;
 	}
 
 	.status-4xx {
-		background: #FEE2E2;
+		background: #FEF2F2;
 		color: #DC2626;
 	}
 
 	.status-5xx {
-		background: #FEE2E2;
-		color: #B91C1C;
+		background: #FEF2F2;
+		color: #991B1B;
 	}
 
 	.duration,
 	.timestamp {
 		font-size: 12px;
-		color: #9CA3AF;
+		color: #94A3B8;
 	}
 
-	.response-body {
-		background: #1F2937;
-		border: 1px solid #374151;
-		border-radius: 6px;
-		padding: 12px;
-		font-family: monospace;
-		font-size: 12px;
+	.json-display {
+		background: #1E293B;
+		color: #E2E8F0;
+		padding: 16px;
+		border-radius: 8px;
 		overflow-x: auto;
-		white-space: pre-wrap;
-		word-break: break-all;
-		color: #E5E7EB;
+		font-size: 12px;
 		max-height: 400px;
 		overflow-y: auto;
+		font-family: monospace;
+		white-space: pre-wrap;
+		word-break: break-all;
+	}
+
+	.history-list {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
 	}
 
 	.history-item {
 		display: flex;
-		gap: 8px;
+		gap: 10px;
 		align-items: center;
-		padding: 8px;
-		background: #1F2937;
-		border-radius: 4px;
-		margin-bottom: 4px;
+		padding: 10px;
+		background: #F8FAFC;
+		border-radius: 8px;
 		font-size: 13px;
 		font-family: monospace;
 	}
 
 	.history-method {
-		color: #10B981;
-		font-weight: 600;
+		color: #2563EB;
+		font-weight: 700;
 		min-width: 50px;
 	}
 
 	.history-url {
 		flex: 1;
-		color: #E5E7EB;
+		color: #1E293B;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.history-status {
-		font-weight: 600;
+		font-weight: 700;
 	}
 
 	.history-duration {
-		color: #9CA3AF;
+		color: #94A3B8;
 		font-size: 11px;
-	}
-
-	.loading {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 100vh;
-		background: #1F2937;
-		color: #9CA3AF;
 	}
 </style>

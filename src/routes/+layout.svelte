@@ -1,16 +1,7 @@
 <script>
-	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { appStore } from '$stores/appStore.svelte.js';
-	import { terminologyStore } from '$stores/terminologyStore.svelte.js';
-
-	// Load terminology codes on mount
-	onMount(async () => {
-		if (browser) {
-			await terminologyStore.loadCodes();
-		}
-	});
 
 	// Handle URL parameter changes using $effect
 	$effect(() => {

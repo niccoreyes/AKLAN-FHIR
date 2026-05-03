@@ -1,7 +1,7 @@
-# OpenHIE Mock EMR
+# OpenHIE Mock EHR
 ## FHIR Fundamentals 2026 - Aklan Workshop
 
-An interactive, mobile-first Mock EMR for demonstrating OpenHIE interoperability and FHIR data exchange.
+An interactive, mobile-first Mock EHR for demonstrating OpenHIE interoperability and FHIR data exchange.
 
 🚀 **Live Demo**: [https://aklan-fhir.vercel.app](https://aklan-fhir.vercel.app)
 

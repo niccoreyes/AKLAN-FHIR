@@ -1,5 +1,5 @@
 # UI/UX Specification v1.0
-## OpenHIE Mock EMR - Design System & Component Specifications
+## OpenHIE Mock EHR - Design System & Component Specifications
 
 **Date**: May 2026  
 **Status**: Draft for Review  
@@ -518,7 +518,7 @@ Sound: Optional pleasant chime
 ┌─────────────────────────────────────────┐
 │                                         │
 │   Welcome to                            │
-│   OpenHIE Mock EMR                      │
+│   OpenHIE Mock EHR                      │
 │                                         │
 │   FHIR Fundamentals 2026                │
 │   Aklan Workshop                        │

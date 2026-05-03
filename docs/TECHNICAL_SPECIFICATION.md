@@ -1,5 +1,5 @@
 # Technical Specification v1.0
-## OpenHIE Mock EMR - FHIR Fundamentals 2026
+## OpenHIE Mock EHR - FHIR Fundamentals 2026
 
 **Date**: May 2026  
 **Status**: Draft for Review  
@@ -1113,7 +1113,7 @@ describe('FHIR Client', () => {
 # .env
 PUBLIC_FHIR_BASE_URL=https://cdr.fhirlab.net/fhir
 PUBLIC_TERMINOLOGY_URL=https://tx.fhirlab.net/fhir
-PUBLIC_APP_NAME=OpenHIE Mock EMR
+PUBLIC_APP_NAME=OpenHIE Mock EHR
 PUBLIC_WORKSHOP_NAME=FHIR Fundamentals 2026 - Aklan
 ```
 

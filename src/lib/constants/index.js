@@ -1,3 +1,7 @@
+// App Configuration
+export const APP_NAME = 'OpenHIE Mock EHR';
+export const APP_VERSION = '2.0.0';
+
 // FHIR Server Configuration
 export const FHIR_CONFIG = {
 	shrBaseUrl: 'https://cdr.fhirlab.net/fhir',
