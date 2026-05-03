@@ -3,6 +3,7 @@
 	import { browser } from '$app/environment';
 	import { fhirClient } from '$services/fhir-client.js';
 	import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+	import { getLoincDisplay, getSnomedDisplay, getRxnormDisplay, getIcd10Display } from '$stores/codeDisplayStore.js';
 	import AppHeader from '$components/AppHeader.svelte';
 
 	// State
@@ -18,12 +19,41 @@
 	let searchQuery = $state('');
 	let error = $state('');
 	
+	// Code display cache for terminology server lookups
+	let codeDisplays = $state(new Map());
+	
 	// Pagination state
 	let totalPatientCount = $state(0);
 	let nextPageUrl = $state(null);
 	let hasMorePatients = $state(false);
 
 	const resourceTypes = ['Patient', 'Encounter', 'Observation', 'Condition', 'MedicationRequest', 'ServiceRequest', 'DiagnosticReport', 'Practitioner', 'Organization'];
+	
+	// Helper to get code display from cache or fetch from server
+	async function getCodeDisplay(code, system, fetchFn) {
+		const key = `${system}|${code}`;
+		if (codeDisplays.has(key)) {
+			return codeDisplays.get(key);
+		}
+		const display = await fetchFn(code);
+		codeDisplays.set(key, display);
+		return display;
+	}
+	
+	// Get LOINC display
+	function getLoincDisplayCached(code) {
+		return getCodeDisplay(code, 'http://loinc.org', getLoincDisplay);
+	}
+	
+	// Get SNOMED display
+	function getSnomedDisplayCached(code) {
+		return getCodeDisplay(code, 'http://snomed.info/sct', getSnomedDisplay);
+	}
+	
+	// Get RxNorm display
+	function getRxnormDisplayCached(code) {
+		return getCodeDisplay(code, 'http://www.nlm.nih.gov/research/umls/rxnorm', getRxnormDisplay);
+	}
 
 	// Check server status
 	async function checkServer() {

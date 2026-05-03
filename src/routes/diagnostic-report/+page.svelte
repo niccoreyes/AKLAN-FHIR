@@ -11,6 +11,7 @@
 		DEFAULT_LAB_COMPONENTS,
 		DEFAULT_UCUM_UNITS
 	} from '$stores/terminologyStore.js';
+	import { getLoincDisplay, preloadCodeDisplays } from '$stores/codeDisplayStore.js';
 	import { CLINICS, CLINIC_CAPABILITIES, LOINC_CODES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 
@@ -70,11 +71,43 @@
 	// Subscribe to terminology stores
 	let labTestData = $state(DEFAULT_LAB_COMPONENTS);
 	let ucumUnits = $state(DEFAULT_UCUM_UNITS);
+	
+	// Cache for LOINC code displays fetched from terminology server
+	let loincDisplays = $state(new Map());
+	
+	// Function to get display for a LOINC code (from cache or default)
+	function getLoincDisplaySync(code) {
+		return loincDisplays.get(code) || code;
+	}
+	
+	// Load LOINC displays from terminology server
+	async function loadLoincDisplays() {
+		const allCodes = Object.values(labTestData).flat().map(t => t.code);
+		
+		// Fetch displays in parallel
+		const displays = await Promise.all(
+			allCodes.map(async (code) => {
+				const display = await getLoincDisplay(code);
+				return { code, display };
+			})
+		);
+		
+		// Update cache
+		const newMap = new Map();
+		displays.forEach(({ code, display }) => {
+			newMap.set(code, display);
+		});
+		loincDisplays = newMap;
+	}
 
 	$effect(() => {
 		const unsubscribeCodes = labTestCodesStore.subscribe(state => {
 			if (state.panels && Object.keys(state.panels).length > 0) {
 				labTestData = state.panels;
+				// Load displays when data changes
+				if (browser) {
+					loadLoincDisplays();
+				}
 			}
 		});
 
@@ -525,14 +558,14 @@
 						<!-- Panel-specific datalist -->
 						<datalist id="loincs-{reportType}">
 							{#each labTestData[reportType] as test}
-								<option value={test.code}>{test.display} - {test.fullDisplay}</option>
+								<option value={test.code}>{test.display} - {getLoincDisplaySync(test.code)}</option>
 							{/each}
 						</datalist>
 					{:else}
 						<!-- All lab tests datalist for custom reports -->
 						<datalist id="loincs-all">
 							{#each Object.values(labTestData).flat() as test}
-								<option value={test.code}>{test.display} - {test.fullDisplay}</option>
+								<option value={test.code}>{test.display} - {getLoincDisplaySync(test.code)}</option>
 							{/each}
 						</datalist>
 					{/if}
