@@ -23,8 +23,13 @@
 	function switchClinic(clinicId) {
 		appStore.setClinic(clinicId);
 		showClinicSwitcher = false;
-		// Navigate to dashboard (accessible by all clinics) to avoid capability check issues
-		window.location.href = '/dashboard';
+		// Preserve all workshop parameters when switching clinics
+		const params = new URLSearchParams();
+		if (appStore.workshopCode) params.set('w', appStore.workshopCode);
+		if (appStore.userName) params.set('u', appStore.userName);
+		params.set('c', clinicId); // Set new clinic
+		if (appStore.roleId) params.set('r', appStore.roleId);
+		window.location.href = '/dashboard?' + params.toString();
 	}
 
 	const navItems = [
