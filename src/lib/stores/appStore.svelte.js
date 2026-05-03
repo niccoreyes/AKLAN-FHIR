@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { derived } from 'svelte/store';
+import { replaceState } from '$app/navigation';
 import { CLINICS, ROLES, WORKSHOP_IDENTIFIER_SYSTEM } from '$constants';
 import { fhirClient } from '$services/fhir-client.js';
 
@@ -80,7 +81,8 @@ export function updateUrlParams(params) {
 		}
 	});
 	
-	window.history.replaceState({}, '', url);
+	// Use SvelteKit's replaceState to avoid conflicts with router
+	replaceState(url, {});
 }
 
 /**
@@ -398,7 +400,7 @@ export function createAppStore() {
 		url.searchParams.delete('c');
 		url.searchParams.delete('r');
 		url.searchParams.delete('v');
-		window.history.replaceState({}, '', url);
+		replaceState(url, {});
 		
 		// Reset store state
 		workshopCode = '';
