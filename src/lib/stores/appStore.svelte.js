@@ -115,20 +115,6 @@ export function createAppStore() {
 	// Track if welcome message has been shown to prevent duplicates
 	let hasShownWelcome = $state(false);
 
-	// Effect: Save settings to localStorage whenever they change
-	$effect(() => {
-		if (browser && workshopCode && userName) {
-			saveToStorage({
-				workshopCode,
-				userName,
-				clinicId,
-				roleId,
-				view,
-				practitionerId
-			});
-		}
-	});
-
 	// Derived values
 	const clinic = $derived(CLINICS.find(c => c.id === clinicId) || null);
 	const role = $derived(ROLES.find(r => r.id === roleId) || null);
@@ -140,6 +126,7 @@ export function createAppStore() {
 	function setWorkshopCode(code) {
 		workshopCode = code;
 		updateUrlParams({ w: code });
+		saveToStorage({ workshopCode: code, userName, clinicId, roleId, view, practitionerId });
 	}
 	
 	/**
@@ -148,6 +135,7 @@ export function createAppStore() {
 	function setUserName(name) {
 		userName = name;
 		updateUrlParams({ u: name });
+		saveToStorage({ workshopCode, userName: name, clinicId, roleId, view, practitionerId });
 	}
 	
 	/**
@@ -156,6 +144,7 @@ export function createAppStore() {
 	function setClinic(id) {
 		clinicId = id;
 		updateUrlParams({ c: id });
+		saveToStorage({ workshopCode, userName, clinicId: id, roleId, view, practitionerId });
 	}
 	
 	/**
@@ -164,14 +153,16 @@ export function createAppStore() {
 	function setRole(id) {
 		roleId = id;
 		updateUrlParams({ r: id });
+		saveToStorage({ workshopCode, userName, clinicId, roleId: id, view, practitionerId });
 	}
-	
+
 	/**
 	 * Toggle between clinical and developer view
 	 */
 	function toggleView() {
 		view = view === 'clinical' ? 'developer' : 'clinical';
 		updateUrlParams({ v: view });
+		saveToStorage({ workshopCode, userName, clinicId, roleId, view, practitionerId });
 	}
 	
 	/**
@@ -246,10 +237,13 @@ export function createAppStore() {
 				// Existing practitioner found - reuse it
 				practitionerId = existingPractitioners[0].resource.id;
 				console.log(`[Practitioner] Reusing existing practitioner: ${practitionerId}`);
-				
+
 				// Save registration state to sessionStorage
 				saveRegistrationState();
-				
+
+				// Save to localStorage with practitionerId
+				saveToStorage({ workshopCode, userName, clinicId, roleId, view, practitionerId });
+
 				// Only show welcome message once per session
 				if (!hasShownWelcome) {
 					hasShownWelcome = true;
@@ -282,12 +276,15 @@ export function createAppStore() {
 				
 				const result = await fhirClient.create(practitioner, workshopCode);
 				practitionerId = result.data.id;
-				
+
 				console.log(`[Practitioner] Created new practitioner: ${practitionerId}`);
-				
+
 				// Save registration state to sessionStorage
 				saveRegistrationState();
-				
+
+				// Save to localStorage with new practitionerId
+				saveToStorage({ workshopCode, userName, clinicId, roleId, view, practitionerId });
+
 				addNotification({
 					type: 'success',
 					message: `Registered!`,
