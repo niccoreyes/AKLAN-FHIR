@@ -1,10 +1,12 @@
 <script>
 	import { page } from '$app/stores';
-	import { APP_NAME } from '$constants';
+	import { APP_NAME, CLINICS, CLINIC_CAPABILITIES } from '$constants';
+	import { appStore } from '$stores/appStore.svelte.js';
 
 	let { active = 'clinical' } = $props();
 
 	let serverStatus = $state('checking');
+	let showClinicSwitcher = $state(false);
 
 	async function checkServer() {
 		try {
@@ -17,12 +19,22 @@
 		}
 	}
 
+	function switchClinic(clinicId) {
+		appStore.setClinic(clinicId);
+		showClinicSwitcher = false;
+		// Reload page to refresh clinic-specific UI
+		window.location.reload();
+	}
+
 	const navItems = [
 		{ id: 'clinical', label: 'Clinical View', href: '/' },
 		{ id: 'developer', label: 'Technical Dashboard', href: '/developer' },
 		{ id: 'architecture', label: 'Architecture', href: '/architecture' },
 		{ id: 'about', label: 'About', href: '/about' }
 	];
+
+	const currentClinic = $derived(CLINICS.find(c => c.id === appStore.clinicId));
+	const currentCaps = $derived(CLINIC_CAPABILITIES[appStore.clinicId] || {});
 </script>
 
 <!-- Header -->
@@ -34,6 +46,38 @@
 			<span>FHIR Fundamentals 2026 - Aklan</span>
 		</div>
 	</div>
+	{#if appStore.isConfigured}
+		<div class="clinic-context">
+			<button 
+				class="clinic-switcher-btn"
+				onclick={() => showClinicSwitcher = !showClinicSwitcher}
+				style="--clinic-color: {currentClinic?.color || '#2563EB'}"
+				title="Click to switch clinic"
+			>
+				<span>{currentClinic?.icon}</span>
+				<span class="clinic-name">{currentClinic?.shortName}</span>
+				<span class="switch-icon">🔁</span>
+			</button>
+			{#if showClinicSwitcher}
+				<div class="clinic-dropdown">
+					<div class="dropdown-header">Switch Clinic (HIE Demo)</div>
+					{#each CLINICS as clinic}
+						<button 
+							class="clinic-option"
+							class:active={clinic.id === appStore.clinicId}
+							onclick={() => switchClinic(clinic.id)}
+						>
+							<span class="option-icon">{clinic.icon}</span>
+							<div class="option-info">
+								<strong>{clinic.shortName}</strong>
+								<span>{CLINIC_CAPABILITIES[clinic.id]?.description || ''}</span>
+							</div>
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	{/if}
 	<nav class="main-nav">
 		{#each navItems as item}
 			<a 
@@ -57,6 +101,12 @@
 		<span class="status-dot {serverStatus}"></span>
 		<span>Terminology: tx.fhirlab.net</span>
 	</div>
+	{#if appStore.isConfigured && currentCaps}
+		<div class="server-info clinic-mode">
+			<span>🏥</span>
+			<span>{currentClinic?.shortName} — {currentCaps.description}</span>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -146,5 +196,115 @@
 
 	.status-dot.error {
 		background: #EF4444;
+	}
+
+	/* Clinic Switcher */
+	.clinic-context {
+		position: relative;
+	}
+
+	.clinic-switcher-btn {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 12px;
+		border-radius: 8px;
+		border: 2px solid var(--clinic-color);
+		background: color-mix(in srgb, var(--clinic-color) 8%, white);
+		color: var(--clinic-color);
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.clinic-switcher-btn:hover {
+		background: color-mix(in srgb, var(--clinic-color) 15%, white);
+	}
+
+	.clinic-name {
+		max-width: 120px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.switch-icon {
+		font-size: 11px;
+		opacity: 0.6;
+	}
+
+	.clinic-dropdown {
+		position: absolute;
+		top: calc(100% + 8px);
+		left: 50%;
+		transform: translateX(-50%);
+		background: white;
+		border: 1px solid #E2E8F0;
+		border-radius: 12px;
+		box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+		padding: 8px;
+		min-width: 280px;
+		z-index: 200;
+	}
+
+	.dropdown-header {
+		font-size: 11px;
+		font-weight: 700;
+		color: #94A3B8;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		padding: 8px 12px;
+		border-bottom: 1px solid #F1F5F9;
+		margin-bottom: 4px;
+	}
+
+	.clinic-option {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 12px;
+		border-radius: 8px;
+		border: none;
+		background: none;
+		cursor: pointer;
+		width: 100%;
+		text-align: left;
+		transition: all 0.2s;
+	}
+
+	.clinic-option:hover {
+		background: #F8FAFC;
+	}
+
+	.clinic-option.active {
+		background: #EFF6FF;
+	}
+
+	.option-icon {
+		font-size: 20px;
+	}
+
+	.option-info {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.option-info strong {
+		font-size: 13px;
+		color: #1E293B;
+	}
+
+	.option-info span {
+		font-size: 11px;
+		color: #64748B;
+		line-height: 1.3;
+	}
+
+	.clinic-mode {
+		margin-left: auto;
+		font-weight: 500;
+		color: #475569;
 	}
 </style>

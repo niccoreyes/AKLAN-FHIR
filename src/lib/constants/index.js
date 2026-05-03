@@ -122,6 +122,40 @@ export const PATIENT_CASES = [
 	}
 ];
 
+// Clinic Capabilities - what each clinic can create and view
+export const CLINIC_CAPABILITIES = {
+	'rhu-kalibo': {
+		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest'],
+		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport'],
+		primaryActions: ['register', 'encounter', 'vitals', 'order', 'prescribe'],
+		description: 'Primary care — register patients, record visits, order labs, refer to hospital'
+	},
+	'aklan-hospital': {
+		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport'],
+		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport'],
+		primaryActions: ['register', 'encounter', 'vitals', 'order', 'prescribe', 'report'],
+		description: 'Secondary care — full clinical services including lab reporting'
+	},
+	'rhu-malay': {
+		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest'],
+		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'DiagnosticReport'],
+		primaryActions: ['register', 'encounter', 'vitals', 'order'],
+		description: 'Rural health — register patients, basic care, refer to hospital'
+	},
+	'kalibo-lab': {
+		canCreate: ['Observation', 'DiagnosticReport'],
+		canView: ['Patient', 'ServiceRequest', 'DiagnosticReport', 'Observation'],
+		primaryActions: ['inbox', 'report'],
+		description: 'Laboratory — receive orders, process tests, report results'
+	},
+	'aklan-pharmacy': {
+		canCreate: ['MedicationDispense'],
+		canView: ['Patient', 'MedicationRequest', 'MedicationDispense'],
+		primaryActions: ['inbox', 'dispense'],
+		description: 'Pharmacy — receive prescriptions, dispense medications'
+	}
+};
+
 // Common LOINC codes for vitals
 export const LOINC_CODES = {
 	bloodPressurePanel: '85354-9',
