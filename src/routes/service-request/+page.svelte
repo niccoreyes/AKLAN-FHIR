@@ -13,15 +13,23 @@
 	const urlEncounterId = $derived($page.url.searchParams.get('encounter') || '');
 
 	onMount(() => {
-		if (browser && !appStore.isConfigured) {
-			window.location.replace('/');
-			return;
-		}
-		// Check clinic can create ServiceRequest
-		const caps = CLINIC_CAPABILITIES[appStore.clinicId];
-		if (!caps?.canCreate?.includes('ServiceRequest')) {
-			window.location.replace('/dashboard');
-		}
+		// Check URL params directly for immediate config check
+		const url = browser ? new URL(window.location.href) : null;
+		const hasUrlConfig = url && (url.searchParams.get('w') || url.searchParams.get('u') || url.searchParams.get('c'));
+		
+		// Give store time to initialize, then check
+		setTimeout(() => {
+			if (!appStore.isConfigured && !hasUrlConfig) {
+				window.location.replace('/');
+				return;
+			}
+			// Check clinic can create ServiceRequest
+			const caps = CLINIC_CAPABILITIES[appStore.clinicId];
+			if (!caps?.canCreate?.includes('ServiceRequest')) {
+				window.location.replace('/dashboard');
+			}
+		}, 100);
+		
 		// Load patient and encounter from URL if provided
 		if (urlPatientId) {
 			loadPatientFromUrl(urlPatientId);

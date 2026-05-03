@@ -10,14 +10,22 @@
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
 
 	onMount(() => {
-		if (browser && !appStore.isConfigured) {
-			window.location.replace('/');
-			return;
-		}
-		const caps = CLINIC_CAPABILITIES[appStore.clinicId];
-		if (!caps?.canCreate?.includes('DiagnosticReport')) {
-			window.location.replace('/dashboard');
-		}
+		// Check URL params directly for immediate config check
+		const url = browser ? new URL(window.location.href) : null;
+		const hasUrlConfig = url && (url.searchParams.get('w') || url.searchParams.get('u') || url.searchParams.get('c'));
+		
+		// Give store time to initialize, then check
+		setTimeout(() => {
+			if (!appStore.isConfigured && !hasUrlConfig) {
+				window.location.replace('/');
+				return;
+			}
+			const caps = CLINIC_CAPABILITIES[appStore.clinicId];
+			if (!caps?.canCreate?.includes('DiagnosticReport')) {
+				window.location.replace('/dashboard');
+			}
+		}, 100);
+		
 		// Check for order param
 		const orderId = $page.url.searchParams.get('order');
 		const patient = $page.url.searchParams.get('patient');

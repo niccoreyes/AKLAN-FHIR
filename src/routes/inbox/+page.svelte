@@ -8,9 +8,17 @@
 
 	// Redirect if not configured
 	onMount(() => {
-		if (browser && !appStore.isConfigured) {
-			window.location.replace('/');
-		}
+		// Check URL params directly for immediate config check
+		const url = browser ? new URL(window.location.href) : null;
+		const hasUrlConfig = url && (url.searchParams.get('w') || url.searchParams.get('u') || url.searchParams.get('c'));
+		
+		// Give store time to initialize, then check
+		setTimeout(() => {
+			if (!appStore.isConfigured && !hasUrlConfig) {
+				window.location.replace('/');
+			}
+		}, 100);
+		
 		loadData();
 	});
 

@@ -10,14 +10,22 @@
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
 
 	onMount(() => {
-		if (browser && !appStore.isConfigured) {
-			window.location.replace('/');
-			return;
-		}
-		const caps = CLINIC_CAPABILITIES[appStore.clinicId];
-		if (!caps?.canCreate?.includes('MedicationDispense')) {
-			window.location.replace('/dashboard');
-		}
+		// Check URL params directly for immediate config check
+		const url = browser ? new URL(window.location.href) : null;
+		const hasUrlConfig = url && (url.searchParams.get('w') || url.searchParams.get('u') || url.searchParams.get('c'));
+		
+		// Give store time to initialize, then check
+		setTimeout(() => {
+			if (!appStore.isConfigured && !hasUrlConfig) {
+				window.location.replace('/');
+				return;
+			}
+			const caps = CLINIC_CAPABILITIES[appStore.clinicId];
+			if (!caps?.canCreate?.includes('MedicationDispense')) {
+				window.location.replace('/dashboard');
+			}
+		}, 100);
+		
 		// Load prescription if provided via URL
 		const rxId = $page.url.searchParams.get('rx');
 		if (rxId) loadPrescription(rxId);
@@ -148,6 +156,28 @@
 			};
 
 			await fhirClient.create(resource, appStore.workshopCode);
+			
+			// Update the MedicationRequest status to "completed" if a prescription was linked
+			if (prescriptionId) {
+				try {
+					const existingRx = await fhirClient.read('MedicationRequest', prescriptionId);
+					if (existingRx) {
+						existingRx.status = 'completed';
+						// Add a note about dispensing
+						if (!existingRx.note) existingRx.note = [];
+						existingRx.note.push({
+							text: `Dispensed by ${appStore.userName} on ${new Date().toLocaleString()}`,
+							time: new Date().toISOString()
+						});
+						await fhirClient.update('MedicationRequest', prescriptionId, existingRx);
+						console.log(`[Dispense] Updated MedicationRequest ${prescriptionId} to completed`);
+					}
+				} catch (updateError) {
+					console.error('[Dispense] Failed to update prescription status:', updateError);
+					// Don't fail the dispense if update fails - still show success
+				}
+			}
+			
 			success = true;
 			setTimeout(() => {
 				// Preserve workshop parameters when redirecting
@@ -272,6 +302,12 @@
 								<button type="button" class="clear-selection" onclick={clearSelection}>Clear selection</button>
 							{/if}
 						</div>
+
+						{#if selectedPrescription}
+							<div class="status-notice">
+								⚠️ This prescription will be marked as "completed" after dispensing and cannot be dispensed again.
+							</div>
+						{/if}
 
 						<div class="field-group">
 							<label>Medication</label>
@@ -655,5 +691,15 @@
 		min-height: 100vh;
 		font-size: 16px;
 		color: #6B7280;
+	}
+
+	.status-notice {
+		padding: 10px 12px;
+		background: #FEF3C7;
+		border: 1px solid #FCD34D;
+		border-radius: 8px;
+		font-size: 13px;
+		color: #92400E;
+		margin-bottom: 16px;
 	}
 </style>

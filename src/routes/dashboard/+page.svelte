@@ -1,15 +1,26 @@
 <script>
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, ROLES, CLINIC_CAPABILITIES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 
-	// Redirect if not configured
+	// Get URL params directly for immediate check
+	const urlParams = $derived(browser ? new URL(window.location.href).searchParams : null);
+	const hasUrlConfig = $derived(urlParams && (urlParams.get('w') || urlParams.get('u') || urlParams.get('c')));
+	
+	// Check both store state and URL params
+	const isReallyConfigured = $derived(appStore.isConfigured || hasUrlConfig);
+
+	// Redirect if not configured (check both store and URL)
 	onMount(() => {
-		if (browser && !appStore.isConfigured) {
-			window.location.replace('/');
-		}
+		// Give a small delay for store to initialize from URL
+		setTimeout(() => {
+			if (browser && !appStore.isConfigured && !hasUrlConfig) {
+				window.location.replace('/');
+			}
+		}, 100);
 		loadInboxCounts();
 	});
 
