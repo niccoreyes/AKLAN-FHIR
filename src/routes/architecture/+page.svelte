@@ -1,6 +1,6 @@
 <script>
 	import AppHeader from '$components/AppHeader.svelte';
-	import { CLINICS, FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+	import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
 
 	// Interactive state
 	let selectedComponent = $state(null);
@@ -229,68 +229,82 @@
 				<span class="fhir-badge">FHIR R4</span>
 			</p>
 			
-			<!-- Tiered Architecture Diagram -->
-			<div class="tiered-architecture">
-				{#each architectureTiers as tier, tierIndex}
-					<div class="architecture-tier" style="--tier-color: {tier.color}">
-						<div class="tier-label">
-							<span class="tier-icon">{tier.icon}</span>
-							<span class="tier-name">{tier.tier}</span>
-						</div>
-						<div class="tier-nodes">
-							{#each tier.nodes as node}
-								<button 
-									class="tier-node"
-									onclick={() => selectComponent(node.type)}
-									class:active={selectedComponent === node.type}
-									style="--node-color: {tier.color}"
-								>
-									<span class="node-icon">{node.icon}</span>
-									<span class="node-name">{node.name}</span>
-								</button>
-							{/each}
-						</div>
-					</div>
-					
-					{#if tierIndex < architectureTiers.length - 1}
-						<div class="tier-connector">
-							<div class="connector-lines">
-								{#each tier.nodes as _, i}
-									<div class="connector-line"></div>
-								{/each}
-							</div>
-							<div class="connector-arrow">↓</div>
-							<div class="connector-protocol">
-								<span class="protocol-badge">FHIR</span>
-							</div>
-						</div>
-					{/if}
-				{/each}
-			</div>
+			<!-- Architecture Diagram -->
+			<div class="architecture-diagram">
+				<!-- PoS Row -->
+				<div class="diagram-row">
+					{#each architectureTiers[0].nodes as node}
+						<button 
+							class="diagram-node clinic-node"
+							onclick={() => selectComponent(node.type)}
+							class:active={selectedComponent === node.type}
+							style="--node-color: {architectureTiers[0].color}"
+						>
+							<span class="node-icon">{node.icon}</span>
+							<span class="node-label">{node.name}</span>
+						</button>
+					{/each}
+				</div>
 
-			<!-- Component Details -->
-			{#if selectedComponent}
-				{@const comp = components[selectedComponent]}
-				<div class="component-detail">
-					<div class="detail-header" style="--comp-color: {comp.color}">
-						<span class="detail-icon">{comp.icon}</span>
-						<h4>{comp.title}</h4>
-					</div>
-					<p class="detail-description">{comp.description}</p>
-					<ul class="detail-list">
-						{#each comp.details as detail}
-							<li>{detail}</li>
-						{/each}
-					</ul>
-					<div class="detail-examples">
-						<span class="examples-label">Examples:</span>
-						{#each comp.examples as example}
-							<span class="example-tag">{example}</span>
-						{/each}
+				<!-- Arrow Down -->
+				<div class="diagram-arrow">↓</div>
+
+				<!-- Demo EHR Row -->
+				<div class="diagram-row">
+					{#each architectureTiers[1].nodes as node}
+						<button 
+							class="diagram-node"
+							onclick={() => selectComponent(node.type)}
+							class:active={selectedComponent === node.type}
+							style="--node-color: {architectureTiers[1].color}"
+						>
+							<span class="node-icon">{node.icon}</span>
+							<span class="node-label">{node.name}</span>
+						</button>
+					{/each}
+				</div>
+
+				<!-- Arrow Down -->
+				<div class="diagram-arrow">↓</div>
+
+				<!-- Interoperability Layer -->
+				<button 
+					class="diagram-node interop-node"
+					onclick={() => selectComponent('interoperability')}
+					class:active={selectedComponent === 'interoperability'}
+					style="--node-color: {components.interoperability.color}"
+				>
+					<span class="node-icon">🔀</span>
+					<span class="node-label">OpenHIM / Mirth</span>
+					<span class="node-sub">Interoperability Layer</span>
+				</button>
+
+				<!-- Arrows Split -->
+				<div class="diagram-split">
+					<div class="split-line"></div>
+					<div class="split-branches">
+						<div class="branch">↙</div>
+						<div class="branch">↘</div>
 					</div>
 				</div>
-			{/if}
-		<!-- Component Details Panel -->
+
+				<!-- Shared Services Row -->
+				<div class="diagram-row backend-row">
+					{#each architectureTiers[3].nodes as node}
+						<button 
+							class="diagram-node backend-node"
+							onclick={() => selectComponent(node.type)}
+							class:active={selectedComponent === node.type}
+							style="--node-color: {components[node.type]?.color || architectureTiers[3].color}"
+						>
+							<span class="node-icon">{node.icon}</span>
+							<span class="node-label">{node.name}</span>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Component Details Panel -->
 			{#if selectedComponent}
 				{@const comp = components[selectedComponent]}
 				<div class="component-details">
@@ -612,9 +626,9 @@
 		border-color: var(--node-color);
 	}
 
-	.app-node {
-		border-color: #2563EB;
-		background: #EFF6FF;
+	.interop-node {
+		border-color: var(--node-color, #F59E0B);
+		background: color-mix(in srgb, var(--node-color, #F59E0B) 8%, white);
 		min-width: 200px;
 	}
 
@@ -1140,133 +1154,6 @@
 		color: #64748B;
 	}
 
-	/* Tiered Architecture Styles */
-	.tiered-architecture {
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-		padding: 20px;
-		background: #F8FAFC;
-		border-radius: 12px;
-		border: 1px solid #E2E8F0;
-	}
-
-	.architecture-tier {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		padding: 16px;
-		background: white;
-		border-radius: 10px;
-		border: 2px solid var(--tier-color, #E2E8F0);
-		border-left: 4px solid var(--tier-color, #E2E8F0);
-	}
-
-	.tier-label {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 12px;
-		font-weight: 600;
-		color: var(--tier-color, #64748B);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		padding-bottom: 8px;
-		border-bottom: 1px dashed #E2E8F0;
-	}
-
-	.tier-icon {
-		font-size: 16px;
-	}
-
-	.tier-nodes {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		justify-content: center;
-	}
-
-	.tier-node {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 6px;
-		padding: 14px 18px;
-		background: white;
-		border: 2px solid #E2E8F0;
-		border-radius: 10px;
-		cursor: pointer;
-		transition: all 0.2s;
-		min-width: 100px;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-	}
-
-	.tier-node:hover {
-		border-color: var(--node-color, #2563EB);
-		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-		transform: translateY(-2px);
-	}
-
-	.tier-node.active {
-		border-color: var(--node-color, #2563EB);
-		background: color-mix(in srgb, var(--node-color, #2563EB) 8%, white);
-	}
-
-	.tier-node .node-icon {
-		font-size: 24px;
-	}
-
-	.tier-node .node-name {
-		font-size: 12px;
-		font-weight: 600;
-		color: #1E293B;
-		text-align: center;
-	}
-
-	.tier-connector {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 8px 0;
-		position: relative;
-	}
-
-	.connector-lines {
-		display: flex;
-		justify-content: space-around;
-		width: 100%;
-		max-width: 400px;
-		gap: 40px;
-	}
-
-	.connector-line {
-		width: 2px;
-		height: 20px;
-		background: linear-gradient(to bottom, #CBD5E1, #94A3B8);
-	}
-
-	.connector-arrow {
-		font-size: 20px;
-		color: #94A3B8;
-		margin-top: -5px;
-	}
-
-	.connector-protocol {
-		margin-top: 4px;
-	}
-
-	.protocol-badge {
-		font-size: 10px;
-		font-weight: 700;
-		color: #2563EB;
-		background: #EFF6FF;
-		padding: 2px 8px;
-		border-radius: 4px;
-		border: 1px solid #BFDBFE;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
 	.section-hint .fhir-badge {
 		display: inline-block;
 		font-size: 11px;
@@ -1278,20 +1165,5 @@
 		border: 1px solid #BFDBFE;
 		margin-left: 8px;
 		vertical-align: middle;
-	}
-
-	@media (max-width: 640px) {
-		.tier-nodes {
-			justify-content: flex-start;
-		}
-		
-		.tier-node {
-			min-width: 80px;
-			padding: 10px 12px;
-		}
-		
-		.connector-lines {
-			gap: 20px;
-		}
 	}
 </style>

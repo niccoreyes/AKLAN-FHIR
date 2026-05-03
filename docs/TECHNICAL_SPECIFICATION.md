@@ -1,8 +1,8 @@
-# Technical Specification v1.0
+# Technical Specification
 ## OpenHIE Mock EHR - FHIR Fundamentals 2026
 
 **Date**: May 2026  
-**Status**: Draft for Review  
+**Status**: Production Ready  
 **Target**: Vercel deployment with fhirlab.net backend
 
 ---
@@ -13,59 +13,66 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           CLIENT LAYER (Vercel)                              │
+│                         CLIENT LAYER (Vercel)                                │
 │                                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
 │  │   Svelte 5   │  │   Svelte 5   │  │   Svelte 5   │  │   Svelte 5   │     │
-│  │   (User 1)   │  │   (User 2)   │  │   (User 3)   │  │   (User n)   │     │
-│  │  RHU Kalibo  │  │   Hospital   │  │   Pharmacy   │  │     ...      │     │
+│  │  RHU Kalibo  │  │   Hospital   │  │   Pharmacy   │  │     Lab      │     │
+│  │  (PoS + EHR) │  │  (PoS + EHR) │  │  (PoS + EHR) │  │  (PoS + EHR) │     │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘     │
 │         │                 │                 │                 │               │
 │         └─────────────────┴─────────────────┴─────────────────┘               │
 │                              │                                               │
-│                              │ HTTPS + FHIR REST API                          │
+│                              │ FHIR REST API (HTTPS)                          │
 └──────────────────────────────┼───────────────────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        FHIR SERVER LAYER                                     │
+│                    INTEROPERABILITY LAYER (IOL)                              │
 │                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────────┐│
-│  │                    cdr.fhirlab.net/fhir                                  ││
-│  │                         (SHR - Shared Health Record)                     ││
+│  │                    OpenHIM / Mirth Connect                               ││
 │  │                                                                          ││
-│  │  FHIR R4 Resources:                                                      ││
-│  │  • Patient, Encounter, Observation, Condition                           ││
-│  │  • MedicationRequest, MedicationDispense                                 ││
-│  │  • ServiceRequest, DiagnosticReport                                     ││
-│  │  • Immunization, Organization, Practitioner                           ││
-│  │  • Bundle (for transactions)                                             ││
+│  │  • Message routing & orchestration                                       ││
+│  • Mediator management                                                     ││
+│  • Authentication & authorization                                          ││
+│  • Logging & auditing                                                      ││
 │  └─────────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────┬───────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        SHARED SERVICES LAYER                                 │
 │                                                                              │
-│  ┌─────────────────────────────────────────────────────────────────────────┐│
-│  │                    tx.fhirlab.net/fhir                                   ││
-│  │                    (Terminology Service)                                  ││
-│  │                                                                          ││
-│  │  Code Systems:                                                           ││
-│  │  • LOINC (observations, labs)                                             ││
-│  │  • SNOMED CT (diagnoses, procedures)                                     ││
-│  │  • ICD-10 (billing, reporting)                                           ││
-│  │  • RxNorm (medications)                                                    ││
-│  │  • PH Custom (Philippine extensions)                                      ││
-│  └─────────────────────────────────────────────────────────────────────────┘│
+│  ┌─────────────────────────────┐  ┌──────────────────────────────────────┐  │
+│  │  Shared Health Record (SHR) │  │      Terminology Service (TS)        │  │
+│  │                             │  │                                      │  │
+│  │  cdr.fhirlab.net/fhir       │  │  tx.fhirlab.net/fhir                 │  │
+│  │                             │  │                                      │  │
+│  │  FHIR R4 Resources:         │  │  Code Systems:                       │  │
+│  │  • Patient                  │  │  • LOINC (observations, labs)        │  │
+│  │  • Encounter                │  │  • SNOMED CT (diagnoses)             │  │
+│  │  • Observation              │  │  • ICD-10 (billing)                  │  │
+│  │  • Condition                │  │  • RxNorm (medications)              │  │
+│  │  • Practitioner             │  │                                      │  │
+│  │  • Organization             │  │  Capabilities:                       │  │
+│  │                             │  │  • LOINC: ✅ Validated               │  │
+│  └─────────────────────────────┘  │  • SNOMED CT: ✅ Validated           │  │
+│                                    │  • ICD-10: ❌ Not supported          │  │
+│                                    │  • RxNorm: ❌ Not supported          │  │
+│                                    └──────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 1.2 OpenHIE Mapping
 
-Our Mock EMR implements these OpenHIE components:
-
-| OpenHIE Component | Implementation | FHIR Endpoint |
-|-------------------|----------------|---------------|
-| **Point of Service (PoS)** | Mock EMR instances | Client-side Svelte app |
-| **Interoperability Layer (IOL)** | Direct API calls | HTTPS to cdr.fhirlab.net |
-| **Shared Health Record (SHR)** | FHIR Repository | cdr.fhirlab.net/fhir |
-| **Terminology Service (TS)** | Code validation | tx.fhirlab.net/fhir |
+| OpenHIE Component | Implementation | Details |
+|-------------------|----------------|---------|
+| **Point of Service (PoS)** | Institution frontend | RHU, Hospital, Lab, Pharmacy |
+| **Demo EHR** | Per-institution EHR instance | Each PoS has its own EHR |
+| **Interoperability Layer (IOL)** | OpenHIM / Mirth Connect | Message routing between EHRs and SHR |
+| **Shared Health Record (SHR)** | cdr.fhirlab.net/fhir | FHIR R4 repository |
+| **Terminology Service (TS)** | tx.fhirlab.net/fhir | Code validation & lookup |
 | **Client Registry (CR)** | Patient matching | cdr.fhirlab.net/fhir/Patient?identifier= |
 
 ### 1.3 Data Flow Patterns
@@ -73,29 +80,29 @@ Our Mock EMR implements these OpenHIE components:
 #### Pattern 1: Create Resource
 ```
 User Action → Svelte Component → fhir-client.js → POST /[ResourceType] → SHR
-                                    ↓
-                              Response: 201 Created
-                                    ↓
-                              Update UI + Show Toast + Record Milestone
+                                     ↓
+                               Response: 201 Created
+                                     ↓
+                               Update UI + Show Toast
 ```
 
 #### Pattern 2: Search Resources
 ```
 User Search → Svelte Component → fhir-client.js → GET /[ResourceType]?params → SHR
-                                    ↓
-                              Response: Bundle
-                                    ↓
-                              Render List + Cache Results
+                                     ↓
+                               Response: Bundle
+                                     ↓
+                               Render List + Pagination
 ```
 
 #### Pattern 3: Cross-Facility Exchange
 ```
 Clinic A: POST /Patient → SHR → Visible to All
-                                    ↓
+                                     ↓
 Clinic B: GET /Patient?name= → SHR → Returns Clinic A's Patient
-                                    ↓
+                                     ↓
 Clinic B: POST /Encounter → SHR → References Clinic A's Patient
-                                    ↓
+                                     ↓
 Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 ```
 
@@ -116,7 +123,10 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
   "meta": {
     "versionId": "1",
     "lastUpdated": "2026-01-15T08:30:00Z",
-    "source": "[clinic-id]"
+    "tag": [{
+      "system": "https://aklan-fhir.app/workshop",
+      "code": "AK26-A"
+    }]
   },
   "identifier": [
     {
@@ -128,10 +138,6 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
           "code": "NI"
         }]
       }
-    },
-    {
-      "system": "http://shr.fhirlab.net/patient-id",
-      "value": "[generated]"
     }
   ],
   "active": true,
@@ -169,31 +175,12 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
       "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
       "code": "M | S | D | W"
     }]
-  },
-  "contact": [
-    {
-      "relationship": [{
-        "coding": [{
-          "system": "http://terminology.hl7.org/CodeSystem/v2-0131",
-          "code": "C",
-          "display": "Emergency Contact"
-        }]
-      }],
-      "name": {
-        "family": "[Name]",
-        "given": ["[Name]"]
-      },
-      "telecom": [{
-        "system": "phone",
-        "value": "+63-XXX-XXX-XXXX"
-      }]
-    }
-  ]
+  }
 }
 ```
 
 **Required Fields**: resourceType, identifier (at least one), name, gender, birthDate
-**Search Parameters**: name, birthdate, gender, identifier, address-city
+**Search Parameters**: name, birthdate, gender, identifier, address-city, _tag
 
 ---
 
@@ -208,7 +195,10 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
   "meta": {
     "versionId": "1",
     "lastUpdated": "2026-01-15T08:30:00Z",
-    "source": "[clinic-id]"
+    "tag": [{
+      "system": "https://aklan-fhir.app/workshop",
+      "code": "AK26-A"
+    }]
   },
   "status": "planned | arrived | in-progress | onleave | finished | cancelled",
   "class": {
@@ -248,31 +238,9 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
     "start": "2026-01-15T08:30:00Z",
     "end": "2026-01-15T09:30:00Z"
   },
-  "location": [
-    {
-      "location": {
-        "reference": "Location/[id]",
-        "display": "[Clinic Name - Department]"
-      },
-      "status": "active | reserved | completed"
-    }
-  ],
   "reasonCode": [
     {
       "text": "[Chief Complaint]"
-    }
-  ],
-  "diagnosis": [
-    {
-      "condition": {
-        "reference": "Condition/[id]"
-      },
-      "use": {
-        "coding": [{
-          "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
-          "code": "AD | DD | CC"
-        }]
-      }
     }
   ],
   "serviceProvider": {
@@ -283,7 +251,9 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 ```
 
 **Required Fields**: resourceType, status, class, subject
-**Search Parameters**: patient, date, status, location, service-provider
+**Search Parameters**: patient, date, status, service-provider, _tag
+**Update**: PUT /Encounter/[id] for edits
+**Delete**: DELETE /Encounter/[id] supported
 
 ---
 
@@ -298,7 +268,10 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
   "meta": {
     "versionId": "1",
     "lastUpdated": "2026-01-15T08:30:00Z",
-    "source": "[clinic-id]"
+    "tag": [{
+      "system": "https://aklan-fhir.app/workshop",
+      "code": "AK26-A"
+    }]
   },
   "status": "registered | preliminary | final | amended",
   "category": [
@@ -331,13 +304,6 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
       "display": "[Provider Name]"
     }
   ],
-  "bodySite": {
-    "coding": [{
-      "system": "http://snomed.info/sct",
-      "code": "368209003",
-      "display": "Right arm"
-    }]
-  },
   "component": [
     {
       "code": {
@@ -371,6 +337,8 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 }
 ```
 
+**Key Design Decision**: All observations are **encounter-linked**. The vitals page requires selecting an active encounter, and observations include an `encounter` reference.
+
 **Common LOINC Codes for Vitals**:
 
 | Vital | LOINC Code | Unit |
@@ -388,164 +356,44 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 | Blood Glucose | 2339-0 | mg/dL |
 
 **Required Fields**: resourceType, status, category, code, subject, effectiveDateTime
-**Search Parameters**: patient, code, date, category
+**Search Parameters**: patient, code, date, category, encounter, _tag
+**Delete**: DELETE /Observation/[id] supported
 
 ---
 
-#### Condition
-**Purpose**: Diagnoses and clinical conditions
-**Profile**: PH Core Condition
+#### Practitioner
+**Purpose**: Workshop participant tracking
+**Profile**: Base FHIR Practitioner
 
 ```json
 {
-  "resourceType": "Condition",
+  "resourceType": "Practitioner",
   "id": "[server-assigned]",
   "meta": {
-    "versionId": "1",
-    "lastUpdated": "2026-01-15T08:30:00Z",
-    "source": "[clinic-id]"
-  },
-  "clinicalStatus": {
-    "coding": [{
-      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-      "code": "active | inactive | resolved"
+    "tag": [{
+      "system": "https://aklan-fhir.app/workshop",
+      "code": "AK26-A"
     }]
   },
-  "verificationStatus": {
-    "coding": [{
-      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-      "code": "provisional | differential | confirmed | refuted"
-    }]
-  },
-  "category": [
+  "active": true,
+  "name": [
     {
-      "coding": [{
-        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
-        "code": "encounter-diagnosis | problem-list-item"
-      }]
+      "use": "official",
+      "given": ["[First Name]"],
+      "text": "[First Name]"
     }
   ],
-  "code": {
-    "coding": [
-      {
-        "system": "http://snomed.info/sct",
-        "code": "38341003",
-        "display": "Hypertensive disorder"
-      },
-      {
-        "system": "http://hl7.org/fhir/sid/icd-10",
-        "code": "I10",
-        "display": "Essential (primary) hypertension"
+  "qualification": [
+    {
+      "code": {
+        "text": "[Role: physician | nurse | midwife | clerk | pharmacist | lab_tech | facilitator]"
       }
-    ],
-    "text": "Hypertension"
-  },
-  "subject": {
-    "reference": "Patient/[id]"
-  },
-  "encounter": {
-    "reference": "Encounter/[id]"
-  },
-  "onsetDateTime": "2026-01-15T08:30:00Z",
-  "recordedDate": "2026-01-15T08:30:00Z",
-  "recorder": {
-    "reference": "Practitioner/[id]"
-  },
-  "asserter": {
-    "reference": "Practitioner/[id]"
-  },
-  "note": [{
-    "text": "[Clinical notes]"
-  }]
+    }
+  ]
 }
 ```
 
-**Required Fields**: resourceType, clinicalStatus, code, subject
-**Search Parameters**: patient, category, clinical-status, code
-
----
-
-#### MedicationRequest
-**Purpose**: Prescriptions and medication orders
-**Profile**: PH Core MedicationRequest
-
-```json
-{
-  "resourceType": "MedicationRequest",
-  "id": "[server-assigned]",
-  "meta": {
-    "versionId": "1",
-    "lastUpdated": "2026-01-15T08:30:00Z",
-    "source": "[clinic-id]"
-  },
-  "status": "active | on-hold | revoked | completed",
-  "intent": "proposal | plan | order | original-order",
-  "category": [
-    {
-      "coding": [{
-        "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
-        "code": "outpatient | inpatient | community"
-      }]
-    }
-  ],
-  "medicationCodeableConcept": {
-    "coding": [{
-      "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
-      "code": "1790983",
-      "display": "Amlodipine 5mg"
-    }]
-  },
-  "subject": {
-    "reference": "Patient/[id]"
-  },
-  "authoredOn": "2026-01-15T08:30:00Z",
-  "requester": {
-    "reference": "Practitioner/[id]",
-    "display": "[Prescriber Name]"
-  },
-  "reasonCode": [{
-    "text": "[Indication]"
-  }],
-  "dosageInstruction": [
-    {
-      "text": "Take 1 tablet by mouth once daily",
-      "route": {
-        "coding": [{
-          "system": "http://snomed.info/sct",
-          "code": "26643006",
-          "display": "Oral route"
-        }]
-      },
-      "doseAndRate": [{
-        "doseQuantity": {
-          "value": 5,
-          "unit": "mg"
-        }
-      }],
-      "timing": {
-        "repeat": {
-          "frequency": 1,
-          "period": 1,
-          "periodUnit": "d"
-        }
-      }
-    }
-  ],
-  "dispenseRequest": {
-    "quantity": {
-      "value": 30,
-      "unit": "tablet"
-    },
-    "expectedSupplyDuration": {
-      "value": 30,
-      "unit": "days"
-    }
-  }
-}
-```
-
-**Required Fields**: resourceType, status, intent, medication, subject, authoredOn
-**Search Parameters**: patient, status, intent
+**Deduplication Strategy**: Name-based matching. On registration, the app searches existing Practitioners by `name` parameter and filters for exact first name matches. If found, reuses existing Practitioner; if not, creates new one.
 
 ---
 
@@ -554,27 +402,29 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 #### LOINC (Laboratory and Clinical Observations)
 **System**: `http://loinc.org`  
 **Purpose**: Standard codes for observations, lab tests, vitals  
-**Usage**: Observation.code, ServiceRequest.code, DiagnosticReport.code
+**Usage**: Observation.code, ServiceRequest.code, DiagnosticReport.code  
+**Validation**: ✅ Supported on tx.fhirlab.net
 
 #### SNOMED CT
 **System**: `http://snomed.info/sct`  
 **Purpose**: Clinical diagnoses, procedures, findings  
-**Usage**: Condition.code, Encounter.type, Procedure.code
+**Usage**: Condition.code, Encounter.type, Procedure.code  
+**Validation**: ✅ Supported on tx.fhirlab.net
 
 #### ICD-10
 **System**: `http://hl7.org/fhir/sid/icd-10`  
 **Purpose**: Billing and reporting codes  
-**Usage**: Condition.code (secondary), Claims
+**Usage**: Condition.code (secondary)  
+**Validation**: ❌ Not supported on tx.fhirlab.net (returns 404)
 
 #### RxNorm
 **System**: `http://www.nlm.nih.gov/research/umls/rxnorm`  
 **Purpose**: Medication identifiers  
-**Usage**: MedicationRequest.medication, MedicationDispense.medication
+**Usage**: MedicationRequest.medication, MedicationDispense.medication  
+**Validation**: ❌ Not supported on tx.fhirlab.net (returns 404)
 
-#### Philippine Custom Extensions
-**System**: `http://ph.gov/fhir/identifiers/`  
-**Purpose**: Philippines-specific identifiers  
-**Usage**: Patient.identifier (PhilHealth, facility MRN)
+#### Fallback Strategy
+When terminology server returns 404, the app uses a **silent fallback**: `lookupCode()` returns `{valid: false}` without throwing, allowing the UI to proceed with the code unchecked.
 
 ---
 
@@ -617,13 +467,6 @@ GET /[ResourceType]/[id]
 Accept: application/fhir+json
 ```
 
-Response:
-```http
-HTTP/1.1 200 OK
-
-{FHIR Resource}
-```
-
 **Search (GET with parameters)**
 ```http
 GET /[ResourceType]?param1=value1&param2=value2
@@ -639,13 +482,7 @@ HTTP/1.1 200 OK
   "type": "searchset",
   "total": 42,
   "link": [...],
-  "entry": [
-    {
-      "fullUrl": "...",
-      "resource": {FHIR Resource},
-      "search": {"mode": "match"}
-    }
-  ]
+  "entry": [...]
 }
 ```
 
@@ -662,23 +499,29 @@ Content-Type: application/fhir+json
 DELETE /[ResourceType]/[id]
 ```
 
+**Pagination**
+```javascript
+// First page
+GET /Patient?_tag=https://aklan-fhir.app/workshop|AK26-A&_count=10
+
+// Subsequent pages via Bundle.link
+GET /Patient?_tag=...&_count=10&_getpagesoffset=10
+```
+
 ---
 
 ### 3.2 Search Parameters
 
 #### Patient Search
 ```javascript
-// By name (partial match)
-GET /Patient?name=Santos
+// By name (partial match) + workshop tag
+GET /Patient?name=Santos&_tag=https://aklan-fhir.app/workshop|AK26-A
 
 // By PhilHealth ID
 GET /Patient?identifier=http://philhealth.gov.ph/member-id|12-123456789-0
 
 // By birthdate
 GET /Patient?birthdate=1985-03-15
-
-// By gender
-GET /Patient?gender=female
 
 // Combined
 GET /Patient?name=Santos&gender=female&birthdate:ge=1980-01-01
@@ -694,9 +537,6 @@ GET /Encounter?date:ge=2026-01-01&date:le=2026-01-31
 
 // By status
 GET /Encounter?status=in-progress
-
-// By location
-GET /Encounter?location=Location/456
 ```
 
 #### Observation Search
@@ -707,11 +547,8 @@ GET /Observation?patient=Patient/123&code=http://loinc.org|85354-9
 // By category
 GET /Observation?patient=Patient/123&category=vital-signs
 
-// By date
-GET /Observation?patient=Patient/123&date:ge=2026-01-01
-
-// Recent first
-GET /Observation?patient=Patient/123&_sort=-date&_count=10
+// By encounter
+GET /Observation?encounter=Encounter/456
 ```
 
 ---
@@ -724,11 +561,6 @@ GET /Observation?patient=Patient/123&_sort=-date&_count=10
 GET /tx.fhirlab.net/fhir/CodeSystem/$lookup
   ?system=http://loinc.org
   &code=85354-9
-
-// Validate SNOMED
-GET /tx.fhirlab.net/fhir/CodeSystem/$lookup
-  ?system=http://snomed.info/sct
-  &code=38341003
 ```
 
 Response:
@@ -744,217 +576,89 @@ Response:
 }
 ```
 
-#### ValueSet Expansion
-```javascript
-// Expand a value set
-GET /tx.fhirlab.net/fhir/ValueSet/$expand
-  ?url=http://loinc.org/vs/bp-panels
-```
-
 ---
 
 ## 4. Data Storage & State Management
 
-### 4.1 Client-Side State (Svelte 5 Runes)
+### 4.1 URL-Driven State (No LocalStorage)
 
-```javascript
-// lib/stores/appStore.svelte.js
+All participant identity is encoded in the URL query parameters:
 
-export function createAppStore() {
-  // Current user context
-  let currentClinic = $state(null);
-  let currentUser = $state(null);
-  let currentRole = $state(null);
-  
-  // Active patient context
-  let activePatient = $state(null);
-  let patientHistory = $state({});
-  
-  // UI state
-  let isLoading = $state(false);
-  let notifications = $state([]);
-  let milestones = $state([]);
-  
-  // Live activity feed
-  let recentActivity = $state([]);
-  
-  return {
-    // Getters
-    get currentClinic() { return currentClinic; },
-    get currentUser() { return currentUser; },
-    get currentRole() { return currentRole; },
-    get activePatient() { return activePatient; },
-    get patientHistory() { return patientHistory; },
-    get isLoading() { return isLoading; },
-    get notifications() { return notifications; },
-    get milestones() { return milestones; },
-    get recentActivity() { return recentActivity; },
-    
-    // Actions
-    setClinic(clinic) { currentClinic = clinic; },
-    setUser(user) { currentUser = user; },
-    setRole(role) { currentRole = role; },
-    setActivePatient(patient) { 
-      activePatient = patient;
-      this.loadPatientHistory(patient.id);
-    },
-    addNotification(notification) {
-      notifications = [notification, ...notifications].slice(0, 5);
-    },
-    recordMilestone(milestone) {
-      if (!milestones.find(m => m.id === milestone.id)) {
-        milestones = [...milestones, milestone];
-        this.addNotification({
-          type: 'milestone',
-          title: `🏆 ${milestone.title}`,
-          message: milestone.description
-        });
-      }
-    }
-  };
-}
+```
+https://aklan-fhir.vercel.app/?w=AK26-A&u=Ana&c=rhu-kalibo
 ```
 
-### 4.2 Caching Strategy
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `w` | Workshop code (group isolation) | `AK26-A` |
+| `u` | User first name (participant tracking) | `Ana` |
+| `c` | Clinic ID (role context) | `rhu-kalibo` |
+| `r` | Role (optional) | `physician` |
 
-```javascript
-// Simple in-memory cache for performance
-const cache = new Map();
-const CACHE_TTL = 30000; // 30 seconds
+**Benefits**:
+- Shareable links
+- No authentication required
+- Server-side rendering friendly
+- No localStorage dependencies
 
-export function cacheGet(key) {
-  const item = cache.get(key);
-  if (!item) return null;
-  if (Date.now() - item.timestamp > CACHE_TTL) {
-    cache.delete(key);
-    return null;
+### 4.2 Workshop Isolation
+
+Resources are tagged with workshop code in `meta.tag`:
+
+```json
+{
+  "meta": {
+    "tag": [{
+      "system": "https://aklan-fhir.app/workshop",
+      "code": "AK26-A"
+    }]
   }
-  return item.data;
-}
-
-export function cacheSet(key, data) {
-  cache.set(key, {
-    data,
-    timestamp: Date.now()
-  });
 }
 ```
+
+Search filtering:
+```
+GET /Patient?_tag=https://aklan-fhir.app/workshop|AK26-A
+```
+
+**Result**: Group A never sees Group B's patients.
 
 ---
 
-## 5. Real-Time Synchronization
+## 5. Application Pages & Features
 
-### 5.1 Polling Strategy
+### 5.1 Public Pages
 
-Since WebSocket is not available, use intelligent polling:
+| Page | Route | Description |
+|------|-------|-------------|
+| **Landing** | `/` | IPS-style clinical viewer with patient list |
+| **Workshop Entry** | `/workshop` | Enter workshop code, name, role, clinic |
+| **Architecture** | `/architecture` | OpenHIE architecture diagram |
+| **About** | `/about` | Workshop information |
 
-```javascript
-// lib/services/liveSync.js
+### 5.2 Authenticated Pages (URL-based)
 
-export class LiveSyncService {
-  constructor() {
-    this.subscribers = new Map();
-    this.intervals = new Map();
-    this.defaultInterval = 3000; // 3 seconds
-  }
+| Page | Route | Description |
+|------|-------|-------------|
+| **Dashboard** | `/dashboard` | Action cards for core workflows |
+| **Patient Search** | `/patient/search` | Search + auto-load workshop patients |
+| **Patient Registration** | `/patient/new` | Create new Patient resource |
+| **Patient Edit** | `/patient/edit` | Edit demographics, contact, address |
+| **Patient Detail** | `/patient/[id]` | View encounters, observations, timeline |
+| **Encounter** | `/encounter` | Create new Encounter |
+| **Encounter Edit** | `/encounter/edit` | Edit encounter details |
+| **Vitals** | `/vitals` | Record vital signs (encounter-linked) |
+| **Developer Mode** | `/developer` | Postman-style FHIR API tester |
+| **Facilitator** | `/facilitator` | Workshop monitoring dashboard |
 
-  subscribe(resourceType, params, callback, interval = this.defaultInterval) {
-    const key = this.generateKey(resourceType, params);
-    
-    if (!this.subscribers.has(key)) {
-      this.subscribers.set(key, new Set());
-      this.startPolling(resourceType, params, key, interval);
-    }
-    
-    this.subscribers.get(key).add(callback);
-    
-    // Return unsubscribe function
-    return () => {
-      this.subscribers.get(key).delete(callback);
-      if (this.subscribers.get(key).size === 0) {
-        this.stopPolling(key);
-      }
-    };
-  }
+### 5.3 Core Features
 
-  startPolling(resourceType, params, key, interval) {
-    let lastResults = null;
-    
-    const poll = async () => {
-      try {
-        const results = await fhirClient.search(resourceType, params);
-        
-        // Deep comparison to detect changes
-        if (JSON.stringify(results) !== JSON.stringify(lastResults)) {
-          lastResults = results;
-          this.notify(key, results);
-        }
-      } catch (error) {
-        console.error('Polling error:', error);
-      }
-    };
-
-    // Poll immediately
-    poll();
-    
-    // Set interval
-    const intervalId = setInterval(poll, interval);
-    this.intervals.set(key, intervalId);
-  }
-
-  stopPolling(key) {
-    const intervalId = this.intervals.get(key);
-    if (intervalId) {
-      clearInterval(intervalId);
-      this.intervals.delete(key);
-      this.subscribers.delete(key);
-    }
-  }
-
-  notify(key, data) {
-    const callbacks = this.subscribers.get(key);
-    if (callbacks) {
-      callbacks.forEach(callback => callback(data));
-    }
-  }
-
-  generateKey(resourceType, params) {
-    return `${resourceType}:${JSON.stringify(params)}`;
-  }
-}
-```
-
-### 5.2 Optimistic Updates
-
-```javascript
-// Optimistic UI pattern
-async function createResourceOptimistic(resource) {
-  // 1. Generate temporary ID
-  const tempId = `temp-${Date.now()}`;
-  const optimisticResource = { ...resource, id: tempId };
-  
-  // 2. Update UI immediately
-  addToLocalState(optimisticResource);
-  
-  try {
-    // 3. Send to server
-    const result = await fhirClient.create(resource);
-    
-    // 4. Replace temp ID with real ID
-    replaceTempId(tempId, result.id);
-    
-    // 5. Show success
-    showToast(`${resource.resourceType} created successfully ✓`);
-    
-    return result;
-  } catch (error) {
-    // 6. Rollback on error
-    removeFromLocalState(tempId);
-    showError(`Failed to create ${resource.resourceType}: ${error.message}`);
-    throw error;
-  }
-}
-```
+- **Patient CRUD**: Create, Read, Update, Delete with confirmation dialogs
+- **Encounter Management**: Create, edit, link to patient
+- **Vitals Recording**: LOINC-coded observations linked to encounters
+- **Cross-Facility Search**: Find patients created by other clinics
+- **Pagination**: `_summary=count` for accurate totals, `_getpagesoffset` for pages
+- **Delete Safety**: Confirmation dialogs before deleting Patient, Encounter, Observation
 
 ---
 
@@ -967,7 +671,7 @@ async function createResourceOptimistic(resource) {
 | 200 | OK | Success |
 | 201 | Created | Resource created successfully |
 | 400 | Bad Request | Show validation error to user |
-| 401 | Unauthorized | Show auth error (shouldn't happen) |
+| 401 | Unauthorized | Not applicable (public server) |
 | 404 | Not Found | Resource doesn't exist |
 | 409 | Conflict | Resource already exists |
 | 422 | Unprocessable Entity | FHIR validation failed |
@@ -1004,7 +708,6 @@ async function createResourceOptimistic(resource) {
 | API Response | < 500ms | SHR server response time |
 | UI Update | < 100ms | Time from action to visual feedback |
 | Search Results | < 1s | Time from search to results display |
-| Polling Interval | 3s | Live sync frequency |
 | Concurrent Users | 20+ | Simultaneous workshop participants |
 
 ### 7.2 Bundle Optimization
@@ -1013,7 +716,7 @@ async function createResourceOptimistic(resource) {
 - Code split by feature
 - Tree-shake unused FHIR profiles
 - Compress FHIR JSON responses
-- Use SvelteKit adapter-static for edge caching
+- Use `@sveltejs/adapter-vercel` for edge deployment
 
 ---
 
@@ -1022,9 +725,8 @@ async function createResourceOptimistic(resource) {
 ### 8.1 CORS
 
 Since fhirlab.net is a public test server:
-- Verify CORS headers allow browser requests
-- Test with multiple browsers
-- Have fallback: proxy through Vercel API routes if needed
+- CORS headers verified for browser requests
+- Fallback: proxy through Vercel API routes if needed
 
 ### 8.2 Data Privacy
 
@@ -1033,53 +735,52 @@ Since fhirlab.net is a public test server:
 - No real PHI (Protected Health Information)
 - Clear workshop disclaimer: "This is a learning environment using synthetic data"
 
-### 8.3 Rate Limiting
+### 8.3 No Authentication
 
-Be mindful of fhirlab.net limits:
-- Implement request batching where possible
-- Use Bundles for transactions
-- Cache aggressively
-- Back off on 429 responses
+The app is designed for **public access**:
+- No OAuth2 / SMART on FHIR
+- No tokens or API keys
+- fhirlab.net servers are fully public
+- Trust-based participant tracking via first name only
 
 ---
 
 ## 9. Testing Strategy
 
-### 9.1 Unit Tests
+### 9.1 E2E Tests (Playwright)
 
 ```javascript
-// Test FHIR client
-import { describe, it, expect } from 'vitest';
-import { fhirClient } from '$lib/services/fhir-client.js';
-
-describe('FHIR Client', () => {
-  it('should create a patient', async () => {
-    const patient = {
-      resourceType: 'Patient',
-      name: [{ family: 'Test', given: ['User'] }],
-      gender: 'male',
-      birthDate: '1990-01-01'
-    };
-    
-    const result = await fhirClient.create(patient);
-    expect(result.id).toBeDefined();
-    expect(result.resourceType).toBe('Patient');
-  });
+// Workshop workflow test
+test('participant can register and view patient', async ({ page }) => {
+  await page.goto('/workshop?w=AK26-TEST');
+  await page.fill('[name="firstName"]', 'TestUser');
+  await page.selectOption('[name="role"]', 'physician');
+  await page.selectOption('[name="clinic"]', 'rhu-kalibo');
+  await page.click('text=Enter Workshop');
+  
+  // Dashboard loads
+  await expect(page.locator('text=Dashboard')).toBeVisible();
+  
+  // Create patient
+  await page.click('text=Register Patient');
+  await page.fill('[name="familyName"]', 'TestPatient');
+  await page.fill('[name="givenName"]', 'Test');
+  await page.click('text=Create Patient');
+  
+  // Patient appears in list
+  await expect(page.locator('text=TestPatient')).toBeVisible();
 });
 ```
 
-### 9.2 Integration Tests
+### 9.2 Test Coverage
 
-- End-to-end patient journey
-- Cross-facility data exchange
-- Terminology validation
-- Error scenarios
-
-### 9.3 Load Testing
-
-- Simulate 20 concurrent users
-- Rapid resource creation
-- Search under load
+- Workshop entry and navigation
+- Patient CRUD operations
+- Encounter creation and editing
+- Vitals recording with encounter linking
+- Cross-facility patient search
+- Developer mode API testing
+- Mobile responsive layouts
 
 ---
 
@@ -1088,33 +789,22 @@ describe('FHIR Client', () => {
 ### 10.1 Vercel Configuration
 
 ```json
-// vercel.json
-{
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": ".svelte-kit/output",
-  "framework": "sveltekit",
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" }
-      ]
-    }
-  ]
-}
+// svelte.config.js
+import adapter from '@sveltejs/adapter-vercel';
+
+export default {
+  kit: {
+    adapter: adapter()
+  }
+};
 ```
 
 ### 10.2 Environment Variables
 
 ```bash
-# .env
+# .env (optional - defaults built in)
 PUBLIC_FHIR_BASE_URL=https://cdr.fhirlab.net/fhir
 PUBLIC_TERMINOLOGY_URL=https://tx.fhirlab.net/fhir
-PUBLIC_APP_NAME=OpenHIE Mock EHR
-PUBLIC_WORKSHOP_NAME=FHIR Fundamentals 2026 - Aklan
 ```
 
 ### 10.3 Pre-Deployment Checklist
@@ -1123,19 +813,72 @@ PUBLIC_WORKSHOP_NAME=FHIR Fundamentals 2026 - Aklan
 - [ ] CORS tested in browser
 - [ ] All FHIR operations tested
 - [ ] Mobile responsiveness verified
-- [ ] Lighthouse score > 80
-- [ ] Test data pre-populated
-- [ ] Documentation updated
+- [ ] Build succeeds without errors
+- [ ] Playwright tests passing
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: 2026-05-03  
-**Next Review**: Before implementation Phase 1
+## 11. Project Structure
 
-**Questions for Review**:
-1. Are all required FHIR resources covered?
-2. Is the polling interval (3s) appropriate?
-3. Should we implement request batching?
-4. Any missing error scenarios?
-5. Performance targets realistic?
+```
+.
+├── src/
+│   ├── lib/
+│   │   ├── constants/
+│   │   │   └── fhir-config.js      # FHIR server URLs, clinic configs
+│   │   ├── services/
+│   │   │   ├── fhir-client.js      # FHIR REST client (CRUD + pagination)
+│   │   │   └── terminology.js      # Dynamic terminology with fallback
+│   │   └── stores/
+│   │       └── appStore.svelte.js  # URL-driven state, practitioner registration
+│   ├── routes/
+│   │   ├── +page.svelte            # Public IPS-style landing page
+│   │   ├── +layout.svelte          # Root layout with AppHeader
+│   │   ├── workshop/
+│   │   │   └── +page.svelte        # Workshop entry (name, role, clinic)
+│   │   ├── dashboard/
+│   │   │   └── +page.svelte        # Action cards dashboard
+│   │   ├── patient/
+│   │   │   ├── search/
+│   │   │   │   └── +page.svelte    # Patient search + auto-load
+│   │   │   ├── new/
+│   │   │   │   └── +page.svelte    # Patient registration form
+│   │   │   ├── edit/
+│   │   │   │   └── +page.svelte    # Patient edit form
+│   │   │   └── [id]/
+│   │   │       └── +page.svelte    # Patient detail (encounters, obs, timeline)
+│   │   ├── encounter/
+│   │   │   ├── +page.svelte        # Encounter creation
+│   │   │   └── edit/
+│   │   │       └── +page.svelte    # Encounter editing
+│   │   ├── vitals/
+│   │   │   └── +page.svelte        # Vitals recording (encounter-linked)
+│   │   ├── developer/
+│   │   │   └── +page.svelte        # Postman-style API tester
+│   │   ├── facilitator/
+│   │   │   └── +page.svelte        # Workshop monitoring
+│   │   ├── architecture/
+│   │   │   └── +page.svelte        # OpenHIE architecture diagram
+│   │   └── about/
+│   │       └── +page.svelte        # About page
+│   └── app.html
+├── tests/
+│   ├── workshop-workflow.spec.js   # E2E workshop tests
+│   └── patient-journey.spec.js     # Patient CRUD tests
+├── docs/
+│   ├── TECHNICAL_SPECIFICATION.md
+│   ├── UI_UX_SPECIFICATION.md
+│   └── ACTIVITY_SPECIFICATION.md
+├── static/
+│   └── robots.txt
+├── svelte.config.js
+├── vite.config.js
+├── playwright.config.js
+└── package.json
+```
+
+---
+
+**Document Version**: 2.0  
+**Last Updated**: 2026-05-03  
+**Next Review**: Post-workshop retrospective
