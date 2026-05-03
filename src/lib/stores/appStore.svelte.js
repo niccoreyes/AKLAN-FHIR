@@ -131,6 +131,7 @@ export function createAppStore() {
 	
 	/**
 	 * Register participant as Practitioner in SHR
+	 * Uses name as unique identifier to avoid duplicates
 	 */
 	async function registerParticipant() {
 		if (!workshopCode || !userName) return;
@@ -139,27 +140,46 @@ export function createAppStore() {
 		error = null;
 		
 		try {
-			// Check if Practitioner already exists
-			const identifier = `${workshopCode}|${userName}`;
+			// Use the user's name as the unique identifier
+			// Search for existing practitioner by name (case-insensitive)
+			console.log(`[Practitioner] Searching for existing practitioner with name: "${userName}"`);
+			
 			const searchResult = await fhirClient.search('Practitioner', {
-				identifier: `${WORKSHOP_IDENTIFIER_SYSTEM}|${identifier}`
+				name: userName,
+				_count: '10'
 			});
 			
-			if (searchResult.entry && searchResult.entry.length > 0) {
-				// Existing participant
-				practitionerId = searchResult.entry[0].resource.id;
+			// Filter to exact name match (FHIR search is partial match by default)
+			const existingPractitioners = searchResult.entry?.filter(entry => {
+				const practitioner = entry.resource;
+				const practitionerName = practitioner.name?.[0]?.given?.[0] || '';
+				// Case-insensitive exact match
+				return practitionerName.toLowerCase() === userName.toLowerCase();
+			}) || [];
+			
+			const existingCount = existingPractitioners.length;
+			console.log(`[Practitioner] Search found ${existingCount} existing practitioner(s) with exact name match`);
+			
+			if (existingCount > 0 && existingPractitioners[0]?.resource?.id) {
+				// Existing practitioner found - reuse it
+				practitionerId = existingPractitioners[0].resource.id;
+				console.log(`[Practitioner] Reusing existing practitioner: ${practitionerId}`);
+				
 				addNotification({
 					type: 'info',
 					message: `Welcome back, ${userName}!`,
 					duration: 3000
 				});
 			} else {
-				// Create new Practitioner
+				// No existing practitioner found - create new one
+				console.log(`[Practitioner] No existing practitioner found with name "${userName}", creating new one...`);
+				
 				const practitioner = {
 					resourceType: 'Practitioner',
+					// Use name as the identifier - name serves as unique ID
 					identifier: [{
 						system: WORKSHOP_IDENTIFIER_SYSTEM,
-						value: identifier
+						value: userName  // Use the name itself as the identifier value
 					}],
 					name: [{
 						given: [userName]
@@ -174,6 +194,8 @@ export function createAppStore() {
 				const result = await fhirClient.create(practitioner, workshopCode);
 				practitionerId = result.data.id;
 				
+				console.log(`[Practitioner] Created new practitioner: ${practitionerId}`);
+				
 				addNotification({
 					type: 'success',
 					message: `Welcome, ${userName}! You're now registered.`,
@@ -181,6 +203,7 @@ export function createAppStore() {
 				});
 			}
 		} catch (err) {
+			console.error('[Practitioner] Error during registration:', err);
 			error = err.message;
 			addNotification({
 				type: 'error',
