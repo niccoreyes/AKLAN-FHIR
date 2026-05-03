@@ -13,6 +13,33 @@
 	// Get patient ID from URL params
 	let patientId = $derived($page.params.id);
 
+	// Delete state
+	let deletingId = $state(null);
+	let deletingType = $state('');
+	let deleteError = $state('');
+
+	async function deleteResource(resourceType, resourceId) {
+		if (!confirm(`Are you sure you want to delete this ${resourceType.toLowerCase()}?`)) {
+			return;
+		}
+
+		deletingId = resourceId;
+		deletingType = resourceType;
+		deleteError = '';
+
+		try {
+			await fhirClient.delete(resourceType, resourceId);
+			// Refresh the data
+			await loadPatientData();
+		} catch (e) {
+			deleteError = e.message || `Failed to delete ${resourceType.toLowerCase()}`;
+			alert(`Error deleting ${resourceType.toLowerCase()}: ` + deleteError);
+		} finally {
+			deletingId = null;
+			deletingType = '';
+		}
+	}
+
 	// Helper functions
 	function getPatientName(p) {
 		const name = p?.name?.[0];
@@ -171,7 +198,7 @@
 	{:else if error}
 		<div class="error-state">
 			⚠️ {error}
-			<button on:click={loadPatientData} class="retry-btn">Retry</button>
+    <button onclick={loadPatientData} class="retry-btn">Retry</button>
 		</div>
 	{:else if patient}
 		<!-- Patient Header -->
@@ -256,9 +283,20 @@
 								</div>
 							{/if}
 							<div class="encounter-actions">
+								<a href="/encounter/edit?id={encounter.id}" class="btn-edit">
+									✏️ Edit
+								</a>
 								<a href="/vitals?patient={patientId}&encounter={encounter.id}" class="btn-add-vitals">
 									+ Add Vitals
 								</a>
+								<button 
+									type="button" 
+									class="btn-delete"
+									onclick={() => deleteResource('Encounter', encounter.id)}
+									disabled={deletingId === encounter.id && deletingType === 'Encounter'}
+								>
+									{deletingId === encounter.id && deletingType === 'Encounter' ? '⏳' : '🗑️'} Delete
+								</button>
 							</div>
 						</div>
 					{/each}
@@ -277,7 +315,18 @@
 						<div class="observation-card">
 							<div class="observation-header">
 								<span class="observation-type">{obs.code?.text || 'Observation'}</span>
-								<span class="observation-date">{formatDate(obs.effectiveDateTime || obs.issued)}</span>
+								<div class="observation-actions">
+									<span class="observation-date">{formatDate(obs.effectiveDateTime || obs.issued)}</span>
+									<button 
+										type="button" 
+										class="btn-delete-small"
+										onclick={() => deleteResource('Observation', obs.id)}
+										disabled={deletingId === obs.id && deletingType === 'Observation'}
+										title="Delete observation"
+									>
+										{deletingId === obs.id && deletingType === 'Observation' ? '⏳' : '🗑️'}
+									</button>
+								</div>
 							</div>
 							<div class="observation-value">
 								{#if obs.component}
@@ -963,5 +1012,70 @@
 		font-size: 14px;
 		color: #64748B;
 		margin: -12px 0 16px 0;
+	}
+
+	/* Action buttons */
+	.btn-edit {
+		padding: 8px 16px;
+		background: #FEF3C7;
+		color: #92400E;
+		border: 1px solid #FCD34D;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-edit:hover {
+		background: #FDE68A;
+	}
+
+	.btn-delete {
+		padding: 8px 16px;
+		background: #FEF2F2;
+		color: #DC2626;
+		border: 1px solid #FECACA;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-delete:hover {
+		background: #FECACA;
+	}
+
+	.btn-delete:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.observation-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.btn-delete-small {
+		padding: 4px 8px;
+		background: #FEF2F2;
+		color: #DC2626;
+		border: 1px solid #FECACA;
+		border-radius: 4px;
+		font-size: 12px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-delete-small:hover {
+		background: #FECACA;
+	}
+
+	.btn-delete-small:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 </style>

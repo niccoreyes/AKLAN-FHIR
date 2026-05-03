@@ -216,6 +216,44 @@ export class FHIRClient {
 	}
 
 	/**
+	 * Update an existing resource
+	 * @param {string} resourceType - FHIR resource type
+	 * @param {string} id - Resource ID
+	 * @param {Object} resource - Updated FHIR resource
+	 * @returns {Promise<Object>} Update result
+	 */
+	async update(resourceType, id, resource) {
+		const url = `${this.baseUrl}/${resourceType}/${id}`;
+		
+		try {
+			const response = await fetch(url, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/fhir+json',
+					'Accept': 'application/fhir+json'
+				},
+				body: JSON.stringify(resource)
+			});
+
+			if (!response.ok) {
+				const errorText = await response.text();
+				throw new Error(`FHIR Error ${response.status}: ${errorText}`);
+			}
+
+			const result = await response.json();
+			return {
+				success: true,
+				data: result,
+				location: response.headers.get('Location'),
+				status: response.status
+			};
+		} catch (error) {
+			console.error('FHIR Update Error:', error);
+			throw error;
+		}
+	}
+
+	/**
 	 * Validate a code using the Terminology Server
 	 * @param {string} system - Code system URL
 	 * @param {string} code - Code to validate

@@ -1493,3 +1493,150 @@ https://svelte.dev/e/css_unused_selector
 https://svelte.dev/e/css_unused_selector
 4:19:57 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:472:1 Unused CSS selector ".toggle-icon"
 https://svelte.dev/e/css_unused_selector
+4:20:56 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:174:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:22:53 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:198:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:22:53 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte
+4:22:53 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:22:53 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:198:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:22:57 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:198:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:22:57 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte
+4:22:57 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:22:57 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:198:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:23:00 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:201:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:23:00 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte
+4:23:00 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:23:00 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:201:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:23:03 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:23:09 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:23:17 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:23:40 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:23:41 PM [vite] (ssr) Error when evaluating SSR module /src/routes/patient/[id]/+page.svelte: src/routes/patient/[id]/+page.svelte:201:11 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/patient/[id]/+page.svelte:201:11
+   199 |      <div class="error-state">
+   200 |        ⚠️ {error}
+   201 |        <button on:click={loadPatientData} class="retry-btn">Retry</button>
+                                                  ^
+   202 |      </div>
+   203 |    {:else if patient}
+
+[1;31m[500] GET /patient/2039[0m
+
+4:23:49 PM [vite] (client) hmr update /src/routes/developer/+page.svelte, /src/routes/+layout.svelte, /src/routes/dashboard/+page.svelte, /src/routes/workshop/+page.svelte, /src/routes/patient/new/+page.svelte, /src/routes/patient/search/+page.svelte, /src/routes/encounter/+page.svelte, /src/routes/vitals/+page.svelte, /src/routes/+page.svelte, /src/routes/facilitator/+page.svelte, /src/routes/patient/[id]/+page.svelte
+4:23:49 PM [vite] (ssr) page reload src/lib/services/fhir-client.js
+4:23:49 PM [vite] (ssr) Error when evaluating SSR module /src/routes/patient/[id]/+page.svelte: src/routes/patient/[id]/+page.svelte:201:11 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/patient/[id]/+page.svelte:201:11
+   199 |      <div class="error-state">
+   200 |        ⚠️ {error}
+   201 |        <button on:click={loadPatientData} class="retry-btn">Retry</button>
+                                                  ^
+   202 |      </div>
+   203 |    {:else if patient}
+
+[1;31m[500] GET /patient/2039[0m
+
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:23:51 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:23:51 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:23:51 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:23:51 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:23:52 PM [vite] (ssr) Error when evaluating SSR module /src/routes/patient/[id]/+page.svelte: src/routes/patient/[id]/+page.svelte:201:11 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/patient/[id]/+page.svelte:201:11
+   199 |      <div class="error-state">
+   200 |        ⚠️ {error}
+   201 |        <button on:click={loadPatientData} class="retry-btn">Retry</button>
+                                                  ^
+   202 |      </div>
+   203 |    {:else if patient}
+
+[1;31m[500] GET /patient/2039[0m
+
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:23:54 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:23:54 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:23:54 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:23:54 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:23:55 PM [vite] (ssr) Error when evaluating SSR module /src/routes/patient/[id]/+page.svelte: src/routes/patient/[id]/+page.svelte:201:11 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/patient/[id]/+page.svelte:201:11
+   199 |      <div class="error-state">
+   200 |        ⚠️ {error}
+   201 |        <button on:click={loadPatientData} class="retry-btn">Retry</button>
+                                                  ^
+   202 |      </div>
+   203 |    {:else if patient}
+
+[1;31m[500] GET /patient/2039[0m
+
+4:23:56 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte, /src/routes/patient/[id]/+page.svelte?svelte&type=style&lang.css
+4:23:56 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:24:00 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:24:00 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:24:00 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:24:00 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
