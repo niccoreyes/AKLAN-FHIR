@@ -269,4 +269,84 @@ test.describe('OpenHIE Mock EHR - Workshop Workflow Tests', () => {
     
     console.log('✅ Bottom navigation works');
   });
+
+  test('9. Clinic switching preserves URL params', async ({ page }) => {
+    // Login with initial clinic (pharmacy)
+    await page.fill('#workshop-code', workshopCode);
+    await page.fill('#first-name', userName);
+    await page.click(`.clinic-card:has-text("Aklan Pharmacy")`);
+    await page.click('button[type="submit"]');
+    await page.waitForURL(/\/dashboard.*/);
+    
+    // Verify initial URL has all params
+    let url = page.url();
+    expect(url).toContain('w=AK26-A');
+    expect(url).toContain('u=Thomas');
+    expect(url).toContain('c=aklan-pharmacy');
+    
+    console.log('✅ Initial login with pharmacy OK');
+    
+    // Switch clinic using the clinic badge dropdown
+    await page.click('.clinic-badge');
+    await page.waitForSelector('.clinic-dropdown', { state: 'visible' });
+    
+    // Click on RHU Kalibo option
+    await page.click('.clinic-option:has-text("RHU Kalibo")');
+    
+    // Wait for navigation and verify new clinic
+    await page.waitForURL(/.*c=rhu-kalibo.*/);
+
+    // Verify URL still has all params with new clinic
+    url = page.url();
+    expect(url).toContain('w=AK26-A');
+    expect(url).toContain('u=Thomas');
+    expect(url).toContain('c=rhu-kalibo');
+
+    console.log('✅ Clinic switch preserves params');
+
+    // Now click on Prescribe action
+    await page.click('a:has-text("Prescribe")');
+
+    // Wait for medication-request page with returnTo
+    await page.waitForURL(/\/medication-request.*/);
+    
+    // Verify URL has all params including returnTo
+    url = page.url();
+    expect(url).toContain('w=AK26-A');
+    expect(url).toContain('u=Thomas');
+    expect(url).toContain('c=rhu-kalibo');
+    expect(url).toContain('returnTo=');
+    
+    // Page should load, not redirect to /
+    await expect(page.locator('h1:has-text("Prescribe Medication")')).toBeVisible({ timeout: 5000 });
+    
+    console.log('✅ Prescribe page loads correctly after clinic switch');
+  });
+
+  test('10. Action links preserve workshop context', async ({ page }) => {
+    // Login
+    await page.fill('#workshop-code', workshopCode);
+    await page.fill('#first-name', userName);
+    await page.click(`.clinic-card:has-text("RHU Kalibo")`);
+    await page.click('button[type="submit"]');
+    await page.waitForURL(/\/dashboard.*/);
+
+    // Check that all visible action links contain workshop params
+    // RHU Kalibo has: register, encounter, vitals, order, prescribe
+    const actions = ['Register Patient', 'Record Visit', 'Record Vitals', 'Order Labs', 'Prescribe'];
+
+    for (const action of actions) {
+      const link = page.locator(`a.action-card:has-text("${action}")`);
+      await expect(link).toBeVisible();
+      const href = await link.getAttribute('href');
+
+      // All links should have returnTo and workshop params
+      expect(href).toContain('returnTo=');
+      expect(href).toContain('w=AK26-A');
+      expect(href).toContain('u=Thomas');
+      expect(href).toContain('c=rhu-kalibo');
+    }
+    
+    console.log('✅ All action links preserve workshop context');
+  });
 });

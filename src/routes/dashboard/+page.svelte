@@ -118,7 +118,7 @@
 			<!-- Primary Actions -->
 			<div class="action-grid">
 				{#each visibleActions as action}
-					{@const hrefWithReturn = action.href + (action.href.includes('?') ? '&' : '?') + 'returnTo=' + encodeURIComponent('/dashboard')}
+					{@const hrefWithReturn = appStore.buildUrl(action.href, { returnTo: '/dashboard' })}
 					<a href={hrefWithReturn} class="action-card">
 						<span class="action-icon">{action.icon}</span>
 						<div class="action-text">
@@ -189,22 +189,22 @@
 
 		<!-- Bottom Navigation -->
 		<nav class="bottom-nav">
-			<a href="/dashboard" class="nav-item active">
+			<a href={appStore.buildUrl('/dashboard')} class="nav-item active">
 				<span class="nav-icon">🏠</span>
 				<span class="nav-label">Home</span>
 			</a>
-			<a href="/patient/search" class="nav-item">
+			<a href={appStore.buildUrl('/patient/search')} class="nav-item">
 				<span class="nav-icon">👤</span>
 				<span class="nav-label">Patients</span>
 			</a>
-			<a href="/inbox" class="nav-item">
+			<a href={appStore.buildUrl('/inbox')} class="nav-item">
 				<span class="nav-icon">📥</span>
 				<span class="nav-label">Inbox</span>
 				{#if inboxCounts.serviceRequest || inboxCounts.medicationRequest}
 					<span class="nav-badge">●</span>
 				{/if}
 			</a>
-			<a href="/developer" class="nav-item">
+			<a href={appStore.buildUrl('/developer')} class="nav-item">
 				<span class="nav-icon">🔧</span>
 				<span class="nav-label">Developer</span>
 			</a>
