@@ -102,7 +102,10 @@
   }
   
   function createNewEncounter() {
-    goto(appStore.buildUrl('/encounter', { patient: patientId }));
+    goto(appStore.buildUrl('/encounter', { 
+      patient: patientId,
+      returnTo: $page.url.pathname + $page.url.search
+    }));
   }
 
   async function handleSubmit() {
