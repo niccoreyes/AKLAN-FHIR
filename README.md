@@ -9,23 +9,24 @@ An interactive, mobile-first Mock EHR for demonstrating OpenHIE interoperability
 
 ## ✨ Features
 
-### Lite Mode UI (Default)
+### OpenHIE Architecture
+- 🏥 **Point of Service** (RHU, Hospital, Lab, Pharmacy)
+- 🔀 **Interoperability Layer** (OpenHIM / Mirth Connect)
+- 🗄️ **Shared Health Record** (cdr.fhirlab.net)
+- 📚 **Terminology Server** (tx.fhirlab.net)
+
+### Clinical Workflows
 - 📱 Mobile-first, touch-optimized design
-- 🎯 Guided workflows for patient registration, vitals, encounters
-- 🎨 Color-coded clinic branding
-- 🔔 Real-time notifications
+- 🎯 Patient registration, search, edit
+- 📝 Encounter recording and editing
+- 🩺 Vital signs (encounter-linked)
+- 🔧 Postman-style FHIR API tester (Developer Mode)
+- 🏷️ Dynamic terminology queries
 
-### Developer Mode
-- 🔧 Postman-style FHIR API testing interface
-- 📝 JSON editor with syntax highlighting
-- 📊 Request history and response viewer
-- 🏷️ Dynamic terminology queries from tx.fhirlab.net
-
-### OpenHIE Integration
-- 🌐 Connected to **cdr.fhirlab.net** (Shared Health Record)
-- 📚 Terminology from **tx.fhirlab.net** (LOINC, SNOMED CT)
+### Workshop Features
 - 🏷️ Workshop isolation via FHIR `meta.tag`
 - 👤 Participant tracking via `Practitioner` resources
+- 🔗 Shareable URLs (no accounts, no passwords)
 
 ---
 
@@ -37,33 +38,34 @@ All participant identity is encoded in the URL:
 https://aklan-fhir.vercel.app/?w=AK26-A&u=Ana&c=rhu-kalibo
 ```
 
-- `w` = Workshop code (group isolation)
-- `u` = User first name
-- `c` = Clinic ID
-- `r` = Role (optional)
+| Parameter | Purpose | Example |
+|-----------|---------|---------|
+| `w` | Workshop code (group isolation) | `AK26-A` |
+| `u` | User first name | `Ana` |
+| `c` | Clinic ID | `rhu-kalibo` |
+| `r` | Role (optional) | `physician` |
 
-### Dynamic Terminology
-Instead of hardcoded codes, the app queries **tx.fhirlab.net** in real-time:
-- ✅ LOINC codes for observations
-- ✅ SNOMED CT for conditions
-- ✅ ICD-10 for billing
-- ✅ RxNorm for medications
-
-### Workshop Isolation
-Each resource is tagged with workshop code:
-```json
-{
-  "resourceType": "Patient",
-  "meta": {
-    "tag": [{
-      "system": "https://aklan-fhir.app/workshop",
-      "code": "AK26-A"
-    }]
-  }
-}
+### OpenHIE Data Flow
+```
+Point of Service (PoS)
+    │
+    │ FHIR REST API
+    ▼
+Interoperability Layer (OpenHIM / Mirth)
+    │
+    ▼
+Shared Services (SHR + Terminology)
 ```
 
-Query by workshop:
+### Dynamic Terminology
+The app queries **tx.fhirlab.net** in real-time:
+- ✅ LOINC codes for observations
+- ✅ SNOMED CT for conditions
+- ❌ ICD-10 — not supported (silent fallback)
+- ❌ RxNorm — not supported (silent fallback)
+
+### Workshop Isolation
+Resources tagged with workshop code in `meta.tag`:
 ```
 GET /Patient?_tag=https://aklan-fhir.app/workshop|AK26-A
 ```
@@ -117,15 +119,14 @@ npm run preview
 
 ### For Facilitators
 
-1. **Generate Workshop**
-   - Visit: `https://your-app.vercel.app/setup` (if implemented)
-   - Or manually create QR codes with workshop codes
-   - Format: `AK26-A` through `AK26-E` for 5 groups
+1. **Workshop Codes**
+   - Pre-defined: `AK26-A` through `AK26-E` for 5 groups
+   - Each group has isolated data via FHIR `meta.tag`
 
-2. **Distribute QR Codes**
+2. **Distribute Links**
    ```
-   https://aklan-fhir.vercel.app/?w=AK26-A&c=rhu-kalibo
-   https://aklan-fhir.vercel.app/?w=AK26-A&c=aklan-hospital
+   https://aklan-fhir.vercel.app/workshop?w=AK26-A&c=rhu-kalibo
+   https://aklan-fhir.vercel.app/workshop?w=AK26-A&c=aklan-hospital
    ```
 
 3. **Monitor Progress**
@@ -133,10 +134,11 @@ npm run preview
 
 ### For Participants
 
-1. **Scan QR Code** → Opens app with pre-filled workshop + clinic
-2. **Enter First Name** → Creates Practitioner resource in SHR
-3. **Use Lite Mode** → Register patients, record vitals
-4. **Switch to Developer Mode** → See raw FHIR API calls
+1. **Open Workshop Link** → Pre-filled workshop + clinic
+2. **Enter First Name** → Creates/reuses Practitioner in SHR
+3. **Select Role** → Physician, Nurse, Midwife, etc.
+4. **Dashboard** → Register patients, record encounters, vitals
+5. **Developer Mode** → `/developer` for raw FHIR API testing
 
 ---
 
@@ -144,10 +146,12 @@ npm run preview
 
 - **Framework**: Svelte 5 + SvelteKit
 - **Adapter**: Vercel (Edge/Node.js)
-- **State**: Svelte 5 Runes (URL-driven)
-- **Styling**: CSS (mobile-first)
+- **State**: Svelte 5 Runes (URL-driven, no localStorage)
+- **Styling**: CSS (mobile-first, responsive)
 - **FHIR**: R4 (via cdr.fhirlab.net)
 - **Terminology**: LOINC, SNOMED CT (via tx.fhirlab.net)
+- **Testing**: Playwright E2E
+- **Deployment**: Vercel
 
 ---
 
@@ -212,6 +216,47 @@ npm run preview
 
 ## 📝 Project Structure
 
+```
+.
+├── src/
+│   ├── lib/
+│   │   ├── components/         # Shared AppHeader, layouts
+│   │   ├── constants/          # FHIR config, clinics, roles, terminology
+│   │   ├── services/
+│   │   │   ├── fhir-client.js  # FHIR REST client (CRUD + pagination)
+│   │   │   └── terminology.js  # Dynamic terminology with fallback
+│   │   └── stores/
+│   │       └── appStore.svelte.js  # URL-driven state, practitioner registration
+│   └── routes/
+│       ├── +page.svelte        # Public IPS-style landing page
+│       ├── +layout.svelte      # Root layout with AppHeader
+│       ├── workshop/           # Workshop entry (name, role, clinic)
+│       ├── dashboard/          # Action cards dashboard
+│       ├── patient/
+│       │   ├── search/         # Patient search + auto-load
+│       │   ├── new/            # Patient registration
+│       │   ├── edit/           # Patient edit
+│       │   └── [id]/           # Patient detail (encounters, observations)
+│       ├── encounter/
+│       │   ├── +page.svelte    # Encounter creation
+│       │   └── edit/           # Encounter editing
+│       ├── vitals/             # Vitals recording (encounter-linked)
+│       ├── developer/          # Postman-style FHIR API tester
+│       ├── facilitator/        # Workshop monitoring dashboard
+│       ├── architecture/       # OpenHIE architecture diagram
+│       └── about/              # About page
+├── tests/
+│   └── workshop-workflow.spec.js   # E2E workshop tests
+├── docs/
+│   ├── TECHNICAL_SPECIFICATION.md
+│   ├── UI_UX_SPECIFICATION.md
+│   └── ACTIVITY_SPECIFICATION.md
+├── static/
+│   └── robots.txt
+├── svelte.config.js
+├── vite.config.js
+├── playwright.config.js
+└── package.json
 ```
 .
 ├── src/
