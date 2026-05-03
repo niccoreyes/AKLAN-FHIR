@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import { APP_NAME, CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { appStore } from '$stores/appStore.svelte.js';
 
@@ -8,6 +9,22 @@
 
 	let serverStatus = $state('checking');
 	let showClinicSwitcher = $state(false);
+	let hasAttemptedRegistration = $state(false);
+
+	// Auto-register participant when configured but no practitionerId
+	// This handles clinic switching where practitionerId is lost
+	$effect(() => {
+		if (browser && appStore.isConfigured && !appStore.practitionerId && !appStore.isLoading && !hasAttemptedRegistration) {
+			// Don't auto-register if we're on the workshop page (manual registration)
+			if (window.location.pathname === '/workshop') {
+				hasAttemptedRegistration = true;
+				return;
+			}
+			console.log('[AppHeader] Auto-registering participant...');
+			hasAttemptedRegistration = true;
+			appStore.registerParticipant();
+		}
+	});
 
 	async function checkServer() {
 		try {
