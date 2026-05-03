@@ -298,8 +298,13 @@
 			return;
 		}
 		if (!appStore.practitionerId) {
-			error = 'Practitioner not registered. Please return to workshop and re-register.';
-			return;
+			// Trigger auto-registration if not registered
+			error = 'Connecting to FHIR server...';
+			await appStore.registerParticipant();
+			if (!appStore.practitionerId) {
+				error = 'Failed to register practitioner. Please refresh the page.';
+				return;
+			}
 		}
 		isSubmitting = true;
 		error = null;

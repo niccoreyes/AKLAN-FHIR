@@ -19,12 +19,6 @@
 			// Don't auto-register if we're on the workshop page (manual registration)
 			if (window.location.pathname === '/workshop') return;
 			
-			// Check if we've already attempted registration in this session
-			if (appStore.loadRegistrationState()) {
-				console.log('[AppHeader] Registration already attempted in this session, skipping auto-register');
-				return;
-			}
-			
 			console.log('[AppHeader] Auto-registering participant...');
 			isRegistering = true;
 			appStore.registerParticipant().then(() => {
