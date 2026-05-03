@@ -5,6 +5,8 @@
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
+	import { deriveUnit } from '$lib/utils/medication-helpers.js';
+	import LogsToggle from '$components/LogsToggle.svelte';
 
 	// Get return URL from query params
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
@@ -60,7 +62,8 @@
 	// Dosage fields (populated from selection or manual)
 	let medName = $state('');
 	let strength = $state('');
-	let form = $state('tablet');
+	let form = $state('');
+	let unit = $state('');
 	let dosageText = $state('');
 	let route = $state('oral');
 	let frequency = $state('1');
@@ -84,14 +87,15 @@
 		return strengthMatch ? strengthMatch[0] : '';
 	}
 
-	// Extract form from display name
+	// Extract form from display name as a preview fallback only.
+	// The actual form is populated from the CodeSystem dosageForm property.
 	function extractForm(display) {
-		const forms = ['tablet', 'capsule', 'syrup', 'suspension', 'injection', 'cream', 'ointment', 'drops', 'inhaler'];
+		const forms = ['tablet', 'capsule', 'syrup', 'suspension', 'injection', 'cream', 'ointment', 'drops', 'inhaler', 'solution', 'powder', 'gel', 'spray', 'patch'];
 		const lower = display.toLowerCase();
 		for (const f of forms) {
 			if (lower.includes(f)) return f;
 		}
-		return 'tablet';
+		return '';
 	}
 
 	// Search Philippine FDA medications
@@ -125,17 +129,44 @@
 	}
 
 	// When user selects from dropdown
-	function selectMedication(med) {
+	async function selectMedication(med) {
 		selectedMedication = med;
 		medSearchQuery = med.display;
 		medName = med.nameOnly || med.display;
-		strength = med.strength || '';
-		form = med.form || 'tablet';
-		// Auto-build dosage text
-		dosageText = `${strength ? strength + ' ' : ''}${form}`;
 		medSearchResults = [];
 		showDropdown = false;
 		useFreeText = false;
+
+		// Fetch CodeSystem properties (dosageStrength, dosageForm) from terminology server
+		let lookedUpStrength = '';
+		let lookedUpForm = '';
+		try {
+			const lookup = await fhirClient.lookupCodeProperties(PH_FDA_SYSTEM, med.code);
+			if (lookup.success) {
+				const ds = lookup.properties.get('dosageStrength');
+				const df = lookup.properties.get('dosageForm');
+
+				// Use dosageStrength if it is a real strength value (not "NA" or instructions)
+				if (ds && ds !== 'NA' && !ds.toLowerCase().includes('see reverse') && !ds.toLowerCase().includes('formulation')) {
+					lookedUpStrength = ds;
+				}
+
+				// Use dosageForm directly as provided by the CodeSystem (raw valueString)
+				if (df && df !== 'NA') {
+					lookedUpForm = df;
+				}
+			}
+		} catch (e) {
+			console.warn('Failed to lookup medication properties:', e);
+		}
+
+		// Fallback to regex extraction from display name if lookup didn't yield useful values
+		strength = lookedUpStrength || med.strength || '';
+		form = lookedUpForm || med.form || '';
+		unit = deriveUnit(form);
+
+		// Auto-build dosage text
+		dosageText = `${strength ? strength + ' ' : ''}${form}`.trim();
 	}
 
 	// Switch to free text mode
@@ -153,7 +184,8 @@
 		medSearchQuery = '';
 		medName = '';
 		strength = '';
-		form = 'tablet';
+		form = '';
+		unit = '';
 		dosageText = '';
 		useFreeText = false;
 		medSearchResults = [];
@@ -344,7 +376,7 @@
 				authoredOn: new Date().toISOString(),
 				medicationCodeableConcept: medConcept,
 				dosageInstruction: [{
-					text: `${dosageText || medText} — ${frequency} time${frequency !== '1' ? 's' : ''} every ${period} ${periodUnit}`,
+					text: `${dosageText || fullMedText} — ${frequency} time${frequency !== '1' ? 's' : ''} every ${period} ${periodUnit}`,
 					route: { text: route },
 					timing: {
 						repeat: {
@@ -356,7 +388,7 @@
 				}],
 				encounter: encounterId ? { reference: `Encounter/${encounterId}` } : undefined,
 				dispenseRequest: {
-					quantity: { value: parseInt(quantity), unit: form === 'syrup' || form === 'suspension' ? 'ml' : 'tablet' }
+					quantity: { value: parseInt(quantity), unit: unit || deriveUnit(form) || '' }
 				},
 				note: note ? [{ text: note }] : undefined
 			};
@@ -394,6 +426,7 @@
 		<header class="page-header">
 			<a href="/dashboard" class="back-btn">←</a>
 			<h1>💊 Prescribe Medication</h1>
+			<LogsToggle />
 		</header>
 
 		<main class="page-content">
@@ -561,8 +594,8 @@
 									<button type="button" class="search-result med-result" onclick={() => selectMedication(med)}>
 										<div class="med-info">
 											<span class="med-name">{med.nameOnly || med.display}</span>
-											{#if med.strength}
-												<span class="med-strength">{med.strength} • {med.form}</span>
+											{#if med.strength || med.form}
+												<span class="med-strength">{med.strength}{med.strength && med.form ? ' • ' : ''}{med.form}</span>
 											{/if}
 										</div>
 										<span class="med-code">{med.code}</span>
@@ -607,17 +640,28 @@
 						<div class="detail-row">
 							<div class="field-group flex-1">
 								<label>Form</label>
-								<select bind:value={form}>
-									<option value="tablet">Tablet</option>
-									<option value="capsule">Capsule</option>
-									<option value="syrup">Syrup</option>
-									<option value="suspension">Suspension</option>
-									<option value="injection">Injection</option>
-									<option value="cream">Cream</option>
-									<option value="ointment">Ointment</option>
-									<option value="drops">Drops</option>
-									<option value="inhaler">Inhaler</option>
-								</select>
+								<input
+									type="text"
+									bind:value={form}
+									list="form-suggestions"
+									placeholder="e.g. Tablet, Capsule, Powder for Suspension..."
+								/>
+								<datalist id="form-suggestions">
+									<option value="Tablet" />
+									<option value="Capsule" />
+									<option value="Syrup" />
+									<option value="Suspension" />
+									<option value="Powder for Suspension" />
+									<option value="Solution for Injection" />
+									<option value="Cream" />
+									<option value="Ointment" />
+									<option value="Gel" />
+									<option value="Drops" />
+									<option value="Inhaler" />
+									<option value="Patch" />
+									<option value="Spray" />
+									<option value="Powder" />
+								</datalist>
 							</div>
 							<div class="field-group flex-2">
 								<label>Full Dosage Description</label>
@@ -646,7 +690,7 @@
 						</div>
 						<div class="field-group third">
 							<label>Unit</label>
-							<input type="text" value={form === 'syrup' || form === 'suspension' ? 'ml' : 'tablets'} readonly class="readonly" />
+							<input type="text" bind:value={unit} placeholder={deriveUnit(form) || 'e.g. tablet, ml, g...'} />
 						</div>
 					</div>
 
@@ -717,6 +761,7 @@
 		font-size: 18px;
 		font-weight: 700;
 		color: #111827;
+		flex: 1;
 	}
 
 	.page-content {

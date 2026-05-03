@@ -5,6 +5,7 @@
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
+	import LogsToggle from '$components/LogsToggle.svelte';
 
 	// Redirect if not configured
 	onMount(() => {
@@ -109,6 +110,7 @@
 			<div class="header-main">
 				<a href="/dashboard" class="back-btn">←</a>
 				<h1>📥 Work Queue</h1>
+				<LogsToggle />
 			</div>
 			<p class="header-sub">Cross-clinic requests visible to {clinic?.shortName}</p>
 		</header>
@@ -298,6 +300,7 @@
 		font-size: 20px;
 		font-weight: 700;
 		color: #111827;
+		flex: 1;
 	}
 
 	.header-sub {

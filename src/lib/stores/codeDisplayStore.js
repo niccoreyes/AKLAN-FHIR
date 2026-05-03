@@ -89,12 +89,12 @@ export function getIcd10Display(code) {
 }
 
 /**
- * Get display for a RxNorm code
- * @param {string} code - RxNorm code
+ * Get display for a PH FDA CPR code
+ * @param {string} code - PH FDA CPR code
  * @returns {Promise<string>} Display name
  */
-export function getRxnormDisplay(code) {
-	return getCodeDisplay(code, 'http://www.nlm.nih.gov/research/umls/rxnorm', code);
+export function getPhFdaCprDisplay(code) {
+	return getCodeDisplay(code, 'https://tx.fhirlab.net/fhir/ValueSet/TestPHFDACPRVS', code);
 }
 
 /**

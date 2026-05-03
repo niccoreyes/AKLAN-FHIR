@@ -53,13 +53,13 @@
 │  │  • Patient                  │  │  • LOINC (observations, labs)        │  │
 │  │  • Encounter                │  │  • SNOMED CT (diagnoses)             │  │
 │  │  • Observation              │  │  • ICD-10 (billing)                  │  │
-│  │  • Condition                │  │  • RxNorm (medications)              │  │
+  │  │  • Condition                │  │  • PH FDA CPR (medications)          │  │
 │  │  • Practitioner             │  │                                      │  │
 │  │  • Organization             │  │  Capabilities:                       │  │
 │  │                             │  │  • LOINC: ✅ Validated               │  │
 │  └─────────────────────────────┘  │  • SNOMED CT: ✅ Validated           │  │
 │                                    │  • ICD-10: ❌ Not supported          │  │
-│                                    │  • RxNorm: ❌ Not supported          │  │
+│                                    │  • PH FDA CPR: ✅ Supported          │  │
 │                                    └──────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -489,11 +489,11 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 **Query Method**: `GET /ValueSet/$expand?url={ACR_ICD_VALUESET_URL}&filter={searchTerm}&count={n}`  
 **Example**: `GET /ValueSet/$expand?url=http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical&filter=diabetes&count=10`
 
-#### RxNorm
-**System**: `http://www.nlm.nih.gov/research/umls/rxnorm`  
-**Purpose**: Medication identifiers  
-**Usage**: MedicationRequest.medication, MedicationDispense.medication  
-**Validation**: ❌ Not supported on tx.fhirlab.net (returns 404)
+#### PH FDA CPR (Philippines FDA Community Product Repository)
+**ValueSet**: `https://tx.fhirlab.net/fhir/ValueSet/TestPHFDACPRVS`  
+**Purpose**: Philippine FDA medication identifiers  
+**Usage**: MedicationRequest.medicationCodeableConcept, MedicationDispense.medicationCodeableConcept  
+**Validation**: ✅ Supported on tx.fhirlab.net
 
 #### Fallback Strategy
 When terminology server returns 404, the app uses a **silent fallback**: `lookupCode()` returns `{valid: false}` without throwing, allowing the UI to proceed with the code unchecked.

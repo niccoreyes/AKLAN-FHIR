@@ -14,6 +14,7 @@
 	import { getLoincDisplay, preloadCodeDisplays } from '$stores/codeDisplayStore.js';
 	import { CLINICS, CLINIC_CAPABILITIES, LOINC_CODES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
+	import LogsToggle from '$components/LogsToggle.svelte';
 
 	// Get return URL from query params
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
@@ -476,7 +477,8 @@
 	<div class="dr-page" style="--clinic-color: {clinic?.color || '#2563EB'}">
 		<header class="page-header">
 			<a href="/dashboard" class="back-btn">←</a>
-			<h1>📄 Lab Report</h1>
+			<h1>📄 Lab Results</h1>
+			<LogsToggle />
 		</header>
 
 		<main class="page-content">
@@ -725,6 +727,7 @@
 		font-size: 18px;
 		font-weight: 700;
 		color: #111827;
+		flex: 1;
 	}
 
 	.page-content {

@@ -62,7 +62,7 @@ The app queries **tx.fhirlab.net** in real-time:
 - ✅ LOINC codes for observations
 - ✅ SNOMED CT for conditions
 - ❌ ICD-10 — not supported (silent fallback)
-- ❌ RxNorm — not supported (silent fallback)
+- ✅ PH FDA CPR — Philippine FDA medication codes
 
 ### Workshop Isolation
 Resources tagged with workshop code in `meta.tag`:
@@ -172,7 +172,7 @@ npm run preview
 - **LOINC**: `http://loinc.org`
 - **SNOMED CT**: `http://snomed.info/sct`
 - **ICD-10**: `http://hl7.org/fhir/sid/icd-10`
-- **RxNorm**: `http://www.nlm.nih.gov/research/umls/rxnorm`
+- **PH FDA CPR**: `https://tx.fhirlab.net/fhir/ValueSet/TestPHFDACPRVS` — Philippine FDA Community Product Repository for medications
 - **PhilHealth ACR ICD-10**: `http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library` — Used for encounter diagnoses (9,520 codes via tx.fhirlab.net)
 
 ---

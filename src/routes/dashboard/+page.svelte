@@ -6,6 +6,7 @@
 	import { CLINICS, ROLES, CLINIC_CAPABILITIES, WORKSHOP_TAG_SYSTEM, VITAL_SIGNS_LOINC_CODES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 	import DashboardPatientGrid from '$components/DashboardPatientGrid.svelte';
+	import LogsToggle from '$components/LogsToggle.svelte';
 
 	// Get URL params directly for immediate check
 	const urlParams = $derived(browser ? new URL(window.location.href).searchParams : null);
@@ -235,14 +236,15 @@
 			>
 				{appStore.view === 'clinical' ? '👁️' : '🔧'}
 			</button>
-			<button 
-				class="logout-btn"
-				onclick={() => appStore.logout()}
-				title="Logout"
-			>
-				🚪
-			</button>
-		</header>
+		<button 
+			class="logout-btn"
+			onclick={() => appStore.logout()}
+			title="Logout"
+		>
+			🚪
+		</button>
+		<LogsToggle />
+	</header>
 
 		<!-- Main Content -->
 		<main class="dashboard-content">

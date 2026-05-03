@@ -623,7 +623,7 @@ Your Progress
 │   Route: Oral                                   │
 │   Frequency: Once daily                         │
 │   Duration: 30 days                             │
-│   RxNorm Code: 1790983                          │
+│   PH FDA CPR Code: 1790983 (example)                          │
 │                                                 │
 │   🔬 LAB DETAILS:                              │
 │   • CBC (LOINC: 58410-2)                       │

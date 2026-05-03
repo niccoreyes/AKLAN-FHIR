@@ -4,6 +4,7 @@
 	import { browser } from '$app/environment';
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, ROLES } from '$constants';
+	import LogsToggle from '$components/LogsToggle.svelte';
 
 	// Predefined workshop codes
 	const PREDEFINED_WORKSHOPS = ['AK26-A', 'AK26-B', 'AK26-C', 'AK26-D', 'AK26-E'];
@@ -155,6 +156,9 @@
 				{#if appStore.isConfigured}
 					<a href={appStore.buildUrl('/dashboard')} class="dashboard-link">Dashboard →</a>
 				{/if}
+				<div class="header-actions">
+					<LogsToggle />
+				</div>
 			</div>
 			<h1>🎓 Join Workshop</h1>
 			<p class="subtitle">OpenHIE Mock EHR</p>
@@ -345,6 +349,14 @@
 		margin-bottom: 16px;
 		padding-bottom: 12px;
 		border-bottom: 1px solid #e2e8f0;
+		gap: 12px;
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-left: auto;
 	}
 
 	.back-link,

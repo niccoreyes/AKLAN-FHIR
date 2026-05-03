@@ -3,7 +3,7 @@
 	import { browser } from '$app/environment';
 	import { fhirClient } from '$services/fhir-client.js';
 	import { FHIR_CONFIG, WORKSHOP_TAG_SYSTEM } from '$constants';
-	import { getLoincDisplay, getSnomedDisplay, getRxnormDisplay, getIcd10Display } from '$stores/codeDisplayStore.js';
+	import { getLoincDisplay, getSnomedDisplay, getPhFdaCprDisplay, getIcd10Display } from '$stores/codeDisplayStore.js';
 	import AppHeader from '$components/AppHeader.svelte';
 
 	// State
@@ -50,9 +50,9 @@
 		return getCodeDisplay(code, 'http://snomed.info/sct', getSnomedDisplay);
 	}
 	
-	// Get RxNorm display
-	function getRxnormDisplayCached(code) {
-		return getCodeDisplay(code, 'http://www.nlm.nih.gov/research/umls/rxnorm', getRxnormDisplay);
+	// Get PH FDA CPR display
+	function getPhFdaCprDisplayCached(code) {
+		return getCodeDisplay(code, 'https://tx.fhirlab.net/fhir/ValueSet/TestPHFDACPRVS', getPhFdaCprDisplay);
 	}
 
 	// Check server status
@@ -514,9 +514,9 @@
 										</div>
 										<div class="med-meta">
 											<span class="badge badge-{med.status}">{med.status}</span>
-											{#if med.medicationCodeableConcept?.coding?.[0]?.code}
-												<span class="code-label">RxNorm: {med.medicationCodeableConcept?.coding?.[0]?.code}</span>
-											{/if}
+												{#if med.medicationCodeableConcept?.coding?.[0]?.code}
+													<span class="code-label">PH FDA CPR: {med.medicationCodeableConcept?.coding?.[0]?.code}</span>
+												{/if}
 										</div>
 									</div>
 								{/each}

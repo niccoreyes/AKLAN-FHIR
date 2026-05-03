@@ -6,6 +6,7 @@
 	import { CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 	import { deriveUnit } from '$lib/utils/medication-helpers.js';
+	import LogsToggle from '$components/LogsToggle.svelte';
 
 	// Get return URL from query params
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
@@ -252,6 +253,7 @@
 		<header class="page-header">
 			<a href={returnTo} class="back-btn">←</a>
 			<h1>💊 Dispense Medication</h1>
+			<LogsToggle />
 		</header>
 
 		<main class="page-content">
@@ -412,6 +414,7 @@
 		font-size: 18px;
 		font-weight: 700;
 		color: #111827;
+		flex: 1;
 	}
 
 	.page-content {
