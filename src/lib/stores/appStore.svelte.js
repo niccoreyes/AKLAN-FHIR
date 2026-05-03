@@ -123,10 +123,26 @@ export function createAppStore() {
 		const id = Date.now();
 		notifications = [{ id, ...notification }, ...notifications].slice(0, 5);
 		
-		// Auto-remove after 5 seconds
-		setTimeout(() => {
-			notifications = notifications.filter(n => n.id !== id);
-		}, 5000);
+		// Auto-remove after 5 seconds (unless persistent)
+		if (!notification.persistent) {
+			setTimeout(() => {
+				notifications = notifications.filter(n => n.id !== id);
+			}, notification.duration || 5000);
+		}
+	}
+	
+	/**
+	 * Remove notification by ID
+	 */
+	function removeNotification(id) {
+		notifications = notifications.filter(n => n.id !== id);
+	}
+	
+	/**
+	 * Clear all notifications
+	 */
+	function clearNotifications() {
+		notifications = [];
 	}
 	
 	/**
@@ -165,6 +181,9 @@ export function createAppStore() {
 				practitionerId = existingPractitioners[0].resource.id;
 				console.log(`[Practitioner] Reusing existing practitioner: ${practitionerId}`);
 				
+				// Save registration state to sessionStorage
+				saveRegistrationState();
+				
 				addNotification({
 					type: 'info',
 					message: `Welcome back, ${userName}!`,
@@ -195,6 +214,9 @@ export function createAppStore() {
 				practitionerId = result.data.id;
 				
 				console.log(`[Practitioner] Created new practitioner: ${practitionerId}`);
+				
+				// Save registration state to sessionStorage
+				saveRegistrationState();
 				
 				addNotification({
 					type: 'success',
@@ -263,6 +285,75 @@ export function createAppStore() {
 		return queryString ? `${path}?${queryString}` : path;
 	}
 	
+	/**
+	 * Load registration state from sessionStorage
+	 * @returns {boolean} Whether registration was previously attempted
+	 */
+	function loadRegistrationState() {
+		if (!browser) return false;
+		try {
+			return sessionStorage.getItem(`workshop_registration_${workshopCode}_${userName}`) === 'true';
+		} catch (e) {
+			return false;
+		}
+	}
+	
+	/**
+	 * Save registration state to sessionStorage
+	 */
+	function saveRegistrationState() {
+		if (!browser || !workshopCode || !userName) return;
+		try {
+			sessionStorage.setItem(`workshop_registration_${workshopCode}_${userName}`, 'true');
+		} catch (e) {
+			console.error('[AppStore] Failed to save registration state:', e);
+		}
+	}
+	
+	/**
+	 * Clear registration state from sessionStorage
+	 */
+	function clearRegistrationState() {
+		if (!browser || !workshopCode || !userName) return;
+		try {
+			sessionStorage.removeItem(`workshop_registration_${workshopCode}_${userName}`);
+		} catch (e) {
+			console.error('[AppStore] Failed to clear registration state:', e);
+		}
+	}
+	
+	/**
+	 * Logout - clear all state and redirect to home
+	 */
+	function logout() {
+		if (!browser) return;
+		
+		// Clear registration state
+		clearRegistrationState();
+		
+		// Clear URL parameters
+		const url = new URL(window.location.href);
+		url.searchParams.delete('w');
+		url.searchParams.delete('u');
+		url.searchParams.delete('c');
+		url.searchParams.delete('r');
+		url.searchParams.delete('v');
+		window.history.replaceState({}, '', url);
+		
+		// Reset store state
+		workshopCode = '';
+		userName = '';
+		clinicId = '';
+		roleId = '';
+		view = 'clinical';
+		practitionerId = null;
+		notifications = [];
+		error = null;
+		
+		// Navigate to home
+		window.location.href = '/';
+	}
+	
 	return {
 		// State
 		get workshopCode() { return workshopCode; },
@@ -289,9 +380,15 @@ export function createAppStore() {
 		toggleView,
 		toggleGroupFilter,
 		addNotification,
+		removeNotification,
+		clearNotifications,
 		registerParticipant,
 		updateRole,
-		buildUrl
+		buildUrl,
+		logout,
+		loadRegistrationState,
+		saveRegistrationState,
+		clearRegistrationState
 	};
 }
 

@@ -89,6 +89,10 @@
 			error = 'All results need LOINC code and value';
 			return;
 		}
+		if (!appStore.practitionerId) {
+			error = 'Practitioner not registered. Please wait for auto-registration to complete or refresh the page.';
+			return;
+		}
 		isSubmitting = true;
 		error = null;
 

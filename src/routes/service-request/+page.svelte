@@ -50,6 +50,10 @@
 			error = 'Patient and order type are required';
 			return;
 		}
+		if (!appStore.practitionerId) {
+			error = 'Practitioner not registered. Please wait for auto-registration to complete or refresh the page.';
+			return;
+		}
 		isSubmitting = true;
 		error = null;
 
