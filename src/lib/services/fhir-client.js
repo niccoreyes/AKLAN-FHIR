@@ -129,6 +129,68 @@ export class FHIRClient {
 	}
 
 	/**
+	 * Search with pagination support
+	 * @param {string} resourceType - FHIR resource type
+	 * @param {Object} params - Search parameters
+	 * @param {string} workshopCode - Optional workshop code to filter
+	 * @returns {Promise<Object>} {resources, total, nextUrl, hasMore, bundle}
+	 */
+	async searchPaginated(resourceType, params = {}, workshopCode = null) {
+		const bundle = await this.search(resourceType, params, workshopCode);
+		
+		const resources = bundle.entry?.map(e => e.resource) || [];
+		const total = bundle.total || resources.length;
+		const nextLink = bundle.link?.find(l => l.relation === 'next')?.url;
+		const prevLink = bundle.link?.find(l => l.relation === 'previous')?.url;
+		
+		return {
+			resources,
+			total,
+			nextUrl: nextLink,
+			prevUrl: prevLink,
+			hasMore: !!nextLink,
+			bundle
+		};
+	}
+
+	/**
+	 * Fetch next page from pagination URL
+	 * @param {string} nextUrl - The next page URL from bundle.link
+	 * @returns {Promise<Object>} {resources, total, nextUrl, hasMore, bundle}
+	 */
+	async fetchNextPage(nextUrl) {
+		try {
+			const response = await fetch(nextUrl, {
+				headers: {
+					'Accept': 'application/fhir+json'
+				}
+			});
+
+			if (!response.ok) {
+				throw new Error(`FHIR Error ${response.status}`);
+			}
+
+			const bundle = await response.json();
+			const resources = bundle.entry?.map(e => e.resource) || [];
+			const total = bundle.total || resources.length;
+			const nextLink = bundle.link?.find(l => l.relation === 'next')?.url;
+			const prevLink = bundle.link?.find(l => l.relation === 'previous')?.url;
+			
+			return {
+				resources,
+				total,
+				nextUrl: nextLink,
+				prevUrl: prevLink,
+				hasMore: !!nextLink,
+				bundle
+			};
+		} catch (error) {
+			console.error('FHIR Pagination Error:', error);
+			throw error;
+		}
+	}
+
+	/**
 	 * Delete a resource
 	 * @param {string} resourceType - FHIR resource type
 	 * @param {string} id - Resource ID

@@ -11,11 +11,17 @@
 	let selectedPatientResources = $state({});
 	let resourceCounts = $state({});
 	let isLoading = $state(true);
+	let isLoadingMore = $state(false);
 	let serverStatus = $state('checking');
 	let workshopTag = $state('');
 	let showOnlyTagged = $state(true);
 	let searchQuery = $state('');
 	let error = $state('');
+	
+	// Pagination state
+	let totalPatientCount = $state(0);
+	let nextPageUrl = $state(null);
+	let hasMorePatients = $state(false);
 
 	const resourceTypes = ['Patient', 'Encounter', 'Observation', 'Condition', 'MedicationRequest', 'ServiceRequest', 'DiagnosticReport', 'Practitioner', 'Organization'];
 
@@ -44,10 +50,13 @@
 		resourceCounts = counts;
 	}
 
-	// Fetch patients
+	// Fetch patients with pagination
 	async function fetchPatients() {
 		isLoading = true;
+		isLoadingMore = false;
 		error = '';
+		nextPageUrl = null;
+		hasMorePatients = false;
 		
 		try {
 			const params = {
@@ -63,13 +72,44 @@
 				params.name = searchQuery;
 			}
 			
-			const result = await fhirClient.search('Patient', params);
-			patients = result.entry?.map(e => e.resource) || [];
+			// First, get the accurate total count with _summary=count
+			const countParams = { ...params, _summary: 'count' };
+			delete countParams._count; // Remove _count for count query
+			delete countParams._sort;  // Remove _sort for count query
+			const countResult = await fhirClient.search('Patient', countParams);
+			const accurateTotal = countResult.total || 0;
+			
+			// Then fetch the actual data
+			const result = await fhirClient.searchPaginated('Patient', params);
+			patients = result.resources;
+			totalPatientCount = accurateTotal;
+			nextPageUrl = result.nextUrl;
+			hasMorePatients = result.hasMore || patients.length < accurateTotal;
 		} catch (e) {
 			error = e.message;
 			patients = [];
+			totalPatientCount = 0;
 		} finally {
 			isLoading = false;
+		}
+	}
+	
+	// Load more patients (pagination)
+	async function loadMorePatients() {
+		if (!nextPageUrl || isLoadingMore) return;
+		
+		isLoadingMore = true;
+		
+		try {
+			const result = await fhirClient.fetchNextPage(nextPageUrl);
+			patients = [...patients, ...result.resources];
+			nextPageUrl = result.nextUrl;
+			// Check if there are more based on both next URL and total count
+			hasMorePatients = result.hasMore || patients.length < totalPatientCount;
+		} catch (e) {
+			console.error('Error loading more patients:', e);
+		} finally {
+			isLoadingMore = false;
 		}
 	}
 
@@ -186,8 +226,40 @@
 
 	<!-- Main Content -->
 	<div class="content-area">
-		<!-- Filters -->
-		<div class="filters-bar">
+		<!-- Workshop Filter Banner -->
+		<div class="workshop-filter-banner">
+			<div class="filter-content">
+				<div class="filter-title">
+					<span class="filter-icon">🏷️</span>
+					<span>Workshop Data Filter</span>
+				</div>
+				<div class="filter-controls">
+					<input 
+						type="text" 
+						bind:value={workshopTag}
+						placeholder="Enter workshop tag (e.g., AK26-A)"
+						class="workshop-tag-input"
+					/>
+					<button 
+						class="filter-toggle {showOnlyTagged ? 'active' : 'inactive'}"
+						on:click={() => { showOnlyTagged = !showOnlyTagged; fetchPatients(); }}
+					>
+						<span class="toggle-indicator"></span>
+						<span class="toggle-label">
+							{showOnlyTagged ? '🎯 Workshop Only' : '🌐 All SHR Data'}
+						</span>
+					</button>
+				</div>
+			</div>
+			<p class="filter-description">
+				{showOnlyTagged 
+					? `Showing only patients tagged with "${workshopTag || 'current workshop'}". Toggle to view all patients in the Shared Health Record.`
+					: 'Showing all patients in the Shared Health Record. Toggle to filter by workshop tag.'}
+			</p>
+		</div>
+
+		<!-- Search Bar -->
+		<div class="search-bar">
 			<input 
 				type="text" 
 				bind:value={searchQuery}
@@ -195,18 +267,6 @@
 				class="search-input"
 				on:keydown={(e) => e.key === 'Enter' && fetchPatients()}
 			/>
-			<div class="filter-group">
-				<input 
-					type="text" 
-					bind:value={workshopTag}
-					placeholder="Workshop tag (e.g., AK26-A)"
-					class="tag-input"
-				/>
-				<label class="checkbox-label">
-					<input type="checkbox" bind:checked={showOnlyTagged} />
-					Show only tagged data
-				</label>
-			</div>
 			<button class="refresh-btn" on:click={fetchPatients}>🔄 Refresh</button>
 		</div>
 
@@ -214,7 +274,22 @@
 		<div class="panels-container">
 			<!-- Patient List Panel -->
 			<div class="patient-list-panel">
-				<h2>Patients ({patients.length})</h2>
+				<div class="panel-header">
+					<h2>👥 Patients</h2>
+					<div class="patient-count">
+						{#if isLoading}
+							<span class="loading-text">Loading...</span>
+						{:else}
+							<span class="count-display">
+								<strong>{patients.length}</strong>
+								<span class="count-total">of {totalPatientCount} total</span>
+								{#if showOnlyTagged && workshopTag}
+									<span class="count-tag">🎯 {workshopTag}</span>
+								{/if}
+							</span>
+						{/if}
+					</div>
+				</div>
 				
 				{#if isLoading}
 					<div class="loading-state">
@@ -267,6 +342,25 @@
 							</a>
 						{/each}
 					</div>
+					
+					<!-- Load More Button -->
+					{#if hasMorePatients}
+						<div class="load-more-container">
+							<button 
+								class="load-more-btn"
+								on:click={loadMorePatients}
+								disabled={isLoadingMore}
+							>
+								{#if isLoadingMore}
+									<span class="spinner"></span>
+									Loading more...
+								{:else}
+									📥 Load More Patients
+									<span class="load-more-hint">({patients.length} of {totalPatientCount})</span>
+								{/if}
+							</button>
+						</div>
+					{/if}
 				{/if}
 			</div>
 
@@ -478,59 +572,127 @@
 		width: 100%;
 	}
 
-	/* Filters */
-	.filters-bar {
+	/* Workshop Filter Banner */
+	.workshop-filter-banner {
+		background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+		border: 2px solid #BFDBFE;
+		border-radius: 12px;
+		padding: 20px;
+		margin-bottom: 20px;
+	}
+
+	.filter-content {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.filter-title {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 18px;
+		font-weight: 600;
+		color: #1E40AF;
+	}
+
+	.filter-icon {
+		font-size: 24px;
+	}
+
+	.filter-controls {
+		display: flex;
+		gap: 12px;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.workshop-tag-input {
+		padding: 12px 16px;
+		border: 2px solid #93C5FD;
+		border-radius: 8px;
+		font-size: 14px;
+		min-width: 220px;
+		background: white;
+	}
+
+	.workshop-tag-input:focus {
+		outline: none;
+		border-color: #2563EB;
+		box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+	}
+
+	.filter-toggle {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 16px;
+		border-radius: 8px;
+		border: 2px solid;
+		cursor: pointer;
+		font-size: 14px;
+		font-weight: 600;
+		transition: all 0.2s;
+		background: white;
+	}
+
+	.filter-toggle.active {
+		border-color: #2563EB;
+		color: #2563EB;
+		background: #EFF6FF;
+	}
+
+	.filter-toggle.inactive {
+		border-color: #94A3B8;
+		color: #64748B;
+		background: white;
+	}
+
+	.toggle-indicator {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background: currentColor;
+	}
+
+	.filter-description {
+		margin: 12px 0 0 0;
+		font-size: 13px;
+		color: #475569;
+	}
+
+	/* Search Bar */
+	.search-bar {
 		display: flex;
 		gap: 12px;
 		margin-bottom: 24px;
-		flex-wrap: wrap;
 		align-items: center;
 	}
 
 	.search-input {
 		flex: 1;
-		min-width: 200px;
-		padding: 10px 16px;
+		padding: 12px 16px;
 		border: 1px solid #E2E8F0;
 		border-radius: 8px;
 		font-size: 14px;
 		background: white;
-	}
-
-	.filter-group {
-		display: flex;
-		gap: 8px;
-		align-items: center;
-	}
-
-	.tag-input {
-		padding: 10px 16px;
-		border: 1px solid #E2E8F0;
-		border-radius: 8px;
-		font-size: 14px;
-		width: 180px;
-	}
-
-	.checkbox-label {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 13px;
-		color: #475569;
-		cursor: pointer;
 	}
 
 	.refresh-btn {
-		padding: 10px 16px;
+		padding: 12px 20px;
 		background: white;
 		border: 1px solid #E2E8F0;
 		border-radius: 8px;
 		cursor: pointer;
 		font-size: 14px;
+		font-weight: 500;
 	}
 
 	.refresh-btn:hover {
 		background: #F8FAFC;
+		border-color: #CBD5E1;
 	}
 
 	/* Panels */
@@ -547,19 +709,64 @@
 		}
 	}
 
-	/* Patient List */
+	/* Patient List Panel */
 	.patient-list-panel {
 		background: white;
 		border-radius: 12px;
 		border: 1px solid #E2E8F0;
 		padding: 20px;
+		max-height: calc(100vh - 300px);
+		overflow-y: auto;
 	}
 
-	.patient-list-panel h2 {
-		margin: 0 0 16px 0;
-		font-size: 16px;
+	.panel-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #E2E8F0;
+	}
+
+	.panel-header h2 {
+		margin: 0;
+		font-size: 18px;
 		font-weight: 600;
 		color: #1E293B;
+	}
+
+	.patient-count {
+		font-size: 14px;
+		color: #64748B;
+	}
+
+	.count-display {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.count-display strong {
+		color: #2563EB;
+		font-size: 20px;
+	}
+
+	.count-total {
+		color: #94A3B8;
+	}
+
+	.count-tag {
+		background: #DBEAFE;
+		color: #1E40AF;
+		padding: 2px 10px;
+		border-radius: 12px;
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.loading-text {
+		color: #94A3B8;
+		font-style: italic;
 	}
 
 	.loading-state {
@@ -710,6 +917,59 @@
 		border-radius: 4px;
 		margin-top: 4px;
 		display: inline-block;
+	}
+
+	/* Load More Button */
+	.load-more-container {
+		margin-top: 16px;
+		padding-top: 16px;
+		border-top: 1px solid #E2E8F0;
+		text-align: center;
+	}
+
+	.load-more-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 12px 24px;
+		background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+		color: white;
+		border: none;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+		box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+	}
+
+	.load-more-btn:hover:not(:disabled) {
+		transform: translateY(-1px);
+		box-shadow: 0 6px 12px -2px rgba(37, 99, 235, 0.3);
+	}
+
+	.load-more-btn:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
+	.load-more-hint {
+		font-size: 12px;
+		opacity: 0.8;
+		font-weight: 400;
+	}
+
+	.spinner {
+		width: 16px;
+		height: 16px;
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		border-top-color: white;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
 	}
 
 	/* Summary Panel */
