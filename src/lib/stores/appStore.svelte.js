@@ -243,16 +243,6 @@ export function createAppStore() {
 
 				// Save to localStorage with practitionerId
 				saveToStorage({ workshopCode, userName, clinicId, roleId, view, practitionerId });
-
-				// Only show welcome message once per session
-				if (!hasShownWelcome) {
-					hasShownWelcome = true;
-					addNotification({
-						type: 'info',
-						message: `Welcome back!`,
-						duration: 1500
-					});
-				}
 			} else {
 				// No existing practitioner found - create new one
 				console.log(`[Practitioner] No existing practitioner found with name "${userName}", creating new one...`);
