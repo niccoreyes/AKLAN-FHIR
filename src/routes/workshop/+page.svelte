@@ -150,6 +150,12 @@
 <div class="page">
 	<div class="card">
 		<header class="header">
+			<div class="header-top">
+				<a href="/" class="back-link">← Public Viewer</a>
+				{#if appStore.isConfigured}
+					<a href={appStore.buildUrl('/dashboard')} class="dashboard-link">Dashboard →</a>
+				{/if}
+			</div>
 			<h1>🎓 Join Workshop</h1>
 			<p class="subtitle">OpenHIE Mock EHR</p>
 		</header>
@@ -292,7 +298,12 @@
 		</form>
 
 		<footer class="footer">
-			<a href="/" class="back-link">← Back to Public Viewer</a>
+			<div class="footer-links">
+				<a href="/" class="back-link">← Public Viewer</a>
+				{#if appStore.isConfigured}
+					<a href={appStore.buildUrl('/dashboard')} class="dashboard-link">Dashboard →</a>
+				{/if}
+			</div>
 		</footer>
 	</div>
 </div>
@@ -325,6 +336,41 @@
 	.header {
 		text-align: center;
 		margin-bottom: 28px;
+	}
+
+	.header-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #e2e8f0;
+	}
+
+	.back-link,
+	.dashboard-link {
+		font-size: 13px;
+		color: #64748b;
+		text-decoration: none;
+		padding: 6px 12px;
+		border-radius: 8px;
+		transition: all 0.2s;
+	}
+
+	.back-link:hover,
+	.dashboard-link:hover {
+		color: #0f172a;
+		background: #f1f5f9;
+	}
+
+	.dashboard-link {
+		color: #059669;
+		font-weight: 500;
+	}
+
+	.dashboard-link:hover {
+		color: #047857;
+		background: #d1fae5;
 	}
 
 	.header h1 {
@@ -589,20 +635,40 @@
 	/* Footer */
 	.footer {
 		margin-top: 24px;
-		text-align: center;
 	}
 
-	.back-link {
+	.footer-links {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.footer .back-link,
+	.footer .dashboard-link {
 		font-size: 14px;
 		font-weight: 500;
 		color: #64748b;
 		text-decoration: none;
 		transition: color 0.2s;
+		padding: 8px 16px;
+		border-radius: 8px;
 	}
 
-	.back-link:hover {
+	.footer .back-link:hover,
+	.footer .dashboard-link:hover {
 		color: #0f172a;
 		text-decoration: underline;
+		background: #f1f5f9;
+	}
+
+	.footer .dashboard-link {
+		color: #059669;
+	}
+
+	.footer .dashboard-link:hover {
+		color: #047857;
+		background: #d1fae5;
 	}
 
 	/* Autocomplete */

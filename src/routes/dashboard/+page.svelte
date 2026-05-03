@@ -139,6 +139,13 @@
 			>
 				{appStore.view === 'clinical' ? '👁️' : '🔧'}
 			</button>
+			<button 
+				class="logout-btn"
+				onclick={() => appStore.logout()}
+				title="Logout"
+			>
+				🚪
+			</button>
 		</header>
 
 		<!-- Main Content -->
@@ -411,6 +418,25 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.logout-btn {
+		width: 40px;
+		height: 40px;
+		border-radius: 10px;
+		border: 1px solid #FEE2E2;
+		background: #FEF2F2;
+		font-size: 18px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: 8px;
+	}
+
+	.logout-btn:hover {
+		background: #FEE2E2;
+		border-color: #FECACA;
 	}
 
 	.dashboard-content {
