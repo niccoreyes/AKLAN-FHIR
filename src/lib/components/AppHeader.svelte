@@ -230,26 +230,27 @@
 	/* Toast Notifications - Fixed position, non-blocking */
 	.toast-container {
 		position: fixed;
-		top: 80px;
-		right: 24px;
+		top: 130px;
+		right: 16px;
 		z-index: 1000;
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
 		pointer-events: none;
+		max-width: calc(100vw - 32px);
 	}
 
 	.toast {
 		pointer-events: auto;
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		padding: 12px 16px;
-		border-radius: 10px;
+		gap: 10px;
+		padding: 10px 14px;
+		border-radius: 8px;
 		background: white;
 		box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
-		min-width: 300px;
-		max-width: 400px;
+		min-width: auto;
+		max-width: 320px;
 		animation: slideIn 0.3s ease-out;
 	}
 

@@ -121,13 +121,14 @@ export function createAppStore() {
 	 */
 	function addNotification(notification) {
 		const id = Date.now();
-		notifications = [{ id, ...notification }, ...notifications].slice(0, 5);
+		notifications = [{ id, ...notification }, ...notifications].slice(0, 3);
 		
-		// Auto-remove after 5 seconds (unless persistent)
+		// Auto-remove after 2 seconds for welcome messages, 4 seconds for errors (unless persistent)
 		if (!notification.persistent) {
+			const duration = notification.duration || (notification.type === 'error' ? 4000 : 2000);
 			setTimeout(() => {
 				notifications = notifications.filter(n => n.id !== id);
-			}, notification.duration || 5000);
+			}, duration);
 		}
 	}
 	
@@ -186,8 +187,8 @@ export function createAppStore() {
 				
 				addNotification({
 					type: 'info',
-					message: `Welcome back, ${userName}!`,
-					duration: 3000
+					message: `Welcome back!`,
+					duration: 1500
 				});
 			} else {
 				// No existing practitioner found - create new one
@@ -220,8 +221,8 @@ export function createAppStore() {
 				
 				addNotification({
 					type: 'success',
-					message: `Welcome, ${userName}! You're now registered.`,
-					duration: 3000
+					message: `Registered!`,
+					duration: 1500
 				});
 			}
 		} catch (err) {
