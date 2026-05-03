@@ -216,6 +216,10 @@
 			error = 'Medication name is required';
 			return;
 		}
+		if (!appStore.practitionerId) {
+			error = 'Practitioner not registered. Please return to workshop and re-register.';
+			return;
+		}
 		isSubmitting = true;
 		error = null;
 

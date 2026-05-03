@@ -40,6 +40,30 @@
 			.filter(Boolean) || []
 	);
 
+	async function loadInboxCounts() {
+		if (!appStore.workshopCode || !appStore.isConfigured) return;
+		loadingInbox = true;
+		try {
+			const results = await Promise.all([
+				fhirClient.search('Patient', { _tag: appStore.workshopCode, _summary: 'count' }),
+				fhirClient.search('Encounter', { _tag: appStore.workshopCode, _summary: 'count' }),
+				fhirClient.search('ServiceRequest', { _tag: appStore.workshopCode, _summary: 'count' }),
+				fhirClient.search('MedicationRequest', { _tag: appStore.workshopCode, _summary: 'count' }),
+				fhirClient.search('DiagnosticReport', { _tag: appStore.workshopCode, _summary: 'count' })
+			]);
+			inboxCounts = {
+				patient: results[0].total || 0,
+				encounter: results[1].total || 0,
+				serviceRequest: results[2].total || 0,
+				medicationRequest: results[3].total || 0,
+				diagnosticReport: results[4].total || 0
+			};
+		} catch (e) {
+			console.error('Failed to load inbox counts:', e);
+		}
+		loadingInbox = false;
+	}
+
 	function switchClinic(clinicId) {
 		appStore.setClinic(clinicId);
 		showClinicSwitcher = false;
