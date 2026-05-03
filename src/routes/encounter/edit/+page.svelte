@@ -146,9 +146,9 @@
   function goBack() {
     const patientId = getPatientId();
     if (patientId) {
-      goto(`/patient/${patientId}`);
+      goto(appStore.buildUrl(`/patient/${patientId}`));
     } else {
-      goto('/patient/search');
+      goto(appStore.buildUrl('/patient/search'));
     }
   }
 </script>

@@ -94,13 +94,13 @@
 
   function startEncounter() {
     if (createdPatient?.id) {
-      goto(`/encounter?patient=${createdPatient.id}`);
+      goto(appStore.buildUrl('/encounter', { patient: createdPatient.id }));
     }
   }
 
   function recordVitals() {
     if (createdPatient?.id) {
-      goto(`/vitals?patient=${createdPatient.id}`);
+      goto(appStore.buildUrl('/vitals', { patient: createdPatient.id }));
     }
   }
 </script>

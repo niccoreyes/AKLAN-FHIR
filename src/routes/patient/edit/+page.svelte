@@ -156,7 +156,7 @@
   }
 
   function goBack() {
-    goto(`/patient/${patientId}`);
+    goto(appStore.buildUrl(`/patient/${patientId}`));
   }
 </script>
 

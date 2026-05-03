@@ -237,6 +237,32 @@ export function createAppStore() {
 		}
 	}
 	
+	/**
+	 * Build URL with workshop parameters preserved
+	 * @param {string} path - Target path
+	 * @param {Object} extraParams - Additional query parameters
+	 * @returns {string} URL with workshop context
+	 */
+	function buildUrl(path, extraParams = {}) {
+		const params = new URLSearchParams();
+		
+		// Always preserve workshop context
+		if (workshopCode) params.set('w', workshopCode);
+		if (userName) params.set('u', userName);
+		if (clinicId) params.set('c', clinicId);
+		if (roleId) params.set('r', roleId);
+		
+		// Add any extra parameters
+		Object.entries(extraParams).forEach(([key, value]) => {
+			if (value !== undefined && value !== null) {
+				params.set(key, String(value));
+			}
+		});
+		
+		const queryString = params.toString();
+		return queryString ? `${path}?${queryString}` : path;
+	}
+	
 	return {
 		// State
 		get workshopCode() { return workshopCode; },
@@ -264,9 +290,18 @@ export function createAppStore() {
 		toggleGroupFilter,
 		addNotification,
 		registerParticipant,
-		updateRole
+		updateRole,
+		buildUrl
 	};
 }
 
 // Create and export singleton
 export const appStore = createAppStore();
+
+/**
+ * Standalone helper to build URL with workshop context
+ * Uses the appStore singleton
+ */
+export function buildWorkshopUrl(path, extraParams = {}) {
+	return appStore.buildUrl(path, extraParams);
+}

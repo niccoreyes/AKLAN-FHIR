@@ -93,7 +93,8 @@
 	onMount(() => {
 		if (browser && appStore.isConfigured) {
 			// Use window.location.replace to avoid adding to history stack
-			window.location.replace('/dashboard');
+			// Preserve workshop parameters
+			window.location.replace(appStore.buildUrl('/dashboard'));
 		}
 	});
 
@@ -125,7 +126,7 @@
 			}
 
 			await appStore.registerParticipant();
-			goto('/dashboard');
+			goto(appStore.buildUrl('/dashboard'));
 		} catch (err) {
 			error = err.message || 'Failed to register. Please try again.';
 		} finally {

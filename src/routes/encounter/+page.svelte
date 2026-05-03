@@ -127,11 +127,11 @@
   }
 
   function recordVitals() {
-    goto(`/vitals?patient=${patientId}`);
+    goto(appStore.buildUrl('/vitals', { patient: patientId }));
   }
 
   function goToDashboard() {
-    goto('/dashboard');
+    goto(appStore.buildUrl('/dashboard'));
   }
 </script>
 

@@ -116,15 +116,15 @@
   }
 
   function selectPatient(patientId) {
-    goto(`/patient/${patientId}`);
+    goto(appStore.buildUrl(`/patient/${patientId}`));
   }
 
   function startEncounter(patientId) {
-    goto(`/encounter?patient=${patientId}`);
+    goto(appStore.buildUrl('/encounter', { patient: patientId }));
   }
 
   function recordVitals(patientId) {
-    goto(`/vitals?patient=${patientId}`);
+    goto(appStore.buildUrl('/vitals', { patient: patientId }));
   }
 
   function getPatientName(patient) {

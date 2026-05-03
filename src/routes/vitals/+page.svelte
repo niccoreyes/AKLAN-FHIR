@@ -102,7 +102,7 @@
   }
   
   function createNewEncounter() {
-    goto(`/encounter?patient=${patientId}`);
+    goto(appStore.buildUrl('/encounter', { patient: patientId }));
   }
 
   async function handleSubmit() {
@@ -417,7 +417,7 @@
   }
 
   function goToDashboard() {
-    goto('/dashboard');
+    goto(appStore.buildUrl('/dashboard'));
   }
 </script>
 
