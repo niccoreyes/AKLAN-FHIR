@@ -20,18 +20,20 @@
 	 * />
 	 */
 	import { appStore } from '$stores/appStore.svelte.js';
+	import { fhirClient } from '$services/fhir-client.js';
 	import CodeDisplay from './CodeDisplay.svelte';
 	import ObservationCard from './ObservationCard.svelte';
-	
+
 	// Props
-	let { 
+	let {
 		encounter = null,
 		observations = [],
 		medications = [],
 		serviceRequests = [],
 		diagnosticReports = [],
 		patientId = '',
-		clinicColor = '#2563EB'
+		clinicColor = '#2563EB',
+		onDelete = null // Callback after successful delete
 	} = $props();
 	
 	// State

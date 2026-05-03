@@ -310,20 +310,18 @@
 					</div>
 				{/if}
 
-				<!-- NEW: Patient-Level Quick Actions -->
-				<div class="patient-quick-actions">
-					<a href="/encounter?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn new-encounter">
-						➕ New Encounter
-					</a>
-					<a href="/vitals?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn vitals">
-						🩺 Record Vitals
-					</a>
-					<a href="/medication-request?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn prescribe">
-						💊 Prescribe
-					</a>
-					<a href="/service-request?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn labs">
-						🧪 Order Labs
-					</a>
+				<!-- NEW: Patient Actions - Encounter First Architecture -->
+				<div class="patient-actions-bar">
+					<div class="primary-action">
+						<a href="/encounter?patient={patient.id}&returnTo=/patient/{patient.id}" class="action-btn primary">
+							➕ {encounters.length > 0 ? 'New Visit' : 'Record First Visit'}
+						</a>
+					</div>
+					{#if encounters.length > 0}
+						<p class="encounter-first-prompt">👆 Click on any visit below to add vitals, prescriptions, or lab orders</p>
+					{:else}
+						<p class="encounter-first-hint">Start by recording a visit. Then you can add vitals, prescriptions, and lab orders within each visit.</p>
+					{/if}
 				</div>
 
 				<div class="patient-actions-secondary">
@@ -586,62 +584,54 @@
 		overflow-y: auto;
 	}
 
-	/* NEW: Patient Quick Actions */
-	.patient-quick-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
+	/* NEW: Patient Actions - Encounter First */
+	.patient-actions-bar {
 		margin: 16px 0;
-		padding: 16px;
+		padding: 20px;
 		background: #F8FAFC;
-		border-radius: 10px;
+		border-radius: 12px;
 		border: 1px solid #E2E8F0;
+		text-align: center;
 	}
 
-	.quick-action-btn {
-		padding: 10px 16px;
-		border-radius: 8px;
-		font-size: 13px;
+	.primary-action {
+		margin-bottom: 12px;
+	}
+
+	.action-btn.primary {
+		display: inline-block;
+		padding: 14px 28px;
+		background: #2563EB;
+		color: white;
+		border-radius: 10px;
+		font-size: 15px;
 		font-weight: 600;
 		text-decoration: none;
 		transition: all 0.2s;
-		white-space: nowrap;
+		box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 	}
 
-	.quick-action-btn.new-encounter {
-		background: #DBEAFE;
-		color: #1D4ED8;
+	.action-btn.primary:hover {
+		background: #1D4ED8;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
 	}
 
-	.quick-action-btn.new-encounter:hover {
-		background: #BFDBFE;
+	.encounter-first-prompt {
+		font-size: 14px;
+		color: #4B5563;
+		margin: 0;
+		font-weight: 500;
 	}
 
-	.quick-action-btn.vitals {
-		background: #DCFCE7;
-		color: #166534;
-	}
-
-	.quick-action-btn.vitals:hover {
-		background: #BBF7D0;
-	}
-
-	.quick-action-btn.prescribe {
-		background: #FCE7F3;
-		color: #BE185D;
-	}
-
-	.quick-action-btn.prescribe:hover {
-		background: #FBCFE8;
-	}
-
-	.quick-action-btn.labs {
-		background: #F3E8FF;
-		color: #7C3AED;
-	}
-
-	.quick-action-btn.labs:hover {
-		background: #E9D5FF;
+	.encounter-first-hint {
+		font-size: 13px;
+		color: #6B7280;
+		margin: 12px 0 0 0;
+		font-style: italic;
+		max-width: 400px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.patient-actions-secondary {
