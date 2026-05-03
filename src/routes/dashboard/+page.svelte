@@ -42,7 +42,9 @@
 		prescribe: { icon: '💊', label: 'Prescribe', desc: 'Create medication orders', href: '/medication-request', requires: 'MedicationRequest' },
 		report: { icon: '📄', label: 'Lab Results', desc: 'Create diagnostic reports', href: '/diagnostic-report', requires: 'DiagnosticReport' },
 		dispense: { icon: '💊', label: 'Dispense', desc: 'Dispense medications', href: '/dispense', requires: 'MedicationDispense' },
-		inbox: { icon: '📥', label: 'Work Queue', desc: 'Orders & requests from other clinics', href: '/inbox', requires: 'inbox' }
+		inbox: { icon: '📥', label: 'Work Queue', desc: 'Orders & requests from other clinics', href: '/inbox', requires: 'inbox' },
+		viewLabs: { icon: '🔬', label: 'View Lab Results', desc: 'Check patient lab reports', href: '/patient/search', requires: 'DiagnosticReport', viewAction: true },
+		viewMeds: { icon: '💉', label: 'View Medications', desc: 'Check prescriptions & dispensed meds', href: '/patient/search', requires: 'MedicationRequest', viewAction: true }
 	};
 
 	const visibleActions = $derived(
@@ -156,7 +158,7 @@
 			<div class="action-grid">
 				{#each visibleActions as action}
 					{@const hrefWithReturn = appStore.buildUrl(action.href, { returnTo: '/dashboard' })}
-					<a href={hrefWithReturn} class="action-card">
+					<a href={hrefWithReturn} class="action-card" class:view-action={action.viewAction}>
 						<span class="action-icon">{action.icon}</span>
 						<div class="action-text">
 							<strong>{action.label}</strong>
@@ -483,6 +485,16 @@
 		border-color: var(--clinic-color);
 		transform: translateY(-2px);
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	}
+
+	.action-card.view-action {
+		background: linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 100%);
+		border-color: #BBF7D0;
+	}
+
+	.action-card.view-action:hover {
+		border-color: #22C55E;
+		background: linear-gradient(135deg, #DCFCE7 0%, #FFFFFF 100%);
 	}
 
 	.action-icon {

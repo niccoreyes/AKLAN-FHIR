@@ -127,20 +127,20 @@ export const CLINIC_CAPABILITIES = {
 	'rhu-kalibo': {
 		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest'],
 		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense'],
-		primaryActions: ['register', 'encounter', 'vitals', 'order', 'prescribe'],
-		description: 'Primary care — register patients, record visits, order labs, refer to hospital'
+		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'prescribe', 'viewLabs', 'viewMeds'],
+		description: 'Primary care — register patients, record visits, order labs, view results, refer to hospital'
 	},
 	'aklan-hospital': {
 		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport'],
 		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense'],
-		primaryActions: ['register', 'encounter', 'vitals', 'order', 'prescribe', 'report'],
-		description: 'Secondary care — full clinical services including lab reporting'
+		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'prescribe', 'report', 'viewLabs', 'viewMeds'],
+		description: 'Secondary care — full clinical services including lab reporting and medication tracking'
 	},
 	'rhu-malay': {
 		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest'],
 		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'DiagnosticReport', 'MedicationDispense'],
-		primaryActions: ['register', 'encounter', 'vitals', 'order'],
-		description: 'Rural health — register patients, basic care, refer to hospital'
+		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'viewLabs', 'viewMeds'],
+		description: 'Rural health — register patients, basic care, view results, refer to hospital'
 	},
 	'kalibo-lab': {
 		canCreate: ['Observation', 'DiagnosticReport'],
