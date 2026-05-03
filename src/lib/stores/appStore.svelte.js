@@ -22,6 +22,48 @@ export function parseUrlParams() {
 }
 
 /**
+ * Load workshop settings from localStorage
+ * @returns {Object|null} Saved settings or null if not found
+ */
+function loadFromStorage() {
+	if (!browser) return null;
+	try {
+		const saved = localStorage.getItem('workshop_settings');
+		if (saved) {
+			return JSON.parse(saved);
+		}
+	} catch (e) {
+		console.error('[AppStore] Failed to load from localStorage:', e);
+	}
+	return null;
+}
+
+/**
+ * Save workshop settings to localStorage
+ * @param {Object} settings - Settings to save
+ */
+function saveToStorage(settings) {
+	if (!browser) return;
+	try {
+		localStorage.setItem('workshop_settings', JSON.stringify(settings));
+	} catch (e) {
+		console.error('[AppStore] Failed to save to localStorage:', e);
+	}
+}
+
+/**
+ * Clear workshop settings from localStorage
+ */
+function clearStorage() {
+	if (!browser) return;
+	try {
+		localStorage.removeItem('workshop_settings');
+	} catch (e) {
+		console.error('[AppStore] Failed to clear localStorage:', e);
+	}
+}
+
+/**
  * Update URL parameters
  * @param {Object} params - Parameters to update
  */
@@ -45,15 +87,21 @@ export function updateUrlParams(params) {
  * Create the main app store using Svelte 5 runes
  */
 export function createAppStore() {
-	// Parse initial URL params
-	const initialParams = parseUrlParams();
+	// Parse initial URL params first
+	const urlParams = parseUrlParams();
+	// If URL params are empty, try loading from localStorage
+	const storageParams = loadFromStorage();
+	
+	const initialParams = urlParams.workshopCode || urlParams.userName 
+		? urlParams 
+		: (storageParams || urlParams);
 	
 	// Reactive state
-	let workshopCode = $state(initialParams.workshopCode);
-	let userName = $state(initialParams.userName);
-	let clinicId = $state(initialParams.clinicId);
-	let roleId = $state(initialParams.roleId);
-	let view = $state(initialParams.view);
+	let workshopCode = $state(initialParams.workshopCode || '');
+	let userName = $state(initialParams.userName || '');
+	let clinicId = $state(initialParams.clinicId || '');
+	let roleId = $state(initialParams.roleId || '');
+	let view = $state(initialParams.view || 'clinical');
 	
 	// UI state
 		let isLoading = $state(false);
@@ -66,6 +114,20 @@ export function createAppStore() {
 	
 	// Track if welcome message has been shown to prevent duplicates
 	let hasShownWelcome = $state(false);
+
+	// Effect: Save settings to localStorage whenever they change
+	$effect(() => {
+		if (browser && workshopCode && userName) {
+			saveToStorage({
+				workshopCode,
+				userName,
+				clinicId,
+				roleId,
+				view,
+				practitionerId
+			});
+		}
+	});
 
 	// Derived values
 	const clinic = $derived(CLINICS.find(c => c.id === clinicId) || null);
@@ -338,6 +400,9 @@ export function createAppStore() {
 		
 		// Clear registration state
 		clearRegistrationState();
+		
+		// Clear localStorage
+		clearStorage();
 		
 		// Clear URL parameters
 		const url = new URL(window.location.href);
