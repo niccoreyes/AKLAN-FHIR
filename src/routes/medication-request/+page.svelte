@@ -20,7 +20,10 @@
 
 	let patientId = $state('');
 	let patientName = $state('');
-	let medication = $state('');
+	let selectedMedication = $state(null); // Will hold {code, display, system}
+	let medSearchQuery = $state('');
+	let medSearchResults = $state([]);
+	let isSearchingMeds = $state(false);
 	let dosage = $state('');
 	let route = $state('oral');
 	let frequency = $state('1');
@@ -32,28 +35,74 @@
 	let error = $state(null);
 	let success = $state(false);
 
-	const commonMeds = [
-		'Amlodipine 5mg',
-		'Metformin 500mg',
-		'Losartan 50mg',
-		'Paracetamol 500mg',
-		'Amoxicillin 500mg',
-		'Cefuroxime 500mg',
-		'Metoprolol 50mg',
-		'Simvastatin 20mg',
-		'Omeprazole 20mg',
-		'Salbutamol 2mg'
-	];
+	const PH_FDA_SYSTEM = 'https://thomasreyes.vercel.app/ph-fda';
+	const PH_FDA_VALUESET = 'https://tx.fhirlab.net/fhir/ValueSet/TestPHFDACPRVS';
+
+	// Search Philippine FDA medications
+	async function searchMedications(query) {
+		if (!query || query.length < 2) {
+			medSearchResults = [];
+			return;
+		}
+		isSearchingMeds = true;
+		try {
+			// Use the ValueSet $expand with filter
+			const response = await fetch(
+				`${PH_FDA_VALUESET}/$expand?filter=${encodeURIComponent(query)}&count=20`,
+				{ headers: { 'Accept': 'application/fhir+json' } }
+			);
+			if (!response.ok) throw new Error('Search failed');
+			const data = await response.json();
+			medSearchResults = data.expansion?.contains || [];
+		} catch (e) {
+			console.error('Medication search error:', e);
+			medSearchResults = [];
+		}
+		isSearchingMeds = false;
+	}
+
+	function selectMedication(med) {
+		selectedMedication = med;
+		medSearchQuery = med.display;
+		medSearchResults = [];
+	}
+
+	function clearMedication() {
+		selectedMedication = null;
+		medSearchQuery = '';
+		medSearchResults = [];
+	}
 
 	async function submitRx() {
-		if (!patientId || !medication) {
-			error = 'Patient and medication are required';
+		if (!patientId) {
+			error = 'Patient is required';
+			return;
+		}
+		if (!selectedMedication && !medSearchQuery) {
+			error = 'Medication is required';
 			return;
 		}
 		isSubmitting = true;
 		error = null;
 
 		try {
+			// Build medicationCodeableConcept
+			let medConcept;
+			if (selectedMedication) {
+				// Use proper PH FDA coding
+				medConcept = {
+					coding: [{
+						system: selectedMedication.system || PH_FDA_SYSTEM,
+						code: selectedMedication.code,
+						display: selectedMedication.display
+					}],
+					text: selectedMedication.display
+				};
+			} else {
+				// Fallback to text only (free text entry)
+				medConcept = { text: medSearchQuery };
+			}
+
 			const resource = {
 				resourceType: 'MedicationRequest',
 				status: 'active',
@@ -61,7 +110,7 @@
 				subject: { reference: `Patient/${patientId}`, display: patientName },
 				requester: { reference: `Practitioner/${appStore.practitionerId}`, display: appStore.userName },
 				authoredOn: new Date().toISOString(),
-				medicationCodeableConcept: { text: medication },
+				medicationCodeableConcept: medConcept,
 				dosageInstruction: [{
 					text: `${dosage || 'Take as directed'} ${route}`,
 					route: { text: route },
@@ -90,6 +139,7 @@
 		isSubmitting = false;
 	}
 
+	// Patient search
 	let patientSearchResults = $state([]);
 	let patientSearchQuery = $state('');
 
@@ -119,6 +169,17 @@
 		patientSearchQuery = p.name;
 		patientSearchResults = [];
 	}
+
+	// Debounce medication search
+	let searchTimeout;
+	function onMedSearch() {
+		clearTimeout(searchTimeout);
+		if (medSearchQuery.length < 2) {
+			medSearchResults = [];
+			return;
+		}
+		searchTimeout = setTimeout(() => searchMedications(medSearchQuery), 300);
+	}
 </script>
 
 {#if appStore.isConfigured}
@@ -132,7 +193,7 @@
 			{#if success}
 				<div class="success-box">
 					✅ Prescription submitted!
-					<p>Redirecting to work queue...</p>
+					<p>Pharmacy will be notified...</p>
 				</div>
 			{:else}
 				<form onsubmit={(e) => { e.preventDefault(); submitRx(); }}>
@@ -159,15 +220,48 @@
 						{/if}
 					</div>
 
-					<!-- Medication -->
+					<!-- PH FDA Medication Search -->
 					<div class="field-group">
-						<label>Medication</label>
-						<input type="text" bind:value={medication} list="meds" placeholder="e.g. Amlodipine 5mg" required />
-						<datalist id="meds">
-							{#each commonMeds as m}
-								<option value={m} />
-							{/each}
-						</datalist>
+						<label>
+							Medication (PH FDA Registered)
+							{#if selectedMedication}
+								<span class="fda-badge">✓ FDA-{selectedMedication.code}</span>
+							{/if}
+						</label>
+						<div class="med-input-wrapper">
+							<input 
+								type="text" 
+								placeholder="Search Philippine FDA registered medications..."
+								bind:value={medSearchQuery}
+								oninput={onMedSearch}
+								disabled={!!selectedMedication}
+							/>
+							{#if selectedMedication}
+								<button type="button" class="clear-btn" onclick={clearMedication}>×</button>
+							{/if}
+						</div>
+						{#if isSearchingMeds}
+							<div class="search-hint">Searching PH FDA database...</div>
+						{/if}
+						{#if medSearchResults.length > 0}
+							<div class="search-dropdown med-dropdown">
+								<div class="dropdown-header">🇵🇭 Philippine FDA Registered Products</div>
+								{#each medSearchResults as med}
+									<button type="button" class="search-result med-result" onclick={() => selectMedication(med)}>
+										<span class="med-name">{med.display}</span>
+										<span class="med-code">{med.code}</span>
+									</button>
+								{/each}
+							</div>
+						{/if}
+						{#if medSearchQuery.length >= 2 && !isSearchingMeds && medSearchResults.length === 0 && !selectedMedication}
+							<div class="no-results">
+								No FDA-registered medication found. 
+								<button type="button" class="use-text-btn" onclick={() => { selectedMedication = null; }}>
+									Use "{medSearchQuery}" as free text
+								</button>
+							</div>
+						{/if}
 					</div>
 
 					<!-- Dosage -->
@@ -189,7 +283,7 @@
 							</select>
 						</div>
 						<div class="field-group half">
-							<label>Quantity</label>
+							<label>Quantity to Dispense</label>
 							<input type="number" bind:value={quantity} min="1" />
 						</div>
 					</div>
@@ -197,7 +291,7 @@
 					<!-- Frequency -->
 					<div class="field-row">
 						<div class="field-group third">
-							<label>Freq</label>
+							<label>Times</label>
 							<input type="number" bind:value={frequency} min="1" />
 						</div>
 						<div class="field-group third">
@@ -275,7 +369,9 @@
 	}
 
 	.field-group label {
-		display: block;
+		display: flex;
+		align-items: center;
+		gap: 8px;
 		font-size: 13px;
 		font-weight: 600;
 		color: #374151;
@@ -300,17 +396,46 @@
 		border-color: var(--clinic-color);
 	}
 
-	.field-row {
+	.fda-badge {
+		font-size: 11px;
+		padding: 2px 8px;
+		background: #F0FDF4;
+		color: #15803D;
+		border-radius: 12px;
+		font-weight: 600;
+	}
+
+	.med-input-wrapper {
+		position: relative;
 		display: flex;
-		gap: 12px;
+		align-items: center;
 	}
 
-	.field-group.half {
+	.med-input-wrapper input {
 		flex: 1;
 	}
 
-	.field-group.third {
-		flex: 1;
+	.clear-btn {
+		position: absolute;
+		right: 8px;
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+		border: none;
+		background: #FEE2E2;
+		color: #B91C1C;
+		font-size: 18px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.search-hint {
+		font-size: 12px;
+		color: #6B7280;
+		margin-top: 4px;
+		font-style: italic;
 	}
 
 	.search-dropdown {
@@ -319,6 +444,19 @@
 		margin-top: 4px;
 		overflow: hidden;
 		background: white;
+		max-height: 250px;
+		overflow-y: auto;
+	}
+
+	.dropdown-header {
+		padding: 8px 12px;
+		background: #F1F5F9;
+		font-size: 11px;
+		font-weight: 700;
+		color: #64748B;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border-bottom: 1px solid #E5E7EB;
 	}
 
 	.search-result {
@@ -330,10 +468,47 @@
 		cursor: pointer;
 		font-size: 14px;
 		border-bottom: 1px solid #F3F4F6;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	.search-result:hover {
 		background: #F9FAFB;
+	}
+
+	.med-name {
+		font-weight: 500;
+		color: #1E293B;
+	}
+
+	.med-code {
+		font-size: 11px;
+		color: #6B7280;
+		background: #F1F5F9;
+		padding: 2px 6px;
+		border-radius: 4px;
+	}
+
+	.no-results {
+		padding: 12px;
+		background: #FEF3C7;
+		border-radius: 8px;
+		font-size: 13px;
+		color: #92400E;
+		margin-top: 8px;
+	}
+
+	.use-text-btn {
+		display: block;
+		margin-top: 8px;
+		padding: 6px 12px;
+		background: white;
+		border: 1px solid #F59E0B;
+		border-radius: 6px;
+		color: #B45309;
+		font-size: 12px;
+		cursor: pointer;
 	}
 
 	.selected-patient {
@@ -341,6 +516,19 @@
 		font-size: 13px;
 		color: var(--clinic-color);
 		font-weight: 600;
+	}
+
+	.field-row {
+		display: flex;
+		gap: 12px;
+	}
+
+	.field-group.half {
+		flex: 1;
+	}
+
+	.field-group.third {
+		flex: 1;
 	}
 
 	.submit-btn {
