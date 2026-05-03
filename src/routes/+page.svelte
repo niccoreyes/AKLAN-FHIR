@@ -5,6 +5,8 @@
 	import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
 	import { getLoincDisplay, getSnomedDisplay, getRxnormDisplay, getIcd10Display } from '$stores/codeDisplayStore.js';
 	import AppHeader from '$components/AppHeader.svelte';
+	import FhirLogsPanel from '$components/FhirLogsPanel.svelte';
+	import { fhirLogger } from '$stores/fhirLogger.js';
 
 	// State
 	let patients = $state([]);
@@ -26,6 +28,15 @@
 	let totalPatientCount = $state(0);
 	let nextPageUrl = $state(null);
 	let hasMorePatients = $state(false);
+
+	// Logs panel state
+	let isLogsEnabled = $state(false);
+	$effect(() => {
+		const unsubscribe = fhirLogger.subscribe(state => {
+			isLogsEnabled = state.isEnabled;
+		});
+		return unsubscribe;
+	});
 
 	const resourceTypes = ['Patient', 'Encounter', 'Observation', 'Condition', 'MedicationRequest', 'ServiceRequest', 'DiagnosticReport', 'Practitioner', 'Organization'];
 	
@@ -261,7 +272,8 @@
 	<AppHeader active="clinical" />
 
 	<!-- Main Content -->
-	<div class="content-area">
+	<div class="content-area" class:logs-open={isLogsEnabled}>
+		<div class="main-content-wrapper">
 		<!-- Workshop Filter Banner -->
 		<div class="workshop-filter-banner">
 			<div class="filter-content">
@@ -665,8 +677,16 @@
 			</div>
 		</div>
 
-		<!-- Resource Counts -->
-		<div class="resource-nav">
+		<!-- FHIR Logs Panel - DevTools Style -->
+		{#if isLogsEnabled}
+			<div class="logs-panel-container">
+				<FhirLogsPanel />
+			</div>
+		{/if}
+	</div>
+
+	<!-- Resource Counts -->
+	<div class="resource-nav">
 			<h3>Available FHIR R4 Resources</h3>
 			<div class="resource-chips">
 				{#each Object.entries(resourceCounts) as [type, count]}
@@ -677,6 +697,20 @@
 					{/if}
 				{/each}
 			</div>
+		</div>
+	</div>
+
+	<!-- Resource Counts -->
+	<div class="resource-nav">
+		<h3>Available FHIR R4 Resources</h3>
+		<div class="resource-chips">
+			{#each Object.entries(resourceCounts) as [type, count]}
+				{#if count > 0}
+					<span class="resource-chip">
+						{type} ({count})
+					</span>
+				{/if}
+			{/each}
 		</div>
 	</div>
 
@@ -709,12 +743,43 @@
 
 	/* Content Area */
 	.content-area {
+		display: flex;
 		flex: 1;
 		padding: 24px;
-		padding-bottom: 100px;
+		gap: 0;
+		max-width: 100%;
+		margin: 0;
+		width: 100%;
+	}
+
+	.content-area.logs-open {
+		padding-right: 0;
+	}
+
+	.main-content-wrapper {
+		flex: 1;
 		max-width: 1400px;
 		margin: 0 auto;
 		width: 100%;
+	}
+
+	.content-area.logs-open .main-content-wrapper {
+		max-width: none;
+		margin: 0;
+		padding-right: 24px;
+	}
+
+	/* Logs Panel Container */
+	.logs-panel-container {
+		width: 450px;
+		flex-shrink: 0;
+		background: #1E293B;
+		border-left: 1px solid #334155;
+		margin: -24px -24px -24px 0;
+		height: calc(100vh - 140px);
+		position: sticky;
+		top: 0;
+		overflow: hidden;
 	}
 
 	/* Workshop Filter Banner */
@@ -1561,20 +1626,13 @@
 
 	/* Footer Actions */
 	.footer-actions {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		right: 0;
 		display: flex;
 		gap: 16px;
-		padding: 16px 24px;
-		padding-bottom: calc(16px + env(safe-area-inset-bottom));
+		padding: 24px;
 		background: white;
 		border-top: 1px solid #E2E8F0;
 		justify-content: center;
 		flex-wrap: wrap;
-		z-index: 100;
-		box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
 	}
 
 	.action-btn {

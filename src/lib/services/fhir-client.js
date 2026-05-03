@@ -1,4 +1,5 @@
 import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+import { fhirLogger } from '$stores/fhirLogger.js';
 
 /**
  * FHIR Client for communicating with cdr.fhirlab.net
@@ -7,6 +8,33 @@ export class FHIRClient {
 	constructor() {
 		this.baseUrl = FHIR_CONFIG.shrBaseUrl;
 		this.txUrl = FHIR_CONFIG.txBaseUrl;
+	}
+
+	/**
+	 * Log a transaction to the FHIR logger
+	 */
+	_logTransaction(method, url, requestBody, response, responseBody, error = null) {
+		const txUrl = new URL(url);
+		fhirLogger.logTransaction({
+			method,
+			url: txUrl.pathname + txUrl.search,
+			fullUrl: url,
+			requestBody,
+			responseStatus: response?.status,
+			responseBody,
+			error: error?.message,
+			duration: null,
+			headers: {
+				request: {
+					'Content-Type': 'application/fhir+json',
+					'Accept': 'application/fhir+json'
+				},
+				response: response ? {
+					'Content-Type': response.headers.get('Content-Type'),
+					'Location': response.headers.get('Location')
+				} : null
+			}
+		});
 	}
 
 	/**
@@ -27,9 +55,12 @@ export class FHIRClient {
 		}
 
 		const url = `${this.baseUrl}/${resource.resourceType}`;
+		let response = null;
+		let result = null;
+		let error = null;
 		
 		try {
-			const response = await fetch(url, {
+			response = await fetch(url, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/fhir+json',
@@ -39,20 +70,27 @@ export class FHIRClient {
 			});
 
 			if (!response.ok) {
-				const error = await response.text();
-				throw new Error(`FHIR Error ${response.status}: ${error}`);
+				const errorText = await response.text();
+				throw new Error(`FHIR Error ${response.status}: ${errorText}`);
 			}
 
-			const result = await response.json();
+			result = await response.json();
+			
+			// Log successful transaction
+			this._logTransaction('POST', url, resource, response, result);
+			
 			return {
 				success: true,
 				data: result,
 				location: response.headers.get('Location'),
 				status: response.status
 			};
-		} catch (error) {
-			console.error('FHIR Create Error:', error);
-			throw error;
+		} catch (err) {
+			error = err;
+			console.error('FHIR Create Error:', err);
+			// Log failed transaction
+			this._logTransaction('POST', url, resource, response, result, err);
+			throw err;
 		}
 	}
 
@@ -64,9 +102,11 @@ export class FHIRClient {
 	 */
 	async read(resourceType, id) {
 		const url = `${this.baseUrl}/${resourceType}/${id}`;
+		let response = null;
+		let result = null;
 		
 		try {
-			const response = await fetch(url, {
+			response = await fetch(url, {
 				headers: {
 					'Accept': 'application/fhir+json'
 				}
@@ -76,9 +116,12 @@ export class FHIRClient {
 				throw new Error(`FHIR Error ${response.status}`);
 			}
 
-			return await response.json();
+			result = await response.json();
+			this._logTransaction('GET', url, null, response, result);
+			return result;
 		} catch (error) {
 			console.error('FHIR Read Error:', error);
+			this._logTransaction('GET', url, null, response, result, error);
 			throw error;
 		}
 	}
@@ -110,8 +153,11 @@ export class FHIRClient {
 			? `${this.baseUrl}/${resourceType}?${queryString}`
 			: `${this.baseUrl}/${resourceType}`;
 		
+		let response = null;
+		let result = null;
+		
 		try {
-			const response = await fetch(url, {
+			response = await fetch(url, {
 				headers: {
 					'Accept': 'application/fhir+json'
 				}
@@ -121,9 +167,12 @@ export class FHIRClient {
 				throw new Error(`FHIR Error ${response.status}`);
 			}
 
-			return await response.json();
+			result = await response.json();
+			this._logTransaction('GET', url, null, response, result);
+			return result;
 		} catch (error) {
 			console.error('FHIR Search Error:', error);
+			this._logTransaction('GET', url, null, response, result, error);
 			throw error;
 		}
 	}
@@ -159,8 +208,11 @@ export class FHIRClient {
 	 * @returns {Promise<Object>} {resources, total, nextUrl, hasMore, bundle}
 	 */
 	async fetchNextPage(nextUrl) {
+		let response = null;
+		let bundle = null;
+		
 		try {
-			const response = await fetch(nextUrl, {
+			response = await fetch(nextUrl, {
 				headers: {
 					'Accept': 'application/fhir+json'
 				}
@@ -170,11 +222,13 @@ export class FHIRClient {
 				throw new Error(`FHIR Error ${response.status}`);
 			}
 
-			const bundle = await response.json();
+			bundle = await response.json();
 			const resources = bundle.entry?.map(e => e.resource) || [];
 			const total = bundle.total || resources.length;
 			const nextLink = bundle.link?.find(l => l.relation === 'next')?.url;
 			const prevLink = bundle.link?.find(l => l.relation === 'previous')?.url;
+			
+			this._logTransaction('GET', nextUrl, null, response, bundle);
 			
 			return {
 				resources,
@@ -186,6 +240,7 @@ export class FHIRClient {
 			};
 		} catch (error) {
 			console.error('FHIR Pagination Error:', error);
+			this._logTransaction('GET', nextUrl, null, response, bundle, error);
 			throw error;
 		}
 	}
@@ -198,9 +253,10 @@ export class FHIRClient {
 	 */
 	async delete(resourceType, id) {
 		const url = `${this.baseUrl}/${resourceType}/${id}`;
+		let response = null;
 		
 		try {
-			const response = await fetch(url, {
+			response = await fetch(url, {
 				method: 'DELETE'
 			});
 
@@ -208,9 +264,11 @@ export class FHIRClient {
 				throw new Error(`FHIR Error ${response.status}`);
 			}
 
+			this._logTransaction('DELETE', url, null, response, null);
 			return true;
 		} catch (error) {
 			console.error('FHIR Delete Error:', error);
+			this._logTransaction('DELETE', url, null, response, null, error);
 			throw error;
 		}
 	}
@@ -224,9 +282,11 @@ export class FHIRClient {
 	 */
 	async update(resourceType, id, resource) {
 		const url = `${this.baseUrl}/${resourceType}/${id}`;
+		let response = null;
+		let result = null;
 		
 		try {
-			const response = await fetch(url, {
+			response = await fetch(url, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/fhir+json',
@@ -240,7 +300,9 @@ export class FHIRClient {
 				throw new Error(`FHIR Error ${response.status}: ${errorText}`);
 			}
 
-			const result = await response.json();
+			result = await response.json();
+			this._logTransaction('PUT', url, resource, response, result);
+			
 			return {
 				success: true,
 				data: result,
@@ -249,6 +311,7 @@ export class FHIRClient {
 			};
 		} catch (error) {
 			console.error('FHIR Update Error:', error);
+			this._logTransaction('PUT', url, resource, response, result, error);
 			throw error;
 		}
 	}
@@ -260,23 +323,28 @@ export class FHIRClient {
 	 * @returns {Promise<Object>} Validation result
 	 */
 	async validateCode(system, code) {
-		const url = `${this.txUrl}/CodeSystem/$lookup?system=${encodeURIComponent(system)}&code=${encodeURIComponent(code)}`;
+		const url = `${this.txUrl}/CodeSystem/\$lookup?system=${encodeURIComponent(system)}&code=${encodeURIComponent(code)}`;
+		let response = null;
+		let result = null;
 		
 		try {
-			const response = await fetch(url, {
+			response = await fetch(url, {
 				headers: {
 					'Accept': 'application/fhir+json'
 				}
 			});
 
 			if (!response.ok) {
+				this._logTransaction('GET', url, null, response, null);
 				return { valid: false, error: response.statusText };
 			}
 
-			const result = await response.json();
+			result = await response.json();
+			this._logTransaction('GET', url, null, response, result);
 			return { valid: true, data: result };
 		} catch (error) {
 			console.error('Terminology Error:', error);
+			this._logTransaction('GET', url, null, response, result, error);
 			return { valid: false, error: error.message };
 		}
 	}
@@ -286,8 +354,12 @@ export class FHIRClient {
 	 * @returns {Promise<Object>} CapabilityStatement
 	 */
 	async getCapabilities() {
+		const url = `${this.baseUrl}/metadata`;
+		let response = null;
+		let result = null;
+		
 		try {
-			const response = await fetch(`${this.baseUrl}/metadata`, {
+			response = await fetch(url, {
 				headers: {
 					'Accept': 'application/fhir+json'
 				}
@@ -297,9 +369,12 @@ export class FHIRClient {
 				throw new Error(`FHIR Error ${response.status}`);
 			}
 
-			return await response.json();
+			result = await response.json();
+			this._logTransaction('GET', url, null, response, result);
+			return result;
 		} catch (error) {
 			console.error('FHIR Capabilities Error:', error);
+			this._logTransaction('GET', url, null, response, result, error);
 			throw error;
 		}
 	}
