@@ -8,6 +8,8 @@
 
 	// Get return URL from query params
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
+	const urlPatientId = $derived($page.url.searchParams.get('patient') || '');
+	const urlEncounterId = $derived($page.url.searchParams.get('encounter') || '');
 
 	onMount(() => {
 		if (browser && !appStore.isConfigured) {
@@ -17,6 +19,10 @@
 		const caps = CLINIC_CAPABILITIES[appStore.clinicId];
 		if (!caps?.canCreate?.includes('MedicationRequest')) {
 			window.location.replace('/dashboard');
+		}
+		// Load patient and encounter from URL if provided
+		if (urlPatientId) {
+			loadPatientFromUrl(urlPatientId);
 		}
 	});
 
@@ -29,6 +35,12 @@
 	let patientSearchQuery = $state('');
 	let isSearchingPatients = $state(false);
 	let showPatientDropdown = $state(false);
+	
+	// Encounter
+	let encounterId = $state('');
+	let encounterName = $state('');
+	let patientEncounters = $state([]);
+	let showEncounterSelector = $state(false);
 
 	// Medication
 	let selectedMedication = $state(null); // {code, display, system, strength, form}
@@ -182,6 +194,67 @@
 		patientSearchQuery = '';
 		patientSearchResults = [];
 		showPatientDropdown = false;
+		// Also clear encounter when patient is cleared
+		encounterId = '';
+		encounterName = '';
+		patientEncounters = [];
+	}
+	
+	// Load patient and encounters from URL params
+	async function loadPatientFromUrl(pid) {
+		try {
+			const patient = await fhirClient.read('Patient', pid);
+			if (patient) {
+				patientId = pid;
+				patientName = patient.name?.[0]?.text || `${patient.name?.[0]?.family}, ${patient.name?.[0]?.given?.join(' ')}`;
+				patientSearchQuery = patientName;
+				
+				// Load patient's encounters
+				await loadPatientEncounters(pid);
+				
+				// If encounter ID is in URL, select it
+				if (urlEncounterId) {
+					const enc = patientEncounters.find(e => e.id === urlEncounterId);
+					if (enc) {
+						selectEncounter(enc);
+					}
+				}
+			}
+		} catch (e) {
+			console.error('Failed to load patient from URL:', e);
+		}
+	}
+	
+	// Load patient's encounters
+	async function loadPatientEncounters(pid) {
+		try {
+			const result = await fhirClient.search('Encounter', {
+				patient: `Patient/${pid}`,
+				_tag: appStore.workshopCode,
+				_count: '20',
+				_sort: '-date'
+			});
+			patientEncounters = result.entry?.map(e => ({
+				id: e.resource.id,
+				type: e.resource.type?.[0]?.text || e.resource.type?.[0]?.coding?.[0]?.display || 'Visit',
+				date: e.resource.period?.start,
+				status: e.resource.status
+			})) || [];
+		} catch (e) {
+			console.error('Failed to load encounters:', e);
+			patientEncounters = [];
+		}
+	}
+	
+	function selectEncounter(enc) {
+		encounterId = enc.id;
+		encounterName = `${enc.type} - ${new Date(enc.date).toLocaleDateString()}`;
+		showEncounterSelector = false;
+	}
+	
+	function clearEncounter() {
+		encounterId = '';
+		encounterName = '';
 	}
 
 	// Debounce searches
@@ -263,6 +336,7 @@
 						}
 					}
 				}],
+				encounter: encounterId ? { reference: `Encounter/${encounterId}` } : undefined,
 				dispenseRequest: {
 					quantity: { value: parseInt(quantity), unit: form === 'syrup' || form === 'suspension' ? 'ml' : 'tablet' }
 				},
@@ -364,6 +438,50 @@
 							<p class="selected-patient-info">{patientName} (ID: {patientId.slice(-8)})</p>
 						{/if}
 					</div>
+
+					<!-- Encounter Selector (when patient is selected) -->
+					{#if patientId}
+						<div class="field-group encounter-selector">
+							<label>
+								Encounter (Optional)
+								{#if encounterId}
+									<span class="linked-badge">🔗 Linked</span>
+								{/if}
+							</label>
+							
+							{#if encounterId}
+								<div class="selected-encounter">
+									<span class="encounter-name">{encounterName}</span>
+									<button type="button" class="clear-btn" onclick={clearEncounter}>×</button>
+								</div>
+							{:else}
+								<button 
+									type="button" 
+									class="btn-select-encounter"
+									onclick={() => showEncounterSelector = !showEncounterSelector}
+								>
+									{patientEncounters.length > 0 ? '🔗 Link to Encounter' : 'No encounters available'}
+								</button>
+								
+								{#if showEncounterSelector && patientEncounters.length > 0}
+									<div class="encounter-dropdown">
+										<div class="dropdown-header">Select an encounter to link</div>
+										{#each patientEncounters as enc}
+											<button 
+												type="button" 
+												class="encounter-option"
+												onclick={() => selectEncounter(enc)}
+											>
+												<span class="enc-type">{enc.type}</span>
+												<span class="enc-date">{new Date(enc.date).toLocaleDateString()}</span>
+												<span class="enc-status">{enc.status}</span>
+											</button>
+										{/each}
+									</div>
+								{/if}
+							{/if}
+						</div>
+					{/if}
 
 					<!-- Medication Search with Dropdown -->
 					<div class="field-group med-search-container">
@@ -941,5 +1059,109 @@
 		min-height: 100vh;
 		font-size: 16px;
 		color: #6B7280;
+	}
+
+	/* Encounter Selector Styles */
+	.encounter-selector {
+		background: #FAFAFA;
+		padding: 12px;
+		border-radius: 8px;
+		border: 1px solid #E5E7EB;
+	}
+
+	.linked-badge {
+		font-size: 11px;
+		padding: 2px 8px;
+		background: #DBEAFE;
+		color: #1D4ED8;
+		border-radius: 12px;
+		font-weight: 600;
+	}
+
+	.btn-select-encounter {
+		width: 100%;
+		padding: 10px 12px;
+		background: white;
+		border: 2px dashed #CBD5E1;
+		border-radius: 8px;
+		color: #64748B;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-select-encounter:hover {
+		border-color: #3B82F6;
+		color: #3B82F6;
+		background: #EFF6FF;
+	}
+
+	.selected-encounter {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 12px;
+		background: #DBEAFE;
+		border-radius: 8px;
+		border: 1px solid #93C5FD;
+	}
+
+	.encounter-name {
+		font-weight: 600;
+		color: #1E40AF;
+		font-size: 14px;
+	}
+
+	.encounter-dropdown {
+		margin-top: 8px;
+		background: white;
+		border: 1px solid #E5E7EB;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+		max-height: 200px;
+		overflow-y: auto;
+	}
+
+	.encounter-option {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 12px;
+		border: none;
+		background: none;
+		cursor: pointer;
+		width: 100%;
+		text-align: left;
+		transition: background 0.2s;
+		border-bottom: 1px solid #F3F4F6;
+	}
+
+	.encounter-option:hover {
+		background: #F3F4F6;
+	}
+
+	.encounter-option:last-child {
+		border-bottom: none;
+	}
+
+	.enc-type {
+		font-weight: 500;
+		color: #1E293B;
+		font-size: 13px;
+	}
+
+	.enc-date {
+		font-size: 12px;
+		color: #6B7280;
+	}
+
+	.enc-status {
+		font-size: 11px;
+		padding: 2px 6px;
+		background: #F3F4F6;
+		color: #6B7280;
+		border-radius: 4px;
+		text-transform: capitalize;
 	}
 </style>

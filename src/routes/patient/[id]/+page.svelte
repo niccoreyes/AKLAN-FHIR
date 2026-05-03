@@ -300,6 +300,12 @@
 								<a href="/vitals?patient={patientId}&encounter={encounter.id}" class="btn-add-vitals">
 									+ Add Vitals
 								</a>
+								<a href="/medication-request?patient={patientId}&encounter={encounter.id}&returnTo=/patient/{patientId}" class="btn-prescribe">
+									💊 Prescribe
+								</a>
+								<a href="/service-request?patient={patientId}&encounter={encounter.id}&returnTo=/patient/{patientId}" class="btn-order-labs">
+									🧪 Order Labs
+								</a>
 								<button 
 									type="button" 
 									class="btn-delete"
@@ -1062,6 +1068,40 @@
 	.btn-delete:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
+	}
+
+	.btn-prescribe {
+		padding: 8px 16px;
+		background: #DCFCE7;
+		color: #166534;
+		border: 1px solid #86EFAC;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-prescribe:hover {
+		background: #BBF7D0;
+	}
+
+	.btn-order-labs {
+		padding: 8px 16px;
+		background: #E0E7FF;
+		color: #3730A3;
+		border: 1px solid #A5B4FC;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-order-labs:hover {
+		background: #C7D2FE;
 	}
 
 	.observation-actions {
