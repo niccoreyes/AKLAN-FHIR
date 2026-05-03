@@ -8,11 +8,15 @@ import { browser } from '$app/environment';
 
 // Maximum number of transactions to keep in memory
 const MAX_TRANSACTIONS = 100;
+const STORAGE_KEY = 'fhir-logs-enabled';
 
 function createFhirLogger() {
+	// Initialize from sessionStorage if available
+	const initialEnabled = browser && sessionStorage.getItem(STORAGE_KEY) === 'true';
+	
 	const { subscribe, set, update } = writable({
 		transactions: [],
-		isEnabled: false,
+		isEnabled: initialEnabled,
 		selectedTransaction: null
 	});
 
@@ -25,14 +29,25 @@ function createFhirLogger() {
 		 * Toggle logging on/off
 		 */
 		toggle: () => {
-			update(state => ({ ...state, isEnabled: !state.isEnabled }));
+			update(state => {
+				const newState = { ...state, isEnabled: !state.isEnabled };
+				if (browser) {
+					sessionStorage.setItem(STORAGE_KEY, String(newState.isEnabled));
+				}
+				return newState;
+			});
 		},
 
 		/**
 		 * Enable/disable logging
 		 */
 		setEnabled: (enabled) => {
-			update(state => ({ ...state, isEnabled: enabled }));
+			update(state => {
+				if (browser) {
+					sessionStorage.setItem(STORAGE_KEY, String(enabled));
+				}
+				return { ...state, isEnabled: enabled };
+			});
 		},
 
 		/**
