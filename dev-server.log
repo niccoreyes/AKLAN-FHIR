@@ -1282,3 +1282,108 @@ https://svelte.dev/e/event_directive_deprecated
 4:10:52 PM [vite] (client) page reload .svelte-kit/generated/root.js
 4:10:52 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
 4:10:52 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:12:26 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:174:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:12:26 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte
+4:12:26 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:12:26 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:174:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:12:41 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:174:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+4:12:41 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte?svelte&type=style&lang.css
+4:12:41 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:12:51 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:12:51 PM [vite] (client) hmr update /src/routes/vitals/+page.svelte
+4:12:51 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:12:58 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:12:58 PM [vite] (client) hmr update /src/routes/vitals/+page.svelte
+4:12:58 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:13:02 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:13:02 PM [vite] (client) hmr update /src/routes/vitals/+page.svelte
+4:13:11 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:13:11 PM [vite] (client) hmr update /src/routes/vitals/+page.svelte
+4:13:24 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:13:24 PM [vite] (client) hmr update /src/routes/vitals/+page.svelte?svelte&type=style&lang.css
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:13:26 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:13:26 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:13:26 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:13:26 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:14:33 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte
+4:14:33 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:14:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:99:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:14:37 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte
+4:14:37 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:14:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:99:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:14:41 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:99:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:14:41 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:386:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:14:41 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:399:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:14:41 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte, /src/routes/workshop/+page.svelte?svelte&type=style&lang.css
+4:14:41 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:14:41 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:99:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:14:41 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:386:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:14:41 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:399:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:14:47 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:99:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:14:47 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:386:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:14:47 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:399:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:14:47 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte?svelte&type=style&lang.css
+4:14:47 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:14:49 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:14:49 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:14:49 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:14:49 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:14:49 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:99:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:14:49 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:386:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:14:49 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:399:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector

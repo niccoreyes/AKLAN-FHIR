@@ -5,6 +5,15 @@
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, ROLES } from '$constants';
 
+	// Predefined workshop codes
+	const PREDEFINED_WORKSHOPS = [
+		{ code: 'AK26-A', label: 'AK26-A' },
+		{ code: 'AK26-B', label: 'AK26-B' },
+		{ code: 'AK26-C', label: 'AK26-C' },
+		{ code: 'AK26-D', label: 'AK26-D' },
+		{ code: 'AK26-E', label: 'AK26-E' }
+	];
+
 	// Form state
 	let workshopCode = $state(appStore.workshopCode || '');
 	let userName = $state(appStore.userName || '');
@@ -12,7 +21,7 @@
 	let selectedRole = $state(appStore.roleId || '');
 	let isLoading = $state(false);
 	let error = $state('');
-	let showRoleToggle = $state(false);
+	let useCustomWorkshop = $state(false);
 
 	// Redirect if already configured (use replaceState to avoid back-button issues)
 	onMount(() => {
@@ -87,15 +96,50 @@
 		<form onsubmit={handleSubmit} class="form">
 			<!-- Workshop Code -->
 			<div class="field">
-				<label for="workshop-code" class="label">Workshop Code</label>
-				<input
-					id="workshop-code"
-					type="text"
-					bind:value={workshopCode}
-					placeholder="e.g., AK26-A"
-					class="input"
-					disabled={isLoading}
-				/>
+				<label class="label">Workshop Code</label>
+				
+				{#if !useCustomWorkshop}
+					<div class="workshop-grid">
+						{#each PREDEFINED_WORKSHOPS as workshop}
+							<button
+								type="button"
+								class="workshop-card"
+								class:selected={workshopCode === workshop.code}
+								onclick={() => workshopCode = workshop.code}
+								disabled={isLoading}
+							>
+								<span class="workshop-icon">🏷️</span>
+								<span class="workshop-name">{workshop.label}</span>
+							</button>
+						{/each}
+					</div>
+					<button
+						type="button"
+						class="use-custom-btn"
+						onclick={() => { useCustomWorkshop = true; workshopCode = ''; }}
+						disabled={isLoading}
+					>
+						+ Use Custom Workshop Code
+					</button>
+				{:else}
+					<div class="custom-workshop-input">
+						<input
+							type="text"
+							bind:value={workshopCode}
+							placeholder="Enter custom workshop code"
+							class="input"
+							disabled={isLoading}
+						/>
+						<button
+							type="button"
+							class="back-to-predefined"
+							onclick={() => { useCustomWorkshop = false; workshopCode = ''; }}
+							disabled={isLoading}
+						>
+							← Back to common codes
+						</button>
+					</div>
+				{/if}
 			</div>
 
 			<!-- First Name -->
@@ -132,37 +176,26 @@
 				</div>
 			</div>
 
-			<!-- Optional Role Toggle -->
+			<!-- Role Selection (Always Visible) -->
 			<div class="field">
-				<button
-					type="button"
-					class="toggle"
-					onclick={() => (showRoleToggle = !showRoleToggle)}
-					aria-expanded={showRoleToggle}
-				>
-					<span class="toggle-icon">{showRoleToggle ? '▼' : '▶'}</span>
-					<span>Optional: Select Your Role</span>
-				</button>
-
-				{#if showRoleToggle}
-					<div class="role-grid">
-						{#each ROLES as role}
-					<button
-						type="button"
-						class="role-card"
-						class:selected={selectedRole === role.id}
-						onclick={() => selectRole(role.id)}
-						disabled={isLoading}
-					>
-								<span class="role-icon">{role.icon}</span>
-								<div class="role-info">
-									<span class="role-name">{role.name}</span>
-									<span class="role-desc">{role.description}</span>
-								</div>
-							</button>
-						{/each}
-					</div>
-				{/if}
+				<span class="label">Select Your Role (Optional)</span>
+				<div class="role-grid">
+					{#each ROLES as role}
+						<button
+							type="button"
+							class="role-card"
+							class:selected={selectedRole === role.id}
+							onclick={() => selectRole(role.id)}
+							disabled={isLoading}
+						>
+							<span class="role-icon">{role.icon}</span>
+							<div class="role-info">
+								<span class="role-name">{role.name}</span>
+								<span class="role-desc">{role.description}</span>
+							</div>
+						</button>
+					{/each}
+				</div>
 			</div>
 
 			<!-- Submit -->
@@ -492,5 +525,95 @@
 	.back-link:hover {
 		color: #0f172a;
 		text-decoration: underline;
+	}
+
+	/* Workshop Selection */
+	.workshop-grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 8px;
+		margin-bottom: 12px;
+	}
+
+	@media (max-width: 480px) {
+		.workshop-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	.workshop-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		padding: 12px 8px;
+		background: white;
+		border: 2px solid #e2e8f0;
+		border-radius: 10px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.workshop-card:hover {
+		border-color: #2563eb;
+		background: #f8fafc;
+	}
+
+	.workshop-card.selected {
+		border-color: #2563eb;
+		background: #eff6ff;
+	}
+
+	.workshop-icon {
+		font-size: 20px;
+	}
+
+	.workshop-name {
+		font-size: 13px;
+		font-weight: 600;
+		color: #0f172a;
+	}
+
+	.workshop-card.selected .workshop-name {
+		color: #2563eb;
+	}
+
+	.use-custom-btn {
+		width: 100%;
+		padding: 10px;
+		background: #f1f5f9;
+		border: 1px dashed #cbd5e1;
+		border-radius: 8px;
+		color: #64748b;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.use-custom-btn:hover {
+		background: #e2e8f0;
+		color: #475569;
+	}
+
+	.custom-workshop-input {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.back-to-predefined {
+		align-self: flex-start;
+		padding: 6px 12px;
+		background: transparent;
+		border: none;
+		color: #64748b;
+		font-size: 13px;
+		cursor: pointer;
+		transition: color 0.2s;
+	}
+
+	.back-to-predefined:hover {
+		color: #2563eb;
 	}
 </style>
