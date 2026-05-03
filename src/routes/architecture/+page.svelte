@@ -13,43 +13,58 @@
 			title: 'Point of Service (PoS)',
 			icon: '🏥',
 			color: '#059669',
-			description: 'Clinical systems where healthcare workers directly interact with patients. Each clinic has its own EHR instance.',
+			description: 'Clinical systems where healthcare workers directly interact with patients. Each institution has its own EHR instance for registration, vitals, encounters, and clinical documentation.',
 			details: [
-				'Register new patients',
-				'Record vital signs and observations',
-				'Document encounters and diagnoses',
-				'Create medication requests and referrals',
-				'Retrieve patient history from SHR'
+				'RHU - Rural Health Unit for primary care',
+				'Hospital - Provincial and district hospitals',
+				'Pharmacy - Medication dispensing and inventory',
+				'Laboratory - Diagnostic test ordering and results',
+				'Each PoS connects through its own Demo EHR instance'
 			],
-			examples: ['RHU Kalibo', 'Aklan Provincial Hospital', 'RHU Malay']
+			examples: ['RHU Kalibo', 'Aklan Provincial Hospital', 'Kalibo Lab']
 		},
-		app: {
-			id: 'app',
-			title: 'OpenHIE Mock EHR',
-			icon: '🔧',
+		demoEhr: {
+			id: 'demoEhr',
+			title: 'Demo EHR per Institution',
+			icon: '💻',
 			color: '#2563EB',
-			description: 'This web application acts as the interoperability layer, connecting multiple PoS systems to the Shared Health Record.',
+			description: 'Instance of the Mock EHR application deployed at each Point of Service. Simulates a real EHR system connecting to the interoperability layer.',
 			details: [
-				'Web-based Svelte 5 application',
-				'URL-driven state (no localStorage)',
-				'Mobile-first responsive design',
-				'Supports 5 concurrent clinic roles',
-				'Workshop isolation via FHIR meta.tag'
+				'Web-based FHIR R4 client application',
+				'Dedicated instance per clinic/institution',
+				'User authentication and role management',
+				'Patient registration and clinical workflows',
+				'Sends FHIR resources to Interoperability Layer'
 			],
-			examples: ['Clinical View', 'Technical Dashboard', 'Architecture']
+			examples: ['RHU-Kalibo EHR', 'Hospital EHR', 'Pharmacy EHR']
+		},
+		interoperability: {
+			id: 'interoperability',
+			title: 'Interoperability Layer (IL)',
+			icon: '🔀',
+			color: '#F59E0B',
+			description: 'Middleware that routes, transforms, and orchestrates health data between PoS systems and the Shared Health Record. Can be OpenHIM, Mirth Connect, or custom implementation.',
+			details: [
+				'OpenHIM: Open-source middleware with mediator framework',
+				'Mirth Connect: Integration engine with HL7/FHIR transformers',
+				'Message routing and protocol adaptation',
+				'Authentication, authorization, and audit logging',
+				'Error handling, retry logic, and transaction management'
+			],
+			examples: ['OpenHIM Core', 'Mirth Connect Channels', 'FHIR Gateway']
 		},
 		shr: {
 			id: 'shr',
 			title: 'Shared Health Record (SHR)',
 			icon: '🗄️',
 			color: '#7C3AED',
-			description: 'The central repository that stores and shares patient health information across all connected systems.',
+			description: 'The central repository that stores and shares patient health information across all connected systems. Receives standardized FHIR resources via the Interoperability Layer.',
 			details: [
 				'FHIR R4 compliant server (cdr.fhirlab.net)',
-				'Stores Patient, Encounter, Observation resources',
-				'Retrieves complete patient history',
+				'Stores Patient, Encounter, Observation, Condition resources',
+				'Provides complete patient history on request',
 				'Workshop-tagged data isolation',
-				'Public test server for learning'
+				'Public test server for learning and demonstration'
 			],
 			examples: ['Patient demographics', 'Vital signs history', 'Encounter timeline']
 		},
@@ -58,24 +73,67 @@
 			title: 'Terminology Server',
 			icon: '📚',
 			color: '#DC2626',
-			description: 'Standardizes clinical concepts using coded values from international code systems.',
+			description: 'Standardizes clinical concepts using coded values from international code systems. Ensures semantic interoperability across all components.',
 			details: [
 				'LOINC codes for laboratory observations',
-				'SNOMED CT for clinical conditions',
-				'Validates codes in real-time',
-				'Ensures semantic interoperability',
-				'tx.fhirlab.net (Ontoserver)'
+				'SNOMED CT for clinical conditions and procedures',
+				'ICD-10 for diagnosis classification',
+				'Validates codes in real-time via FHIR $validate',
+				'tx.fhirlab.net (Ontoserver or HAPI FHIR)'
 			],
 			examples: ['85354-9 (Blood Pressure)', '38341003 (Hypertension)']
 		}
 	};
 
 	const dataFlowSteps = [
-		{ icon: '📝', title: 'Register Patient', desc: 'Clerk creates Patient resource with demographics and PhilHealth ID' },
-		{ icon: '🩺', title: 'Record Vitals', desc: 'Nurse creates Observation resources (BP, HR, Temp) linked to Patient' },
-		{ icon: '📋', title: 'Document Encounter', desc: 'Physician creates Encounter with diagnosis (Condition) and orders' },
-		{ icon: '🔄', title: 'Share to SHR', desc: 'All resources saved to Shared Health Record with workshop tag' },
-		{ icon: '🔍', title: 'Retrieve Anywhere', desc: 'Another clinic searches Patient by ID and sees complete history' }
+		{ icon: '🏥', title: 'PoS System', desc: 'Clerk at RHU uses local Demo EHR to register patient with demographics' },
+		{ icon: '💻', title: 'Demo EHR', desc: 'EHR creates FHIR resources (Patient, Observation) locally' },
+		{ icon: '🔀', title: 'Interop Layer', desc: 'FHIR resources routed via OpenHIM/Mirth to SHR with authentication' },
+		{ icon: '🗄️', title: 'SHR Storage', desc: 'Shared Health Record stores resources tagged by workshop/institution' },
+		{ icon: '🔍', title: 'Cross-Institution', desc: 'Hospital retrieves complete patient history via Interop Layer' }
+	];
+
+	// Architecture tiers for layered display
+	const architectureTiers = [
+		{
+			tier: 'Point of Service (PoS)',
+			icon: '🏥',
+			color: '#059669',
+			nodes: [
+				{ name: 'RHU Kalibo', type: 'pos', icon: '🏥' },
+				{ name: 'Aklan Hospital', type: 'pos', icon: '🏥' },
+				{ name: 'Kalibo Lab', type: 'pos', icon: '🧪' },
+				{ name: 'Local Pharmacy', type: 'pos', icon: '💊' }
+			]
+		},
+		{
+			tier: 'Demo EHR Layer',
+			icon: '💻',
+			color: '#2563EB',
+			nodes: [
+				{ name: 'RHU EHR', type: 'demoEhr', icon: '💻' },
+				{ name: 'Hospital EHR', type: 'demoEhr', icon: '💻' },
+				{ name: 'Lab EHR', type: 'demoEhr', icon: '💻' },
+				{ name: 'Pharmacy EHR', type: 'demoEhr', icon: '💻' }
+			]
+		},
+		{
+			tier: 'Interoperability Layer',
+			icon: '🔀',
+			color: '#F59E0B',
+			nodes: [
+				{ name: 'OpenHIM / Mirth', type: 'interoperability', icon: '🔀' }
+			]
+		},
+		{
+			tier: 'Shared Services',
+			icon: '🌐',
+			color: '#7C3AED',
+			nodes: [
+				{ name: 'Shared Health Record', type: 'shr', icon: '🗄️' },
+				{ name: 'Terminology Server', type: 'terminology', icon: '📚' }
+			]
+		}
 	];
 
 	const apiExamples = [
@@ -162,76 +220,77 @@
 			<p>Understanding how health information flows across systems</p>
 		</div>
 
-		<!-- Interactive Diagram -->
+		<!-- Architecture Overview -->
 		<div class="section-card">
-			<h3>System Components</h3>
-			<p class="section-hint">Click each component to learn more</p>
+			<h3>🏗️ Layered Architecture</h3>
+			<p class="section-hint">
+				Each Point of Service (PoS) has its own Demo EHR. All Demo EHRs connect through an 
+				<strong>Interoperability Layer</strong> (OpenHIM or Mirth Connect) to shared services.
+				<span class="fhir-badge">FHIR R4</span>
+			</p>
 			
-			<div class="architecture-diagram">
-				<!-- Clinics Row -->
-				<div class="diagram-row">
-					{#each CLINICS as clinic}
-						<button 
-							class="diagram-node clinic-node"
-							onclick={() => selectComponent('pos')}
-							style="--node-color: {clinic.color}"
-						>
-							<span class="node-icon">{clinic.icon}</span>
-							<span class="node-label">{clinic.shortName}</span>
-						</button>
-					{/each}
-				</div>
-
-				<!-- Arrow Down -->
-				<div class="diagram-arrow">↓</div>
-
-				<!-- App Layer -->
-				<button 
-					class="diagram-node app-node"
-					onclick={() => selectComponent('app')}
-					class:active={selectedComponent === 'app'}
-				>
-					<span class="node-icon">🔧</span>
-					<span class="node-label">OpenHIE Mock EHR</span>
-					<span class="node-sub">Interoperability Layer</span>
-				</button>
-
-				<!-- Arrows Split -->
-				<div class="diagram-split">
-					<div class="split-line"></div>
-					<div class="split-branches">
-						<div class="branch">↙</div>
-						<div class="branch">↘</div>
+			<!-- Tiered Architecture Diagram -->
+			<div class="tiered-architecture">
+				{#each architectureTiers as tier, tierIndex}
+					<div class="architecture-tier" style="--tier-color: {tier.color}">
+						<div class="tier-label">
+							<span class="tier-icon">{tier.icon}</span>
+							<span class="tier-name">{tier.tier}</span>
+						</div>
+						<div class="tier-nodes">
+							{#each tier.nodes as node}
+								<button 
+									class="tier-node"
+									onclick={() => selectComponent(node.type)}
+									class:active={selectedComponent === node.type}
+									style="--node-color: {tier.color}"
+								>
+									<span class="node-icon">{node.icon}</span>
+									<span class="node-name">{node.name}</span>
+								</button>
+							{/each}
+						</div>
 					</div>
-				</div>
-
-				<!-- Backend Row -->
-				<div class="diagram-row backend-row">
-					<button 
-						class="diagram-node backend-node"
-						onclick={() => selectComponent('shr')}
-						class:active={selectedComponent === 'shr'}
-						style="--node-color: #7C3AED"
-					>
-						<span class="node-icon">🗄️</span>
-						<span class="node-label">Shared Health Record</span>
-						<span class="node-sub">cdr.fhirlab.net</span>
-					</button>
 					
-					<button 
-						class="diagram-node backend-node"
-						onclick={() => selectComponent('terminology')}
-						class:active={selectedComponent === 'terminology'}
-						style="--node-color: #DC2626"
-					>
-						<span class="node-icon">📚</span>
-						<span class="node-label">Terminology Server</span>
-						<span class="node-sub">tx.fhirlab.net</span>
-					</button>
-				</div>
+					{#if tierIndex < architectureTiers.length - 1}
+						<div class="tier-connector">
+							<div class="connector-lines">
+								{#each tier.nodes as _, i}
+									<div class="connector-line"></div>
+								{/each}
+							</div>
+							<div class="connector-arrow">↓</div>
+							<div class="connector-protocol">
+								<span class="protocol-badge">FHIR</span>
+							</div>
+						</div>
+					{/if}
+				{/each}
 			</div>
 
-			<!-- Component Details Panel -->
+			<!-- Component Details -->
+			{#if selectedComponent}
+				{@const comp = components[selectedComponent]}
+				<div class="component-detail">
+					<div class="detail-header" style="--comp-color: {comp.color}">
+						<span class="detail-icon">{comp.icon}</span>
+						<h4>{comp.title}</h4>
+					</div>
+					<p class="detail-description">{comp.description}</p>
+					<ul class="detail-list">
+						{#each comp.details as detail}
+							<li>{detail}</li>
+						{/each}
+					</ul>
+					<div class="detail-examples">
+						<span class="examples-label">Examples:</span>
+						{#each comp.examples as example}
+							<span class="example-tag">{example}</span>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		<!-- Component Details Panel -->
 			{#if selectedComponent}
 				{@const comp = components[selectedComponent]}
 				<div class="component-details">
@@ -1079,5 +1138,160 @@
 	.tech-item span {
 		font-size: 13px;
 		color: #64748B;
+	}
+
+	/* Tiered Architecture Styles */
+	.tiered-architecture {
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+		padding: 20px;
+		background: #F8FAFC;
+		border-radius: 12px;
+		border: 1px solid #E2E8F0;
+	}
+
+	.architecture-tier {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		padding: 16px;
+		background: white;
+		border-radius: 10px;
+		border: 2px solid var(--tier-color, #E2E8F0);
+		border-left: 4px solid var(--tier-color, #E2E8F0);
+	}
+
+	.tier-label {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--tier-color, #64748B);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		padding-bottom: 8px;
+		border-bottom: 1px dashed #E2E8F0;
+	}
+
+	.tier-icon {
+		font-size: 16px;
+	}
+
+	.tier-nodes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		justify-content: center;
+	}
+
+	.tier-node {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		padding: 14px 18px;
+		background: white;
+		border: 2px solid #E2E8F0;
+		border-radius: 10px;
+		cursor: pointer;
+		transition: all 0.2s;
+		min-width: 100px;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+	}
+
+	.tier-node:hover {
+		border-color: var(--node-color, #2563EB);
+		box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+		transform: translateY(-2px);
+	}
+
+	.tier-node.active {
+		border-color: var(--node-color, #2563EB);
+		background: color-mix(in srgb, var(--node-color, #2563EB) 8%, white);
+	}
+
+	.tier-node .node-icon {
+		font-size: 24px;
+	}
+
+	.tier-node .node-name {
+		font-size: 12px;
+		font-weight: 600;
+		color: #1E293B;
+		text-align: center;
+	}
+
+	.tier-connector {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 8px 0;
+		position: relative;
+	}
+
+	.connector-lines {
+		display: flex;
+		justify-content: space-around;
+		width: 100%;
+		max-width: 400px;
+		gap: 40px;
+	}
+
+	.connector-line {
+		width: 2px;
+		height: 20px;
+		background: linear-gradient(to bottom, #CBD5E1, #94A3B8);
+	}
+
+	.connector-arrow {
+		font-size: 20px;
+		color: #94A3B8;
+		margin-top: -5px;
+	}
+
+	.connector-protocol {
+		margin-top: 4px;
+	}
+
+	.protocol-badge {
+		font-size: 10px;
+		font-weight: 700;
+		color: #2563EB;
+		background: #EFF6FF;
+		padding: 2px 8px;
+		border-radius: 4px;
+		border: 1px solid #BFDBFE;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.section-hint .fhir-badge {
+		display: inline-block;
+		font-size: 11px;
+		font-weight: 700;
+		color: #2563EB;
+		background: #EFF6FF;
+		padding: 2px 8px;
+		border-radius: 4px;
+		border: 1px solid #BFDBFE;
+		margin-left: 8px;
+		vertical-align: middle;
+	}
+
+	@media (max-width: 640px) {
+		.tier-nodes {
+			justify-content: flex-start;
+		}
+		
+		.tier-node {
+			min-width: 80px;
+			padding: 10px 12px;
+		}
+		
+		.connector-lines {
+			gap: 20px;
+		}
 	}
 </style>

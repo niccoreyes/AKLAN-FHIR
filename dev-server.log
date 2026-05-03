@@ -1674,3 +1674,283 @@ https://svelte.dev/e/state_referenced_locally
 4:38:42 PM [vite] (client) page reload .svelte-kit/generated/root.js
 4:38:42 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
 4:38:42 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:44:21 PM [vite] (client) hmr update /src/routes/architecture/+page.svelte
+4:44:21 PM [vite] (ssr) page reload src/routes/architecture/+page.svelte
+4:44:29 PM [vite] (client) hmr update /src/routes/architecture/+page.svelte
+4:44:29 PM [vite] (ssr) page reload src/routes/architecture/+page.svelte
+4:44:48 PM [vite] (ssr) page reload src/routes/architecture/+page.svelte
+4:44:57 PM [vite] (ssr) Error when evaluating SSR module /src/routes/architecture/+page.svelte: /Users/niccoreyes/Github/AKLAN-FHIR/src/routes/architecture/+page.svelte:567:1 `</div>` attempted to close an element that was not open
+https://svelte.dev/e/element_invalid_closing_tag
+  Plugin: vite-plugin-svelte:compile
+  File: /Users/niccoreyes/Github/AKLAN-FHIR/src/routes/architecture/+page.svelte:567:1
+   565 |        </details>
+   566 |      </div>
+   567 |    </div>
+            ^
+   568 |  </div>
+   569 |  
+
+[1;31m[500] GET /architecture[0m
+
+4:45:03 PM [vite] (ssr) page reload src/routes/architecture/+page.svelte
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/15.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:45:06 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:45:06 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:45:06 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:45:06 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:45:06 PM [vite] (ssr) Error when evaluating SSR module /src/routes/architecture/+page.svelte: /Users/niccoreyes/Github/AKLAN-FHIR/src/routes/architecture/+page.svelte:567:1 `</div>` attempted to close an element that was not open
+https://svelte.dev/e/element_invalid_closing_tag
+  Plugin: vite-plugin-svelte:compile
+  File: /Users/niccoreyes/Github/AKLAN-FHIR/src/routes/architecture/+page.svelte:567:1
+   565 |        </details>
+   566 |      </div>
+   567 |    </div>
+            ^
+   568 |  </div>
+   569 |  
+
+[1;31m[500] GET /architecture[0m
+
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/15.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:45:08 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:45:08 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:45:08 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:45:08 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:45:09 PM [vite] (ssr) Error when evaluating SSR module /src/routes/architecture/+page.svelte: /Users/niccoreyes/Github/AKLAN-FHIR/src/routes/architecture/+page.svelte:567:1 `</div>` attempted to close an element that was not open
+https://svelte.dev/e/element_invalid_closing_tag
+  Plugin: vite-plugin-svelte:compile
+  File: /Users/niccoreyes/Github/AKLAN-FHIR/src/routes/architecture/+page.svelte:567:1
+   565 |        </details>
+   566 |      </div>
+   567 |    </div>
+            ^
+   568 |  </div>
+   569 |  
+
+[1;31m[500] GET /architecture[0m
+
+4:45:25 PM [vite] (ssr) page reload src/routes/architecture/+page.svelte
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/15.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:45:27 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:45:27 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:45:27 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:45:27 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:45:27 PM [vite] (ssr) Error when evaluating SSR module /src/routes/architecture/+page.svelte: src/routes/architecture/+page.svelte:274:5 `{@const}` must be the immediate child of `{#snippet}`, `{#if}`, `{:else if}`, `{:else}`, `{#each}`, `{:then}`, `{:catch}`, `<svelte:fragment>`, `<svelte:boundary>` or `<Component>`
+https://svelte.dev/e/const_tag_invalid_placement
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/architecture/+page.svelte:274:5
+   272 |        {#if selectedComponent}
+   273 |          <div class="component-detail" transition:fade>
+   274 |            {@const comp = components[selectedComponent]}
+                                                                 ^
+   275 |            <div class="detail-header" style="--comp-color: {comp.color}">
+   276 |              <span class="detail-icon">{comp.icon}</span>
+
+[1;31m[500] GET /architecture[0m
+
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/15.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:45:29 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:45:29 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:45:29 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:45:29 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:45:30 PM [vite] (ssr) Error when evaluating SSR module /src/routes/architecture/+page.svelte: src/routes/architecture/+page.svelte:274:5 `{@const}` must be the immediate child of `{#snippet}`, `{#if}`, `{:else if}`, `{:else}`, `{#each}`, `{:then}`, `{:catch}`, `<svelte:fragment>`, `<svelte:boundary>` or `<Component>`
+https://svelte.dev/e/const_tag_invalid_placement
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/architecture/+page.svelte:274:5
+   272 |        {#if selectedComponent}
+   273 |          <div class="component-detail" transition:fade>
+   274 |            {@const comp = components[selectedComponent]}
+                                                                 ^
+   275 |            <div class="detail-header" style="--comp-color: {comp.color}">
+   276 |              <span class="detail-icon">{comp.icon}</span>
+
+[1;31m[500] GET /architecture[0m
+
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:568:1 Unused CSS selector ".architecture-diagram"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:576:1 Unused CSS selector ".diagram-row"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:583:1 Unused CSS selector ".diagram-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:597:1 Unused CSS selector ".diagram-node:hover"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:602:1 Unused CSS selector ".diagram-node.active"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:607:1 Unused CSS selector ".clinic-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:611:1 Unused CSS selector ".clinic-node:hover"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:615:1 Unused CSS selector ".app-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:621:1 Unused CSS selector ".backend-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:630:1 Unused CSS selector ".node-label"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:636:1 Unused CSS selector ".node-sub"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:641:1 Unused CSS selector ".diagram-arrow"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:646:1 Unused CSS selector ".diagram-split"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:653:1 Unused CSS selector ".split-line"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:659:1 Unused CSS selector ".split-branches"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:666:1 Unused CSS selector ".branch"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite] (client) hmr update /src/routes/architecture/+page.svelte, /src/routes/architecture/+page.svelte?svelte&type=style&lang.css
+4:45:35 PM [vite] (ssr) page reload src/routes/architecture/+page.svelte
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:568:1 Unused CSS selector ".architecture-diagram"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:576:1 Unused CSS selector ".diagram-row"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:583:1 Unused CSS selector ".diagram-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:597:1 Unused CSS selector ".diagram-node:hover"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:602:1 Unused CSS selector ".diagram-node.active"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:607:1 Unused CSS selector ".clinic-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:611:1 Unused CSS selector ".clinic-node:hover"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:615:1 Unused CSS selector ".app-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:621:1 Unused CSS selector ".backend-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:630:1 Unused CSS selector ".node-label"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:636:1 Unused CSS selector ".node-sub"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:641:1 Unused CSS selector ".diagram-arrow"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:646:1 Unused CSS selector ".diagram-split"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:653:1 Unused CSS selector ".split-line"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:659:1 Unused CSS selector ".split-branches"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:666:1 Unused CSS selector ".branch"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:568:1 Unused CSS selector ".architecture-diagram"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:576:1 Unused CSS selector ".diagram-row"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:583:1 Unused CSS selector ".diagram-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:597:1 Unused CSS selector ".diagram-node:hover"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:602:1 Unused CSS selector ".diagram-node.active"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:607:1 Unused CSS selector ".clinic-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:611:1 Unused CSS selector ".clinic-node:hover"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:615:1 Unused CSS selector ".app-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:621:1 Unused CSS selector ".backend-node"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:630:1 Unused CSS selector ".node-label"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:636:1 Unused CSS selector ".node-sub"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:641:1 Unused CSS selector ".diagram-arrow"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:646:1 Unused CSS selector ".diagram-split"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:653:1 Unused CSS selector ".split-line"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:659:1 Unused CSS selector ".split-branches"
+https://svelte.dev/e/css_unused_selector
+4:45:35 PM [vite-plugin-svelte] src/routes/architecture/+page.svelte:666:1 Unused CSS selector ".branch"
+https://svelte.dev/e/css_unused_selector
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/15.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:45:37 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:45:37 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:45:37 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:45:37 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
