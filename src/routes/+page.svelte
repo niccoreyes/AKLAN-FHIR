@@ -711,6 +711,7 @@
 	.content-area {
 		flex: 1;
 		padding: 24px;
+		padding-bottom: 100px;
 		max-width: 1400px;
 		margin: 0 auto;
 		width: 100%;
@@ -1560,13 +1561,20 @@
 
 	/* Footer Actions */
 	.footer-actions {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		display: flex;
 		gap: 16px;
-		padding: 24px;
+		padding: 16px 24px;
+		padding-bottom: calc(16px + env(safe-area-inset-bottom));
 		background: white;
 		border-top: 1px solid #E2E8F0;
 		justify-content: center;
 		flex-wrap: wrap;
+		z-index: 100;
+		box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
 	}
 
 	.action-btn {
