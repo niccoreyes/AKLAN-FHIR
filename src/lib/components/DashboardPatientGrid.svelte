@@ -7,7 +7,8 @@
     patients = [], 
     isLoading = false, 
     error = '',
-    clinicColor = '#2563EB'
+    clinicColor = '#2563EB',
+    viewMode = 'clinical' // 'clinical' or 'developer' - affects grid columns
   } = $props();
 
   // Local state
@@ -137,7 +138,7 @@
   }
 </script>
 
-<div class="patient-grid-section">
+<div class="patient-grid-section" data-view={viewMode}>
   <!-- Section Header -->
   <div class="section-header">
     <h2>👤 My Patients</h2>
@@ -358,24 +359,43 @@
     font-size: 14px;
   }
 
-  /* Grid - Responsive with auto-fill for dynamic columns */
+  /* Grid - Responsive with auto-fill, max 3 columns, respects view mode */
   .patient-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  /* Small tablets and up: dynamic columns based on available width */
-  @media (min-width: 480px) {
+  /* Clinical view (default) - more space available */
+  @media (min-width: 640px) {
     .patient-grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
   }
 
-  /* Large screens: ensure max 4 columns even on very wide screens */
-  @media (min-width: 1400px) {
+  @media (min-width: 1200px) {
     .patient-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Developer view - logs panel takes space, tighter breakpoints */
+  :global(.view-developer) .patient-grid,
+  [data-view="developer"] .patient-grid {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    :global(.view-developer) .patient-grid,
+    [data-view="developer"] .patient-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1400px) {
+    :global(.view-developer) .patient-grid,
+    [data-view="developer"] .patient-grid {
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 

@@ -323,10 +323,11 @@
 
 		<!-- Patient Cards Grid -->
 		<DashboardPatientGrid 
-			patients={dashboardPatients} 
+			patients={dashboardPatients}
 			isLoading={dashboardPatientsLoading}
 			error={dashboardPatientsError}
 			clinicColor={clinic?.color || '#2563EB'}
+			viewMode={appStore.view}
 		/>
 
 			<!-- Workshop Info -->
