@@ -9,6 +9,7 @@
 
   // Get patient ID from URL query param
   const patientId = $derived($page.url.searchParams.get('patient') || '');
+  const encounterId = $derived($page.url.searchParams.get('encounter') || '');
 
   // Vitals form state
   let systolic = $state('');
@@ -30,6 +31,12 @@
   // Patient info if provided
   let patient = $state(null);
   let isLoadingPatient = $state(false);
+  
+  // Encounters
+  let encounters = $state([]);
+  let selectedEncounterId = $state(encounterId);
+  let isLoadingEncounters = $state(false);
+  let showEncounterSelector = $state(false);
 
   // Redirect if not configured (use replaceState to avoid back-button issues)
   onMount(async () => {
@@ -38,20 +45,41 @@
       return;
     }
     
-    // Load patient if ID provided
+    // Load patient and encounters if ID provided
     if (patientId) {
-      await loadPatient();
+      await loadPatientAndEncounters();
     }
   });
 
-  async function loadPatient() {
+  async function loadPatientAndEncounters() {
     isLoadingPatient = true;
+    isLoadingEncounters = true;
     try {
+      // Load patient
       patient = await fhirClient.read('Patient', patientId);
+      
+      // Load recent encounters for this patient
+      const result = await fhirClient.search('Encounter', { 
+        patient: `Patient/${patientId}`, 
+        _count: '10', 
+        _sort: '-date' 
+      });
+      encounters = result.entry?.map(e => e.resource) || [];
+      
+      // If encounterId provided in URL but not in selectedEncounterId, use it
+      if (encounterId && !selectedEncounterId) {
+        selectedEncounterId = encounterId;
+      }
+      
+      // If no encounter selected and we have encounters, show selector
+      if (!selectedEncounterId && encounters.length > 0) {
+        showEncounterSelector = true;
+      }
     } catch (e) {
-      console.error('Error loading patient:', e);
+      console.error('Error loading patient/encounters:', e);
     } finally {
       isLoadingPatient = false;
+      isLoadingEncounters = false;
     }
   }
 
@@ -63,10 +91,29 @@
     const family = name.family || '';
     return `${given} ${family}`.trim();
   }
+  
+  function getSelectedEncounter() {
+    return encounters.find(e => e.id === selectedEncounterId);
+  }
+  
+  function selectEncounter(id) {
+    selectedEncounterId = id;
+    showEncounterSelector = false;
+  }
+  
+  function createNewEncounter() {
+    goto(`/encounter?patient=${patientId}`);
+  }
 
   async function handleSubmit() {
     if (!patientId) {
       error = 'Please select a patient first';
+      return;
+    }
+    
+    if (!selectedEncounterId) {
+      error = 'Please select or create an encounter first';
+      showEncounterSelector = true;
       return;
     }
 
@@ -77,6 +124,9 @@
     try {
       const observations = [];
       const now = new Date().toISOString();
+      
+      // Build encounter reference
+      const encounterRef = { reference: `Encounter/${selectedEncounterId}` };
 
       // Blood Pressure (component observation)
       if (systolic && diastolic) {
@@ -99,6 +149,8 @@
             text: 'Blood Pressure'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
+          encounter: encounterRef,
           effectiveDateTime: now,
           component: [
             {
@@ -157,6 +209,7 @@
             text: 'Heart Rate'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
           effectiveDateTime: now,
           valueQuantity: {
             value: parseFloat(heartRate),
@@ -188,6 +241,7 @@
             text: 'Respiratory Rate'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
           effectiveDateTime: now,
           valueQuantity: {
             value: parseFloat(respiratoryRate),
@@ -219,6 +273,7 @@
             text: 'Temperature'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
           effectiveDateTime: now,
           valueQuantity: {
             value: parseFloat(temperature),
@@ -250,6 +305,7 @@
             text: 'Oxygen Saturation'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
           effectiveDateTime: now,
           valueQuantity: {
             value: parseFloat(oxygenSaturation),
@@ -281,6 +337,7 @@
             text: 'Weight'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
           effectiveDateTime: now,
           valueQuantity: {
             value: parseFloat(weight),
@@ -312,6 +369,7 @@
             text: 'Height'
           },
           subject: { reference: `Patient/${patientId}` },
+          encounter: encounterRef,
           effectiveDateTime: now,
           valueQuantity: {
             value: parseFloat(height),
@@ -443,6 +501,66 @@
             </p>
           </div>
         </div>
+      {/if}
+
+      <!-- Encounter Selection -->
+      {#if isLoadingEncounters}
+        <div class="encounter-loading">
+          <span class="spinner"></span>
+          <span>Loading encounters...</span>
+        </div>
+      {:else if showEncounterSelector || !selectedEncounterId}
+        <div class="encounter-selector">
+          <h3>📋 Select Encounter</h3>
+          <p class="encounter-hint">Choose an existing visit or create a new one</p>
+          
+          {#if encounters.length > 0}
+            <div class="encounter-list">
+              {#each encounters as encounter}
+                <button 
+                  type="button"
+                  class="encounter-option"
+                  class:selected={selectedEncounterId === encounter.id}
+                  onclick={() => selectEncounter(encounter.id)}
+                >
+                  <div class="encounter-option-main">
+                    <span class="encounter-type">{encounter.type?.[0]?.text || 'Visit'}</span>
+                    <span class="encounter-date">{new Date(encounter.period?.start).toLocaleDateString()}</span>
+                  </div>
+                  {#if encounter.reasonCode?.[0]?.text}
+                    <div class="encounter-reason">{encounter.reasonCode[0].text}</div>
+                  {/if}
+                </button>
+              {/each}
+            </div>
+          {:else}
+            <div class="no-encounters">
+              <p>No previous encounters found</p>
+            </div>
+          {/if}
+          
+          <div class="encounter-actions">
+            <button type="button" class="btn-create-encounter" onclick={createNewEncounter}>
+              ➕ Create New Encounter
+            </button>
+          </div>
+        </div>
+      {:else if selectedEncounterId}
+        {@const selectedEnc = getSelectedEncounter()}
+        {#if selectedEnc}
+          <div class="selected-encounter">
+            <div class="selected-encounter-header">
+              <div>
+                <span class="selected-label">Recording vitals for:</span>
+                <span class="selected-type">{selectedEnc.type?.[0]?.text || 'Visit'}</span>
+                <span class="selected-date">{new Date(selectedEnc.period?.start).toLocaleDateString()}</span>
+              </div>
+              <button type="button" class="btn-change" onclick={() => showEncounterSelector = true}>
+                Change
+              </button>
+            </div>
+          </div>
+        {/if}
       {/if}
 
       <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
@@ -944,5 +1062,172 @@
   .btn-submit:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+  }
+
+  /* Encounter Selector Styles */
+  .encounter-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    background: #F8FAFC;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    color: #64748B;
+  }
+
+  .encounter-selector {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border: 2px solid #BFDBFE;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .encounter-selector h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1E40AF;
+    margin: 0 0 8px 0;
+  }
+
+  .encounter-hint {
+    font-size: 14px;
+    color: #475569;
+    margin: 0 0 16px 0;
+  }
+
+  .encounter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .encounter-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    text-align: left;
+  }
+
+  .encounter-option:hover {
+    border-color: #2563EB;
+    background: #F8FAFC;
+  }
+
+  .encounter-option.selected {
+    border-color: #2563EB;
+    background: #EFF6FF;
+  }
+
+  .encounter-option-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .encounter-type {
+    font-weight: 600;
+    color: #1E293B;
+  }
+
+  .encounter-date {
+    font-size: 13px;
+    color: #64748B;
+  }
+
+  .encounter-reason {
+    font-size: 12px;
+    color: #94A3B8;
+  }
+
+  .no-encounters {
+    text-align: center;
+    padding: 24px;
+    color: #64748B;
+    font-style: italic;
+  }
+
+  .encounter-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-create-encounter {
+    padding: 12px 24px;
+    background: white;
+    color: #2563EB;
+    border: 2px solid #2563EB;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-create-encounter:hover {
+    background: #EFF6FF;
+  }
+
+  .selected-encounter {
+    background: #F0FDF4;
+    border: 1px solid #86EFAC;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+
+  .selected-encounter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .selected-label {
+    font-size: 12px;
+    color: #166534;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .selected-type {
+    font-weight: 600;
+    color: #166534;
+  }
+
+  .selected-date {
+    font-size: 13px;
+    color: #64748B;
+    margin-left: 8px;
+  }
+
+  .btn-change {
+    padding: 6px 12px;
+    background: white;
+    color: #2563EB;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .btn-change:hover {
+    background: #F8FAFC;
   }
 </style>

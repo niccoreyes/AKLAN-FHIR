@@ -204,13 +204,76 @@
 			</div>
 		</div>
 
-		<!-- Observations Section -->
+		<!-- Extract encounters and observations -->
+		{@const encounters = resources.filter(r => r.resourceType === 'Encounter').sort((a, b) => new Date(b.period?.start || 0) - new Date(a.period?.start || 0))}
 		{@const observations = resources.filter(r => r.resourceType === 'Observation')}
-		{#if observations.length > 0}
+		
+		<!-- Encounters Section -->
+		{#if encounters.length > 0}
+			<div class="encounters-section">
+				<h3>📋 Encounters ({encounters.length})</h3>
+				<div class="encounters-list">
+					{#each encounters as encounter}
+						{@const linkedObservations = observations.filter(obs => obs.encounter?.reference === `Encounter/${encounter.id}`)}
+						<div class="encounter-card">
+							<div class="encounter-header">
+								<div class="encounter-main">
+									<span class="encounter-type">{encounter.type?.[0]?.text || encounter.type?.[0]?.coding?.[0]?.display || 'Visit'}</span>
+									<span class="encounter-status encounter-status-{encounter.status}">{encounter.status}</span>
+								</div>
+								<span class="encounter-date">{formatDate(encounter.period?.start)}</span>
+							</div>
+							<div class="encounter-details">
+								{#if encounter.reasonCode?.[0]?.text}
+									<div class="encounter-reason">🩺 {encounter.reasonCode[0].text}</div>
+								{/if}
+								<div class="encounter-meta">
+									<span>Class: {encounter.class?.display || encounter.class?.code || 'Unknown'}</span>
+									{#if encounter.id}
+										<span>ID: {encounter.id}</span>
+									{/if}
+								</div>
+							</div>
+							{#if linkedObservations.length > 0}
+								<div class="linked-observations">
+									<div class="linked-header">🩺 {linkedObservations.length} observation{linkedObservations.length > 1 ? 's' : ''}</div>
+									<div class="linked-grid">
+										{#each linkedObservations as obs}
+											<div class="linked-obs">
+												<span class="linked-name">{obs.code?.text || 'Observation'}</span>
+												<span class="linked-value">
+													{#if obs.component}
+														{obs.component[0]?.valueQuantity?.value}/{obs.component[1]?.valueQuantity?.value}
+													{:else if obs.valueQuantity}
+														{obs.valueQuantity.value} {obs.valueQuantity.unit}
+													{:else if obs.valueString}
+														{obs.valueString}
+													{/if}
+												</span>
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+							<div class="encounter-actions">
+								<a href="/vitals?patient={patientId}&encounter={encounter.id}" class="btn-add-vitals">
+									+ Add Vitals
+								</a>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
+
+		<!-- Observations Section (show unlinked observations) -->
+		{@const unlinkedObservations = observations.filter(obs => !obs.encounter)}
+		{#if unlinkedObservations.length > 0}
 			<div class="observations-section">
-				<h3>🩺 Vital Signs & Observations ({observations.length})</h3>
+				<h3>🩺 Unlinked Observations ({unlinkedObservations.length})</h3>
+				<p class="observations-subtitle">These observations are not linked to any encounter</p>
 				<div class="observations-grid">
-					{#each observations as obs}
+					{#each unlinkedObservations as obs}
 						<div class="observation-card">
 							<div class="observation-header">
 								<span class="observation-type">{obs.code?.text || 'Observation'}</span>
@@ -218,7 +281,6 @@
 							</div>
 							<div class="observation-value">
 								{#if obs.component}
-									<!-- Blood pressure or other component observations -->
 									<div class="component-values">
 										{#each obs.component as comp}
 											<div class="component">
@@ -717,5 +779,189 @@
 		color: #94A3B8;
 		font-family: monospace;
 		margin-top: 8px;
+	}
+
+	/* Encounters Section */
+	.encounters-section {
+		background: white;
+		border-radius: 12px;
+		border: 1px solid #E2E8F0;
+		padding: 24px;
+		margin-bottom: 24px;
+	}
+
+	.encounters-section h3 {
+		font-size: 18px;
+		font-weight: 600;
+		color: #1E293B;
+		margin: 0 0 20px 0;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #E2E8F0;
+	}
+
+	.encounters-list {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.encounter-card {
+		background: #F8FAFC;
+		border: 1px solid #E2E8F0;
+		border-radius: 12px;
+		padding: 16px;
+		transition: all 0.2s;
+	}
+
+	.encounter-card:hover {
+		border-color: #CBD5E1;
+		background: #F1F5F9;
+	}
+
+	.encounter-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 12px;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.encounter-main {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.encounter-type {
+		font-size: 16px;
+		font-weight: 600;
+		color: #1E293B;
+	}
+
+	.encounter-status {
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		padding: 2px 8px;
+		border-radius: 4px;
+	}
+
+	.encounter-status-in-progress {
+		background: #DBEAFE;
+		color: #1E40AF;
+	}
+
+	.encounter-status-finished {
+		background: #DCFCE7;
+		color: #166534;
+	}
+
+	.encounter-status-planned {
+		background: #FEF3C7;
+		color: #92400E;
+	}
+
+	.encounter-status-cancelled {
+		background: #F1F5F9;
+		color: #64748B;
+	}
+
+	.encounter-date {
+		font-size: 13px;
+		color: #64748B;
+	}
+
+	.encounter-details {
+		margin-bottom: 12px;
+	}
+
+	.encounter-reason {
+		font-size: 14px;
+		color: #374151;
+		margin-bottom: 6px;
+	}
+
+	.encounter-meta {
+		display: flex;
+		gap: 16px;
+		font-size: 12px;
+		color: #94A3B8;
+		flex-wrap: wrap;
+	}
+
+	.linked-observations {
+		background: white;
+		border-radius: 8px;
+		padding: 12px;
+		margin: 12px 0;
+		border: 1px solid #E2E8F0;
+	}
+
+	.linked-header {
+		font-size: 12px;
+		font-weight: 600;
+		color: #64748B;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 8px;
+	}
+
+	.linked-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.linked-obs {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 12px;
+		background: #EFF6FF;
+		border-radius: 6px;
+		font-size: 13px;
+	}
+
+	.linked-name {
+		font-weight: 500;
+		color: #1E40AF;
+	}
+
+	.linked-value {
+		color: #64748B;
+		font-family: monospace;
+	}
+
+	.encounter-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 12px;
+		padding-top: 12px;
+		border-top: 1px dashed #E2E8F0;
+	}
+
+	.btn-add-vitals {
+		padding: 8px 16px;
+		background: #EFF6FF;
+		color: #2563EB;
+		border: 1px solid #BFDBFE;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-add-vitals:hover {
+		background: #DBEAFE;
+	}
+
+	.observations-subtitle {
+		font-size: 14px;
+		color: #64748B;
+		margin: -12px 0 16px 0;
 	}
 </style>
