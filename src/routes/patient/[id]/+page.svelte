@@ -204,6 +204,56 @@
 			</div>
 		</div>
 
+		<!-- Observations Section -->
+		{@const observations = resources.filter(r => r.resourceType === 'Observation')}
+		{#if observations.length > 0}
+			<div class="observations-section">
+				<h3>🩺 Vital Signs & Observations ({observations.length})</h3>
+				<div class="observations-grid">
+					{#each observations as obs}
+						<div class="observation-card">
+							<div class="observation-header">
+								<span class="observation-type">{obs.code?.text || 'Observation'}</span>
+								<span class="observation-date">{formatDate(obs.effectiveDateTime || obs.issued)}</span>
+							</div>
+							<div class="observation-value">
+								{#if obs.component}
+									<!-- Blood pressure or other component observations -->
+									<div class="component-values">
+										{#each obs.component as comp}
+											<div class="component">
+												<span class="comp-name">{comp.code?.text || comp.code?.coding?.[0]?.display || 'Value'}</span>
+												<span class="comp-value">{comp.valueQuantity?.value} {comp.valueQuantity?.unit}</span>
+											</div>
+										{/each}
+									</div>
+								{:else if obs.valueQuantity}
+									<span class="value-large">{obs.valueQuantity.value}</span>
+									<span class="unit">{obs.valueQuantity.unit}</span>
+								{:else if obs.valueString}
+									<span class="value-string">{obs.valueString}</span>
+								{:else if obs.valueCodeableConcept}
+									<span class="value-string">{obs.valueCodeableConcept.text || obs.valueCodeableConcept.coding?.[0]?.display}</span>
+								{:else if obs.valueBoolean !== undefined}
+									<span class="value-string">{obs.valueBoolean ? 'Yes' : 'No'}</span>
+								{:else if obs.valueInteger !== undefined}
+									<span class="value-large">{obs.valueInteger}</span>
+								{/if}
+							</div>
+							{#if obs.note?.[0]?.text}
+								<div class="observation-note">{obs.note[0].text}</div>
+							{/if}
+							{#if obs.code?.coding?.[0]?.code}
+								<div class="code-label">
+									{obs.code?.coding?.[0]?.system?.includes('loinc') ? 'LOINC' : 'Code'}: {obs.code?.coding?.[0]?.code}
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
+
 		<!-- Timeline -->
 		<div class="timeline-container">
 			<h3>📋 Patient Timeline ({resources.length} records)</h3>
@@ -539,5 +589,133 @@
 		font-size: 12px;
 		max-height: 400px;
 		overflow-y: auto;
+	}
+
+	/* Observations Section */
+	.observations-section {
+		background: white;
+		border-radius: 12px;
+		border: 1px solid #E2E8F0;
+		padding: 24px;
+		margin-bottom: 24px;
+	}
+
+	.observations-section h3 {
+		font-size: 18px;
+		font-weight: 600;
+		color: #1E293B;
+		margin: 0 0 20px 0;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #E2E8F0;
+	}
+
+	.observations-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 16px;
+	}
+
+	@media (max-width: 640px) {
+		.observations-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.observation-card {
+		background: #F8FAFC;
+		border: 1px solid #E2E8F0;
+		border-radius: 10px;
+		padding: 16px;
+		transition: all 0.2s;
+	}
+
+	.observation-card:hover {
+		border-color: #CBD5E1;
+		background: #F1F5F9;
+	}
+
+	.observation-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 12px;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.observation-type {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1E293B;
+	}
+
+	.observation-date {
+		font-size: 12px;
+		color: #94A3B8;
+		white-space: nowrap;
+	}
+
+	.observation-value {
+		margin-bottom: 8px;
+	}
+
+	.value-large {
+		font-size: 32px;
+		font-weight: 700;
+		color: #2563EB;
+	}
+
+	.unit {
+		font-size: 14px;
+		color: #64748B;
+		margin-left: 4px;
+	}
+
+	.value-string {
+		font-size: 18px;
+		font-weight: 600;
+		color: #374151;
+	}
+
+	.component-values {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.component {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 8px 12px;
+		background: white;
+		border-radius: 6px;
+	}
+
+	.comp-name {
+		font-size: 13px;
+		color: #64748B;
+	}
+
+	.comp-value {
+		font-size: 16px;
+		font-weight: 600;
+		color: #1E293B;
+	}
+
+	.observation-note {
+		font-size: 13px;
+		color: #64748B;
+		font-style: italic;
+		margin-top: 8px;
+		padding-top: 8px;
+		border-top: 1px dashed #E2E8F0;
+	}
+
+	.code-label {
+		font-size: 11px;
+		color: #94A3B8;
+		font-family: monospace;
+		margin-top: 8px;
 	}
 </style>
