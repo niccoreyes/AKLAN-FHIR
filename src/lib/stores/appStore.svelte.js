@@ -69,6 +69,14 @@ export function createAppStore() {
 	const role = $derived(ROLES.find(r => r.id === roleId) || null);
 	const isConfigured = $derived(workshopCode && userName && clinicId);
 	
+	// Auto-register participant when configured but no practitionerId
+	$effect(() => {
+		if (isConfigured && !practitionerId && !isLoading) {
+			console.log('[AppStore] Auto-registering participant...');
+			registerParticipant();
+		}
+	});
+	
 	/**
 	 * Set workshop code and update URL
 	 */
