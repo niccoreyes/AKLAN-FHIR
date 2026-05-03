@@ -19,41 +19,7 @@
 
 	let inboxCounts = $state({});
 	let loadingInbox = $state(false);
-
-	async function loadInboxCounts() {
-		if (!appStore.isConfigured) return;
-		loadingInbox = true;
-		const counts = {};
-		const tag = appStore.workshopCode;
-
-		try {
-			// Load counts based on what this clinic can VIEW
-			if (caps.canView?.includes('ServiceRequest')) {
-				const sr = await fhirClient.search('ServiceRequest', { _tag: tag, _summary: 'count' });
-				counts.serviceRequest = sr.total || 0;
-			}
-			if (caps.canView?.includes('MedicationRequest')) {
-				const mr = await fhirClient.search('MedicationRequest', { _tag: tag, _summary: 'count' });
-				counts.medicationRequest = mr.total || 0;
-			}
-			if (caps.canView?.includes('DiagnosticReport')) {
-				const dr = await fhirClient.search('DiagnosticReport', { _tag: tag, _summary: 'count' });
-				counts.diagnosticReport = dr.total || 0;
-			}
-			if (caps.canView?.includes('Patient')) {
-				const p = await fhirClient.search('Patient', { _tag: tag, _summary: 'count' });
-				counts.patient = p.total || 0;
-			}
-			if (caps.canView?.includes('Encounter')) {
-				const e = await fhirClient.search('Encounter', { _tag: tag, _summary: 'count' });
-				counts.encounter = e.total || 0;
-			}
-		} catch (e) {
-			console.error('Inbox load error:', e);
-		}
-		inboxCounts = counts;
-		loadingInbox = false;
-	}
+	let showClinicSwitcher = $state(false);
 
 	// All possible actions with their requirements
 	const ALL_ACTIONS = {
@@ -73,15 +39,47 @@
 			?.map(key => ALL_ACTIONS[key])
 			.filter(Boolean) || []
 	);
+
+	function switchClinic(clinicId) {
+		appStore.setClinic(clinicId);
+		showClinicSwitcher = false;
+		window.location.href = '/dashboard';
+	}
 </script>
 
 {#if appStore.isConfigured}
 	<div class="dashboard" style="--clinic-color: {clinic?.color || '#2563EB'}">
 		<!-- Header -->
 		<header class="dashboard-header">
-			<div class="clinic-badge" style="background: {clinic?.color}20; color: {clinic?.color}; border-color: {clinic?.color}">
-				<span class="clinic-icon">{clinic?.icon}</span>
-				<span class="clinic-name">{clinic?.shortName}</span>
+			<div class="clinic-badge-wrapper">
+				<button 
+					class="clinic-badge" 
+					style="background: {clinic?.color}20; color: {clinic?.color}; border-color: {clinic?.color}"
+					onclick={() => showClinicSwitcher = !showClinicSwitcher}
+					title="Click to switch clinic"
+				>
+					<span class="clinic-icon">{clinic?.icon}</span>
+					<span class="clinic-name">{clinic?.shortName}</span>
+					<span class="switch-indicator">↻</span>
+				</button>
+				{#if showClinicSwitcher}
+					<div class="clinic-dropdown">
+						<div class="dropdown-header">🏥 Switch Clinic</div>
+						{#each CLINICS as c}
+							<button 
+								class="clinic-option"
+								class:active={c.id === appStore.clinicId}
+								onclick={() => switchClinic(c.id)}
+							>
+								<span class="option-icon">{c.icon}</span>
+								<div class="option-info">
+									<strong>{c.shortName}</strong>
+									<span>{CLINIC_CAPABILITIES[c.id]?.description || ''}</span>
+								</div>
+							</button>
+						{/each}
+					</div>
+				{/if}
 			</div>
 			<div class="user-info">
 				<strong>{appStore.userName}</strong>
@@ -230,19 +228,103 @@
 		gap: 12px;
 	}
 
+	.clinic-badge-wrapper {
+		position: relative;
+	}
+
 	.clinic-badge {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 6px 12px;
+		gap: 8px;
+		padding: 8px 14px;
 		border-radius: 20px;
 		border: 2px solid;
 		font-size: 14px;
 		font-weight: 600;
+		background: white;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.clinic-badge:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 	}
 
 	.clinic-icon {
-		font-size: 16px;
+		font-size: 18px;
+	}
+
+	.switch-indicator {
+		font-size: 13px;
+		opacity: 0.7;
+	}
+
+	.clinic-dropdown {
+		position: absolute;
+		top: calc(100% + 8px);
+		left: 0;
+		background: white;
+		border: 1px solid #E2E8F0;
+		border-radius: 12px;
+		box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+		padding: 8px;
+		min-width: 280px;
+		z-index: 200;
+	}
+
+	.dropdown-header {
+		padding: 8px 12px;
+		font-size: 11px;
+		font-weight: 700;
+		color: #94A3B8;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border-bottom: 1px solid #F1F5F9;
+		margin-bottom: 4px;
+	}
+
+	.clinic-option {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 12px;
+		border-radius: 8px;
+		border: none;
+		background: none;
+		cursor: pointer;
+		width: 100%;
+		text-align: left;
+		transition: all 0.2s;
+	}
+
+	.clinic-option:hover {
+		background: #F8FAFC;
+	}
+
+	.clinic-option.active {
+		background: #EFF6FF;
+	}
+
+	.option-icon {
+		font-size: 20px;
+	}
+
+	.option-info {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.option-info strong {
+		font-size: 13px;
+		color: #1E293B;
+	}
+
+	.option-info span {
+		font-size: 11px;
+		color: #64748B;
+		line-height: 1.3;
 	}
 
 	.user-info {
