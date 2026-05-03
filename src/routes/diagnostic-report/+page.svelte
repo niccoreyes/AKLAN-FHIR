@@ -150,6 +150,28 @@
 			};
 
 			await fhirClient.create(report, appStore.workshopCode);
+			
+			// Update the linked ServiceRequest status to "completed" if an order was linked
+			if (linkedOrderId) {
+				try {
+					const existingOrder = await fhirClient.read('ServiceRequest', linkedOrderId);
+					if (existingOrder) {
+						existingOrder.status = 'completed';
+						// Add a note about the report
+						if (!existingOrder.note) existingOrder.note = [];
+						existingOrder.note.push({
+							text: `Results reported by ${appStore.userName} on ${new Date().toLocaleString()}`,
+							time: new Date().toISOString()
+						});
+						await fhirClient.update('ServiceRequest', linkedOrderId, existingOrder);
+						console.log(`[DiagnosticReport] Updated ServiceRequest ${linkedOrderId} to completed`);
+					}
+				} catch (updateError) {
+					console.error('[DiagnosticReport] Failed to update order status:', updateError);
+					// Don't fail the report creation if update fails
+				}
+			}
+			
 			success = true;
 			setTimeout(() => {
 				// Preserve workshop parameters when redirecting
