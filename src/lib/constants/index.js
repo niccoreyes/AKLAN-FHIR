@@ -183,3 +183,33 @@ export const ICD10_CODES = {
 	hypertension: 'I10',
 	diabetes: 'E11'
 };
+
+/**
+ * Vital Signs ValueSet URL
+ * Used to identify which observations are vital signs
+ * This ValueSet must exist on the terminology server (tx.fhirlab.net)
+ * Created via: POST https://tx.fhirlab.net/fhir/ValueSet
+ * ValueSet ID: f61716c4-0668-43ba-b4c3-3468f19e2ae6
+ */
+export const VITAL_SIGNS_VALUESET_URL = 'http://aklan-fhir.app/ValueSet/vital-signs-codes';
+
+/**
+ * Common vital signs LOINC codes (fallback if ValueSet not available)
+ * These match the codes in the ValueSet above
+ */
+export const VITAL_SIGNS_LOINC_CODES = [
+	'85354-9',  // Blood pressure panel
+	'8480-6',   // Systolic BP
+	'8462-4',   // Diastolic BP
+	'8867-4',   // Heart rate
+	'9279-1',   // Respiratory rate
+	'8310-5',   // Body temperature
+	'2708-6',   // Oxygen saturation
+	'59408-5',  // Oxygen saturation in Blood
+	'8302-2',   // Body height
+	'8306-3',   // Body height --standing
+	'29463-7',  // Body weight
+	'39156-5',  // BMI
+	'3141-9',   // Body weight Measured
+	'3142-7'    // Body weight Stated
+];

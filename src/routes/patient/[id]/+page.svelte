@@ -3,7 +3,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { fhirClient } from '$services/fhir-client.js';
-	import { APP_NAME, CLINICS } from '$constants';
+	import { APP_NAME, CLINICS, VITAL_SIGNS_LOINC_CODES } from '$constants';
 	import { appStore } from '$stores/appStore.svelte.js';
 	import EncounterCard from '$components/EncounterCard.svelte';
 	import ObservationCard from '$components/ObservationCard.svelte';
@@ -15,6 +15,29 @@
 
 	// Get clinic color for theming
 	let clinicColor = $derived(CLINICS.find(c => c.id === appStore.clinicId)?.color || '#2563EB');
+
+	// Derived: Get latest vital signs
+	let latestVitals = $derived(() => {
+		const observations = resources.filter(r => r.resourceType === 'Observation');
+		const vitals = observations.filter(obs => {
+			const code = obs.code?.coding?.[0]?.code;
+			return code && VITAL_SIGNS_LOINC_CODES.includes(code);
+		}).sort((a, b) => {
+			const dateA = new Date(a.effectiveDateTime || a.issued || 0);
+			const dateB = new Date(b.effectiveDateTime || b.issued || 0);
+			return dateB - dateA;
+		});
+		
+		// Get the most recent of each vital type
+		const latest = {};
+		vitals.forEach(vital => {
+			const code = vital.code?.coding?.[0]?.code;
+			if (code && !latest[code]) {
+				latest[code] = vital;
+			}
+		});
+		return latest;
+	});
 
 	// Get patient ID from URL params
 	let patientId = $derived($page.params.id);
@@ -234,6 +257,58 @@
 						</span>
 					{/if}
 				</div>
+				<!-- NEW: Latest Vital Summary -->
+				{#if Object.keys(latestVitals()).length > 0}
+					{@const vitals = latestVitals()}
+					<div class="vital-summary">
+						<h4 class="vital-summary-title">📊 Latest Vitals</h4>
+						<div class="vital-badges">
+							{#if vitals['8480-6']}
+								<div class="vital-badge bp">
+									<span class="vital-label">BP</span>
+									<span class="vital-value">{vitals['8480-6'].valueQuantity?.value}/{vitals['8462-4']?.valueQuantity?.value || '-'} {vitals['8480-6'].valueQuantity?.unit || 'mmHg'}</span>
+								</div>
+							{/if}
+							{#if vitals['8867-4']}
+								<div class="vital-badge hr">
+									<span class="vital-label">HR</span>
+									<span class="vital-value">{vitals['8867-4'].valueQuantity?.value} {vitals['8867-4'].valueQuantity?.unit || 'bpm'}</span>
+								</div>
+							{/if}
+							{#if vitals['8310-5']}
+								<div class="vital-badge temp">
+									<span class="vital-label">Temp</span>
+									<span class="vital-value">{vitals['8310-5'].valueQuantity?.value}°C</span>
+								</div>
+							{/if}
+							{#if vitals['2708-6'] || vitals['59408-5']}
+								{@const spo2 = vitals['2708-6'] || vitals['59408-5']}
+								<div class="vital-badge spo2">
+									<span class="vital-label">SpO2</span>
+									<span class="vital-value">{spo2.valueQuantity?.value}%</span>
+								</div>
+							{/if}
+							{#if vitals['9279-1']}
+								<div class="vital-badge rr">
+									<span class="vital-label">RR</span>
+									<span class="vital-value">{vitals['9279-1'].valueQuantity?.value} /min</span>
+								</div>
+							{/if}
+							{#if vitals['29463-7']}
+								<div class="vital-badge wt">
+									<span class="vital-label">Weight</span>
+									<span class="vital-value">{vitals['29463-7'].valueQuantity?.value} {vitals['29463-7'].valueQuantity?.unit || 'kg'}</span>
+								</div>
+							{/if}
+						</div>
+						<p class="vital-date">
+							{vitals[Object.keys(vitals)[0]]?.effectiveDateTime ?
+								new Date(vitals[Object.keys(vitals)[0]].effectiveDateTime).toLocaleDateString() :
+								'Unknown date'}
+						</p>
+					</div>
+				{/if}
+
 				<!-- NEW: Patient-Level Quick Actions -->
 				<div class="patient-quick-actions">
 					<a href="/encounter?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn new-encounter">
@@ -651,5 +726,89 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
+	}
+
+	/* NEW: Vital Summary */
+	.vital-summary {
+		background: #F0FDF4;
+		border: 1px solid #86EFAC;
+		border-radius: 10px;
+		padding: 14px 16px;
+		margin: 16px 0;
+	}
+
+	.vital-summary-title {
+		font-size: 13px;
+		font-weight: 600;
+		color: #166534;
+		margin: 0 0 10px 0;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.vital-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.vital-badge {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding: 6px 10px;
+		background: white;
+		border-radius: 6px;
+		border: 1px solid;
+		font-size: 13px;
+	}
+
+	.vital-badge.bp {
+		border-color: #FCA5A5;
+		color: #991B1B;
+	}
+
+	.vital-badge.hr {
+		border-color: #FDBA74;
+		color: #9A3412;
+	}
+
+	.vital-badge.temp {
+		border-color: #FCD34D;
+		color: #92400E;
+	}
+
+	.vital-badge.spo2 {
+		border-color: #6EE7B7;
+		color: #065F46;
+	}
+
+	.vital-badge.rr {
+		border-color: #93C5FD;
+		color: #1E40AF;
+	}
+
+	.vital-badge.wt {
+		border-color: #C4B5FD;
+		color: #5B21B6;
+	}
+
+	.vital-label {
+		font-weight: 600;
+		font-size: 11px;
+		text-transform: uppercase;
+		opacity: 0.8;
+	}
+
+	.vital-value {
+		font-weight: 700;
+		font-size: 14px;
+	}
+
+	.vital-date {
+		font-size: 11px;
+		color: #6B7280;
+		margin: 8px 0 0 0;
+		font-style: italic;
 	}
 </style>
