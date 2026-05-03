@@ -15,12 +15,20 @@
   let reason = $state('');
   let status = $state('in-progress');
   let notes = $state('');
+  let selectedConditions = $state([]); // Array of {system, code, display}
   
   // UI state
   let isSubmitting = $state(false);
   let error = $state('');
   let success = $state(false);
   let createdEncounter = $state(null);
+  
+  // Condition search state
+  let conditionSearchTerm = $state('');
+  let conditionSearchResults = $state([]);
+  let isSearchingConditions = $state(false);
+  let showConditionDropdown = $state(false);
+  let conditionSearchTimeout = null;
 
   // Patient info if provided
   let patient = $state(null);
@@ -57,6 +65,115 @@
     const given = name.given?.join(' ') || '';
     const family = name.family || '';
     return `${given} ${family}`.trim();
+  }
+
+  // Debounced condition search
+  async function searchConditions() {
+    if (!conditionSearchTerm.trim() || conditionSearchTerm.length < 2) {
+      conditionSearchResults = [];
+      showConditionDropdown = false;
+      return;
+    }
+
+    // Show dropdown immediately with loading state
+    showConditionDropdown = true;
+    isSearchingConditions = true;
+    
+    try {
+      console.log('[Condition Search] Searching for:', conditionSearchTerm);
+      const results = await fhirClient.searchACRCodes(conditionSearchTerm, 10);
+      console.log('[Condition Search] Results:', results);
+      
+      // Filter out already selected conditions
+      const selectedCodes = new Set(selectedConditions.map(c => c.code));
+      conditionSearchResults = results.filter(r => !selectedCodes.has(r.code));
+      
+      // Keep dropdown open even if empty (to show "no results" message)
+      showConditionDropdown = true;
+    } catch (e) {
+      console.error('[Condition Search] Error:', e);
+      conditionSearchResults = [];
+      // Still show dropdown to display error state
+      showConditionDropdown = true;
+    } finally {
+      isSearchingConditions = false;
+    }
+  }
+
+  function handleConditionSearchInput(event) {
+    conditionSearchTerm = event.target.value;
+    
+    // Clear existing timeout
+    if (conditionSearchTimeout) {
+      clearTimeout(conditionSearchTimeout);
+    }
+    
+    // Debounce search
+    conditionSearchTimeout = setTimeout(() => {
+      searchConditions();
+    }, 300);
+  }
+
+  function selectCondition(condition) {
+    selectedConditions = [...selectedConditions, condition];
+    conditionSearchTerm = '';
+    conditionSearchResults = [];
+    showConditionDropdown = false;
+  }
+
+  function removeCondition(index) {
+    selectedConditions = selectedConditions.filter((_, i) => i !== index);
+  }
+
+  async function createConditionsForEncounter(encounterId) {
+    const conditionResources = selectedConditions.map(condition => ({
+      resourceType: 'Condition',
+      clinicalStatus: {
+        coding: [{
+          system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+          code: 'active'
+        }]
+      },
+      verificationStatus: {
+        coding: [{
+          system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status',
+          code: 'confirmed'
+        }]
+      },
+      category: [{
+        coding: [{
+          system: 'http://terminology.hl7.org/CodeSystem/condition-category',
+          code: 'encounter-diagnosis',
+          display: 'Encounter Diagnosis'
+        }]
+      }],
+      code: {
+        coding: [{
+          system: condition.system,
+          code: condition.code,
+          display: condition.display
+        }],
+        text: condition.display
+      },
+      subject: {
+        reference: `Patient/${patientId}`
+      },
+      encounter: {
+        reference: `Encounter/${encounterId}`
+      }
+    }));
+
+    // Create all conditions in parallel
+    const results = await Promise.all(
+      conditionResources.map(resource => 
+        fhirClient.create(resource, appStore.workshopCode).catch(e => {
+          console.error('Error creating condition:', e);
+          return { success: false, error: e };
+        })
+      )
+    );
+
+    return results.filter(r => r.success).length;
   }
 
   async function handleSubmit() {
@@ -104,6 +221,13 @@
       
       if (result.success) {
         createdEncounter = result.data;
+        
+        // Create conditions if any are selected
+        if (selectedConditions.length > 0) {
+          const createdCount = await createConditionsForEncounter(createdEncounter.id);
+          console.log(`Created ${createdCount}/${selectedConditions.length} conditions`);
+        }
+        
         success = true;
       } else {
         error = 'Failed to create encounter';
@@ -258,6 +382,80 @@
               placeholder="Additional notes about the encounter..."
               rows="4"
             ></textarea>
+          </div>
+        </div>
+
+        <!-- Diagnoses Section -->
+        <div class="form-section conditions-section">
+          <h3>🏥 Diagnoses</h3>
+          
+          <!-- Selected Condition Chips -->
+          {#if selectedConditions.length > 0}
+            <div class="selected-conditions">
+              {#each selectedConditions as condition, index}
+                <div class="condition-chip">
+                  <span class="condition-chip-code">{condition.code}</span>
+                  <span class="condition-chip-display">{condition.display}</span>
+                  <button 
+                    type="button" 
+                    class="condition-chip-remove"
+                    onclick={() => removeCondition(index)}
+                    title="Remove diagnosis"
+                  >
+                    ×
+                  </button>
+                </div>
+              {/each}
+            </div>
+          {/if}
+          
+          <!-- Condition Search -->
+          <div class="condition-search-container">
+            <div class="form-group">
+              <label for="condition-search">Search ACR ICD-10 Diagnoses</label>
+              <div class="condition-search-wrapper">
+                <input 
+                  type="text" 
+                  id="condition-search"
+                  value={conditionSearchTerm}
+                  oninput={handleConditionSearchInput}
+                  placeholder="Type to search (e.g., diabetes, hypertension)..."
+                  autocomplete="off"
+                />
+                {#if isSearchingConditions}
+                  <span class="search-spinner"></span>
+                {/if}
+              </div>
+              <p class="condition-help">Search PhilHealth ACR ICD-10 codes. Select multiple diagnoses if needed.</p>
+            </div>
+            
+            <!-- Search Results Dropdown -->
+            {#if showConditionDropdown}
+              <div class="condition-dropdown">
+                {#if isSearchingConditions}
+                  <div class="dropdown-loading">
+                    <span class="dropdown-spinner"></span>
+                    <span>Searching ACR ICD-10...</span>
+                  </div>
+                {:else if conditionSearchResults.length === 0}
+                  <div class="dropdown-empty">
+                    <span class="empty-icon">🔍</span>
+                    <span>No matching diagnoses found</span>
+                  </div>
+                {:else}
+                  {#each conditionSearchResults as result}
+                    <button 
+                      type="button"
+                      class="condition-option"
+                      onclick={() => selectCondition(result)}
+                    >
+                      <span class="condition-option-code">{result.code}</span>
+                      <span class="condition-option-display">{result.display}</span>
+                    </button>
+                  {/each}
+                {/if}
+              </div>
+            {/if}
           </div>
         </div>
 
@@ -615,5 +813,181 @@
   .btn-submit:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+  }
+
+  /* Diagnoses Section Styles */
+  .conditions-section {
+    background: linear-gradient(135deg, #F0FDF4 0%, #F9FAFB 100%);
+    border: 1px solid #BBF7D0;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .conditions-section h3 {
+    color: #166534;
+    border-bottom-color: #86EFAC;
+  }
+
+  .selected-conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .condition-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #86EFAC;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .condition-chip-code {
+    font-family: monospace;
+    font-weight: 700;
+    color: #059669;
+    background: #D1FAE5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .condition-chip-display {
+    color: #1F2937;
+    font-weight: 500;
+  }
+
+  .condition-chip-remove {
+    background: none;
+    border: none;
+    color: #EF4444;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .condition-chip-remove:hover {
+    color: #DC2626;
+  }
+
+  .condition-search-container {
+    position: relative;
+  }
+
+  .condition-search-wrapper {
+    position: relative;
+  }
+
+  .search-spinner {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid #E2E8F0;
+    border-top-color: #059669;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  .condition-help {
+    font-size: 12px;
+    color: #6B7280;
+    margin: 4px 0 0 0;
+    font-style: italic;
+  }
+
+  .condition-dropdown {
+    border: 2px solid #059669;
+    border-radius: 8px;
+    margin-top: 8px;
+    background: white;
+    max-height: 280px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .condition-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13px;
+  }
+
+  .condition-option:hover {
+    background: #F0FDF4;
+  }
+
+  .condition-option-code {
+    font-family: monospace;
+    font-weight: 600;
+    color: #059669;
+    background: #D1FAE5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .condition-option-display {
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .dropdown-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    color: #6B7280;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  .dropdown-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #E2E8F0;
+    border-top-color: #059669;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .dropdown-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    color: #6B7280;
+    font-size: 13px;
+  }
+
+  .empty-icon {
+    font-size: 20px;
+    opacity: 0.6;
   }
 </style>

@@ -173,6 +173,7 @@ npm run preview
 - **SNOMED CT**: `http://snomed.info/sct`
 - **ICD-10**: `http://hl7.org/fhir/sid/icd-10`
 - **RxNorm**: `http://www.nlm.nih.gov/research/umls/rxnorm`
+- **PhilHealth ACR ICD-10**: `http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library` — Used for encounter diagnoses (9,520 codes via tx.fhirlab.net)
 
 ---
 

@@ -31,6 +31,7 @@
 		medications = [],
 		serviceRequests = [],
 		diagnosticReports = [],
+		conditions = [],
 		patientId = '',
 		clinicColor = '#2563EB',
 		onDelete = null // Callback after successful delete
@@ -79,7 +80,33 @@
 	}
 
 	function getResourceCount() {
-		return observations.length + medications.length + serviceRequests.length + diagnosticReports.length;
+		return observations.length + medications.length + serviceRequests.length + diagnosticReports.length + conditions.length;
+	}
+
+	// Helper to get condition display text
+	function getConditionDisplay(condition) {
+		const coding = condition.code?.coding?.[0];
+		return coding?.display || condition.code?.text || 'Unnamed Condition';
+	}
+
+	// Helper to get truncated display name (for collapsed view)
+	function truncateDisplay(display, maxLength = 22) {
+		if (!display) return '';
+		if (display.length <= maxLength) return display;
+		return display.substring(0, maxLength - 3) + '...';
+	}
+
+	// Helper to get condition status color
+	function getConditionStatusColor(status) {
+		const colors = {
+			'active': '#10B981',
+			'recurrence': '#F59E0B',
+			'relapse': '#EF4444',
+			'inactive': '#6B7280',
+			'remitted': '#3B82F6',
+			'resolved': '#8B5CF6'
+		};
+		return colors[status?.toLowerCase()] || '#6B7280';
 	}
 	
 	// Derived values
@@ -258,6 +285,24 @@
 						<span class="provider">👤 {participant.display || participant.reference}</span>
 					{/if}
 				</div>
+				
+				<!-- Condition Chips (Collapsed Preview) -->
+				{#if conditions.length > 0}
+					<div class="condition-chips-preview">
+						{#each conditions.slice(0, 2) as condition}
+							<span 
+								class="condition-chip-mini"
+								style="background-color: {getConditionStatusColor(condition.clinicalStatus?.coding?.[0]?.code)}20; 
+								       color: {getConditionStatusColor(condition.clinicalStatus?.coding?.[0]?.code)};"
+							>
+								🏥 {truncateDisplay(getConditionDisplay(condition))}
+							</span>
+						{/each}
+						{#if conditions.length > 2}
+							<span class="condition-chip-more">+{conditions.length - 2} more</span>
+						{/if}
+					</div>
+				{/if}
 			</div>
 			
 			<div class="header-actions">
@@ -299,6 +344,46 @@
 						📝 Edit
 					</a>
 				</div>
+				
+				<!-- Conditions Section -->
+				{#if conditions.length > 0 || isExpanded}
+					<div class="resources-section conditions-section">
+						<div class="section-header">
+							<span class="section-icon">🏥</span>
+							<span class="section-title">Diagnoses ({conditions.length})</span>
+							<a href={buildUrl('/condition', { encounter: encounterId })} class="btn-add-inline">
+								➕ Add
+							</a>
+						</div>
+						{#if conditions.length > 0}
+							<div class="conditions-list">
+								{#each conditions as condition}
+									{@const code = condition.code?.coding?.[0]}
+									{@const status = condition.clinicalStatus?.coding?.[0]?.code || 'active'}
+									<div class="condition-item">
+										<div class="condition-header">
+											<span class="condition-code">{code?.code || 'N/A'}</span>
+											<span 
+												class="condition-status-badge"
+												style="background-color: {getConditionStatusColor(status)}20; color: {getConditionStatusColor(status)};"
+											>
+												{status}
+											</span>
+										</div>
+										<div class="condition-name">{code?.display || condition.code?.text || 'Unnamed Condition'}</div>
+										<div class="condition-meta">
+											<span class="condition-system">ACR ICD-10</span>
+											<span class="condition-separator">•</span>
+											<span class="condition-category">{condition.category?.[0]?.coding?.[0]?.code || 'encounter-diagnosis'}</span>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<p class="empty-section">No diagnoses recorded for this encounter.</p>
+						{/if}
+					</div>
+				{/if}
 				
 				<!-- Observations Section -->
 				{#if observations.length > 0}
@@ -644,5 +729,116 @@
 	.empty-encounter p:last-child {
 		font-size: 13px;
 		color: #9CA3AF;
+	}
+
+	/* Condition Chips (Collapsed Preview) */
+	.condition-chips-preview {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: 8px;
+		align-items: center;
+	}
+
+	.condition-chip-mini {
+		font-size: 12px;
+		padding: 4px 8px;
+		border-radius: 12px;
+		font-weight: 500;
+		white-space: nowrap;
+		max-width: 180px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.condition-chip-more {
+		font-size: 11px;
+		color: #6B7280;
+		font-style: italic;
+	}
+
+	/* Conditions Section (Expanded) */
+	.conditions-section {
+		background: linear-gradient(135deg, #F0FDF4 0%, #F8FAFC 100%);
+		border: 1px solid #BBF7D0;
+		border-radius: 10px;
+		padding: 16px;
+		margin-bottom: 20px;
+	}
+
+	.conditions-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.condition-item {
+		background: white;
+		border: 1px solid #E5E7EB;
+		border-radius: 8px;
+		padding: 12px 14px;
+	}
+
+	.condition-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+	}
+
+	.condition-code {
+		font-family: monospace;
+		font-size: 13px;
+		font-weight: 700;
+		color: #059669;
+	}
+
+	.condition-status-badge {
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		padding: 2px 8px;
+		border-radius: 10px;
+	}
+
+	.condition-name {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1F2937;
+		margin-bottom: 6px;
+	}
+
+	.condition-meta {
+		font-size: 11px;
+		color: #6B7280;
+		display: flex;
+		gap: 8px;
+		align-items: center;
+	}
+
+	.condition-separator {
+		opacity: 0.5;
+	}
+
+	.btn-add-inline {
+		font-size: 12px;
+		color: #059669;
+		text-decoration: none;
+		font-weight: 500;
+		margin-left: auto;
+		padding: 4px 8px;
+		border-radius: 4px;
+		transition: background 0.2s;
+	}
+
+	.btn-add-inline:hover {
+		background: #D1FAE5;
+	}
+
+	.empty-section {
+		font-size: 13px;
+		color: #6B7280;
+		font-style: italic;
+		margin: 8px 0;
 	}
 </style>

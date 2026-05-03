@@ -350,6 +350,120 @@ export class FHIRClient {
 	}
 
 	/**
+	 * Lookup a code with all properties from the Terminology Server
+	 * @param {string} system - Code system URL
+	 * @param {string} code - Code to look up
+	 * @returns {Promise<Object>} { success: boolean, properties: Map<string, string>, display?: string, error?: string }
+	 */
+	async lookupCodeProperties(system, code) {
+		const url = `${this.txUrl}/CodeSystem/\$lookup?system=${encodeURIComponent(system)}&code=${encodeURIComponent(code)}&property=*`;
+		let response = null;
+		let result = null;
+		
+		try {
+			response = await fetch(url, {
+				headers: {
+					'Accept': 'application/fhir+json'
+				}
+			});
+
+			if (!response.ok) {
+				this._logTransaction('GET', url, null, response, null);
+				return { success: false, error: response.statusText, properties: new Map() };
+			}
+
+			result = await response.json();
+			this._logTransaction('GET', url, null, response, result);
+
+			// Parse Parameters resource into a convenient properties map
+			const properties = new Map();
+			let display = null;
+			
+			if (result.parameter) {
+				for (const param of result.parameter) {
+					if (param.name === 'display' && param.valueString) {
+						display = param.valueString;
+					}
+					if (param.name === 'property' && param.part) {
+						const codePart = param.part.find(p => p.name === 'code');
+						const valuePart = param.part.find(p => p.valueString !== undefined);
+						if (codePart && valuePart) {
+							properties.set(codePart.valueCode, valuePart.valueString);
+						}
+					}
+				}
+			}
+
+			return { success: true, display, properties };
+		} catch (error) {
+			console.error('Terminology Lookup Error:', error);
+			this._logTransaction('GET', url, null, response, result, error);
+			return { success: false, error: error.message, properties: new Map() };
+		}
+	}
+
+	/**
+	 * Search PhilHealth ACR ICD-10 codes using ValueSet $expand
+	 * Queries tx.fhirlab.net for diagnosis codes with text filtering
+	 * 
+	 * @param {string} filter - Search term (e.g., "diabetes", "hypertension")
+	 * @param {number} count - Maximum results to return (default 10)
+	 * @returns {Promise<Array>} Array of {system, code, display} objects
+	 */
+	async searchACRCodes(filter, count = 10) {
+		const url = new URL(`${this.txUrl}/ValueSet/\$expand`);
+		url.searchParams.set('url', 'http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical');
+		url.searchParams.set('filter', filter);
+		url.searchParams.set('count', count.toString());
+		
+		console.log('[searchACRCodes] Request URL:', url.toString());
+		
+		let response = null;
+		let result = null;
+		
+		try {
+			response = await fetch(url.toString(), {
+				headers: {
+					'Accept': 'application/fhir+json'
+				}
+			});
+
+			if (!response.ok) {
+				console.error('[searchACRCodes] HTTP Error:', response.status, response.statusText);
+				this._logTransaction('GET', url.toString(), null, response, null);
+				return [];
+			}
+
+			result = await response.json();
+			console.log('[searchACRCodes] Full Response:', JSON.stringify(result, null, 2));
+			this._logTransaction('GET', url.toString(), null, response, result);
+
+			// Extract codes from expansion.contains
+			const expansion = result.expansion;
+			console.log('[searchACRCodes] Expansion object:', expansion);
+			console.log('[searchACRCodes] Contains array:', expansion?.contains);
+			console.log('[searchACRCodes] Total:', expansion?.total);
+			
+			if (expansion && expansion.contains && Array.isArray(expansion.contains)) {
+				const mapped = expansion.contains.map(item => ({
+					system: item.system,
+					code: item.code,
+					display: item.display
+				}));
+				console.log('[searchACRCodes] Mapped results:', mapped);
+				return mapped;
+			}
+
+			console.warn('[searchACRCodes] No contains array found in expansion');
+			return [];
+		} catch (error) {
+			console.error('[searchACRCodes] Error:', error);
+			this._logTransaction('GET', url.toString(), null, response, result, error);
+			return [];
+		}
+	}
+
+	/**
 	 * Get server capabilities
 	 * @returns {Promise<Object>} CapabilityStatement
 	 */

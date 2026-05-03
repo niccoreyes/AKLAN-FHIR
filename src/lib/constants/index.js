@@ -185,6 +185,20 @@ export const ICD10_CODES = {
 };
 
 /**
+ * PhilHealth ACR (All Case Rates) ICD-10 Terminology
+ * Source: http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library
+ * ValueSet: http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical
+ * Server: https://tx.fhirlab.net/fhir
+ * Total Codes: 9,520 ICD-10 diagnosis codes
+ * 
+ * Query method: GET $expand with filter parameter
+ * Example: GET /ValueSet/$expand?url={ACR_ICD_VALUESET_URL}&filter=diabetes&count=10
+ */
+export const ACR_ICD_CODE_SYSTEM = 'http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library';
+export const ACR_ICD_VALUESET_URL = 'http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical';
+export const ACR_ICD_VERSION = '2.3.0-hierarchical';
+
+/**
  * Vital Signs ValueSet URL
  * Used to identify which observations are vital signs
  * This ValueSet must exist on the terminology server (tx.fhirlab.net)

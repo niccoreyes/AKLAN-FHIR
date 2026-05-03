@@ -268,10 +268,13 @@ Before workshop:
 | File | Purpose |
 |------|---------|
 | `src/lib/stores/appStore.svelte.js` | URL state, registration, navigation helpers |
-| `src/lib/constants/index.js` | Clinics, roles, capabilities config |
+| `src/lib/constants/index.js` | Clinics, roles, capabilities config, ACR terminology constants |
+| `src/lib/services/fhir-client.js` | FHIR REST client, ACR ICD-10 `$expand` search |
 | `src/lib/components/AppHeader.svelte` | Navigation, auto-registration, toasts |
+| `src/lib/components/EncounterCard.svelte` | Encounter display with condition chips |
 | `src/routes/dashboard/+page.svelte` | Main dashboard with action cards |
 | `src/routes/patient/[id]/+page.svelte` | Patient timeline with encounter actions |
+| `src/routes/encounter/+page.svelte` | Encounter creation with condition picker |
 
 ---
 
@@ -284,7 +287,24 @@ Before workshop:
 
 ---
 
+## Terminology Dependencies
+
+### PhilHealth ACR ICD-10 (for Condition coding)
+- **ValueSet URL:** `http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical`
+- **CodeSystem URL:** `http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library`
+- **Server:** `https://tx.fhirlab.net/fhir`
+- **Total Codes:** 9,520 ICD-10 diagnosis codes
+- **Query Method:** `GET /ValueSet/$expand?url={VALUESET_URL}&filter={searchTerm}&count={n}`
+- **Usage:** Encounter diagnoses via chip-based selection in encounter form
+
+### Example API Call
+```
+GET https://tx.fhirlab.net/fhir/ValueSet/$expand?url=http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical&filter=diabetes&count=10
+```
+
+---
+
 *This document captures decisions made during development to help future agents understand the project context and avoid repeating mistakes.*
 
-Last updated: 2025-05-03
-Session: Full HIE workflow implementation with encounter linking and status tracking
+Last updated: 2025-05-04
+Session: Condition assignment with PhilHealth ACR ICD-10 terminology

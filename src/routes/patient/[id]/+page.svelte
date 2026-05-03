@@ -341,6 +341,7 @@
 		<!-- Extract resources by type for timeline -->
 		{@const encounters = resources.filter(r => r.resourceType === 'Encounter').sort((a, b) => new Date(b.period?.start || 0) - new Date(a.period?.start || 0))}
 		{@const observations = resources.filter(r => r.resourceType === 'Observation')}
+		{@const conditions = resources.filter(r => r.resourceType === 'Condition')}
 		{@const medications = resources.filter(r => r.resourceType === 'MedicationRequest')}
 		{@const serviceRequests = resources.filter(r => r.resourceType === 'ServiceRequest')}
 		{@const diagnosticReports = resources.filter(r => r.resourceType === 'DiagnosticReport')}
@@ -353,6 +354,7 @@
 				<div class="encounters-timeline">
 					{#each encounters as encounter}
 						{@const encounterObservations = observations.filter(obs => obs.encounter?.reference === `Encounter/${encounter.id}`)}
+						{@const encounterConditions = conditions.filter(c => c.encounter?.reference === `Encounter/${encounter.id}`)}
 						{@const encounterMedications = medications.filter(med => med.encounter?.reference === `Encounter/${encounter.id}`)}
 						{@const encounterServiceRequests = serviceRequests.filter(sr => sr.encounter?.reference === `Encounter/${encounter.id}`)}
 						{@const encounterReports = diagnosticReports.filter(rep => rep.encounter?.reference === `Encounter/${encounter.id}`)}
@@ -360,6 +362,7 @@
 						<EncounterCard
 							{encounter}
 							observations={encounterObservations}
+							conditions={encounterConditions}
 							medications={encounterMedications}
 							serviceRequests={encounterServiceRequests}
 							diagnosticReports={encounterReports}

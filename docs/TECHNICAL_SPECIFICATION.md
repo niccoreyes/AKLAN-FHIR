@@ -397,6 +397,68 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 
 ---
 
+#### Condition (Encounter Diagnoses)
+**Purpose**: Document diagnoses and conditions during encounters  
+**Profile**: PH Core Condition with PhilHealth ACR ICD-10 codes  
+**Dependencies**: 
+- **ValueSet**: `http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical` (9,520 ICD-10 codes)
+- **CodeSystem**: `http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library`
+- **Terminology Server**: `https://tx.fhirlab.net/fhir`
+
+```json
+{
+  "resourceType": "Condition",
+  "id": "[server-assigned]",
+  "meta": {
+    "tag": [{
+      "system": "https://aklan-fhir.app/workshop",
+      "code": "AK26-A"
+    }]
+  },
+  "clinicalStatus": {
+    "coding": [{
+      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+      "code": "active"
+    }]
+  },
+  "verificationStatus": {
+    "coding": [{
+      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+      "code": "confirmed"
+    }]
+  },
+  "category": [{
+    "coding": [{
+      "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+      "code": "encounter-diagnosis",
+      "display": "Encounter Diagnosis"
+    }]
+  }],
+  "code": {
+    "coding": [{
+      "system": "http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library",
+      "code": "J20.9",
+      "display": "Acute bronchitis, unspecified"
+    }],
+    "text": "Acute bronchitis, unspecified"
+  },
+  "subject": {
+    "reference": "Patient/[id]"
+  },
+  "encounter": {
+    "reference": "Encounter/[id]"
+  }
+}
+```
+
+**Required Fields**: resourceType, clinicalStatus, code, subject, encounter  
+**Search Parameters**: patient, encounter, clinical-status, _tag  
+**Code Selection**: Real-time search via `$expand` with `filter` parameter on PhilHealth ACR ValueSet  
+**UI Pattern**: Chip-based selection in encounter form; chips displayed in EncounterCard header  
+**Delete**: DELETE /Condition/[id] supported (cascades with encounter deletion)
+
+---
+
 ### 2.2 Terminology Systems
 
 #### LOINC (Laboratory and Clinical Observations)
@@ -411,11 +473,21 @@ Clinic A: GET /Encounter?patient= → SHR → Returns Both Encounters
 **Usage**: Condition.code, Encounter.type, Procedure.code  
 **Validation**: ✅ Supported on tx.fhirlab.net
 
-#### ICD-10
+#### ICD-10 (General)
 **System**: `http://hl7.org/fhir/sid/icd-10`  
 **Purpose**: Billing and reporting codes  
 **Usage**: Condition.code (secondary)  
 **Validation**: ❌ Not supported on tx.fhirlab.net (returns 404)
+
+#### PhilHealth ACR ICD-10 (Philippines Specific)
+**System**: `http://www.philhealth.gov.ph/fhir/CodeSystem/acr-library`  
+**ValueSet**: `http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical`  
+**Purpose**: Philippine Health Insurance Corporation All Case Rates ICD-10 diagnosis codes  
+**Usage**: Condition.code for encounter diagnoses  
+**Validation**: ✅ Fully supported on tx.fhirlab.net with $expand and $lookup  
+**Total Codes**: 9,520 ICD-10 diagnosis codes  
+**Query Method**: `GET /ValueSet/$expand?url={ACR_ICD_VALUESET_URL}&filter={searchTerm}&count={n}`  
+**Example**: `GET /ValueSet/$expand?url=http://www.philhealth.gov.ph/fhir/ValueSet/acr-icd-hierarchical&filter=diabetes&count=10`
 
 #### RxNorm
 **System**: `http://www.nlm.nih.gov/research/umls/rxnorm`  
