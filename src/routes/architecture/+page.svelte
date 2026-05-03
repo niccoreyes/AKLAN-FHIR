@@ -222,85 +222,110 @@
 
 		<!-- Architecture Overview -->
 		<div class="section-card">
-			<h3>🏗️ Layered Architecture</h3>
+			<h3>🏗️ OpenHIE Architecture</h3>
 			<p class="section-hint">
-				Each Point of Service (PoS) has its own Demo EHR. All Demo EHRs connect through an 
-				<strong>Interoperability Layer</strong> (OpenHIM or Mirth Connect) to shared services.
-				<span class="fhir-badge">FHIR R4</span>
+				Each Point of Service connects via <strong>FHIR</strong> through the Interoperability Layer
+				to access Shared Services.
 			</p>
-			
+
 			<!-- Architecture Diagram -->
-			<div class="architecture-diagram">
-				<!-- PoS Row -->
-				<div class="diagram-row">
-					{#each architectureTiers[0].nodes as node}
-						<button 
-							class="diagram-node clinic-node"
-							onclick={() => selectComponent(node.type)}
-							class:active={selectedComponent === node.type}
-							style="--node-color: {architectureTiers[0].color}"
-						>
-							<span class="node-icon">{node.icon}</span>
-							<span class="node-label">{node.name}</span>
+			<div class="openhie-diagram">
+
+				<!-- POS Zone -->
+				<div class="oh-zone oh-zone-pos">
+					<div class="oh-zone-header">
+						<span>🏥</span>
+						<span>POINT OF SERVICE</span>
+					</div>
+					<div class="oh-zone-body">
+						<button class="oh-node" onclick={() => selectComponent('pos')}>
+							<span class="oh-node-icon">🏥</span>
+							<span class="oh-node-label">RHU Kalibo</span>
 						</button>
-					{/each}
-				</div>
-
-				<!-- Arrow Down -->
-				<div class="diagram-arrow">↓</div>
-
-				<!-- Demo EHR Row -->
-				<div class="diagram-row">
-					{#each architectureTiers[1].nodes as node}
-						<button 
-							class="diagram-node"
-							onclick={() => selectComponent(node.type)}
-							class:active={selectedComponent === node.type}
-							style="--node-color: {architectureTiers[1].color}"
-						>
-							<span class="node-icon">{node.icon}</span>
-							<span class="node-label">{node.name}</span>
+						<button class="oh-node" onclick={() => selectComponent('pos')}>
+							<span class="oh-node-icon">🏥</span>
+							<span class="oh-node-label">Aklan Hospital</span>
 						</button>
-					{/each}
-				</div>
-
-				<!-- Arrow Down -->
-				<div class="diagram-arrow">↓</div>
-
-				<!-- Interoperability Layer -->
-				<button 
-					class="diagram-node interop-node"
-					onclick={() => selectComponent('interoperability')}
-					class:active={selectedComponent === 'interoperability'}
-					style="--node-color: {components.interoperability.color}"
-				>
-					<span class="node-icon">🔀</span>
-					<span class="node-label">OpenHIM / Mirth</span>
-					<span class="node-sub">Interoperability Layer</span>
-				</button>
-
-				<!-- Arrows Split -->
-				<div class="diagram-split">
-					<div class="split-line"></div>
-					<div class="split-branches">
-						<div class="branch">↙</div>
-						<div class="branch">↘</div>
+						<button class="oh-node" onclick={() => selectComponent('pos')}>
+							<span class="oh-node-icon">🧪</span>
+							<span class="oh-node-label">Kalibo Lab</span>
+						</button>
+						<button class="oh-node" onclick={() => selectComponent('pos')}>
+							<span class="oh-node-icon">💊</span>
+							<span class="oh-node-label">Local Pharmacy</span>
+						</button>
 					</div>
 				</div>
 
-				<!-- Shared Services Row -->
-				<div class="diagram-row backend-row">
-					{#each architectureTiers[3].nodes as node}
-						<button 
-							class="diagram-node backend-node"
-							onclick={() => selectComponent(node.type)}
-							class:active={selectedComponent === node.type}
-							style="--node-color: {components[node.type]?.color || architectureTiers[3].color}"
-						>
-							<span class="node-icon">{node.icon}</span>
-							<span class="node-label">{node.name}</span>
+				<!-- PoS → Interop Arrows (converging) -->
+				<div class="oh-connectors-converge">
+					<div class="oh-conn-line">
+						<div class="oh-conn-v"></div>
+						<div class="oh-conn-diag oh-conn-diag-left"></div>
+						<span class="oh-conn-label">FHIR</span>
+					</div>
+					<div class="oh-conn-line">
+						<div class="oh-conn-v"></div>
+						<div class="oh-conn-diag oh-conn-diag-mid-left"></div>
+						<span class="oh-conn-label">FHIR</span>
+					</div>
+					<div class="oh-conn-line">
+						<div class="oh-conn-v"></div>
+						<div class="oh-conn-diag oh-conn-diag-mid-right"></div>
+						<span class="oh-conn-label">FHIR</span>
+					</div>
+					<div class="oh-conn-line">
+						<div class="oh-conn-v"></div>
+						<div class="oh-conn-diag oh-conn-diag-right"></div>
+						<span class="oh-conn-label">FHIR</span>
+					</div>
+					<!-- Horizontal bar connecting all converging lines -->
+					<div class="oh-conn-converge-bar"></div>
+				</div>
+
+				<!-- Interop Zone -->
+				<div class="oh-zone oh-zone-interop">
+					<div class="oh-zone-header">
+						<span>🔀</span>
+						<span>INTEROPERABILITY LAYER</span>
+					</div>
+					<div class="oh-zone-body">
+						<button class="oh-node oh-node-lg" onclick={() => selectComponent('interoperability')}>
+							<span class="oh-node-icon">🔀</span>
+							<span class="oh-node-label">OpenHIM / Mirth</span>
 						</button>
-					{/each}
+					</div>
+				</div>
+
+				<!-- Interop → Shared Arrows (diverging) -->
+				<div class="oh-connectors-diverge">
+					<div class="oh-conn-diverge-bar"></div>
+					<div class="oh-conn-line">
+						<div class="oh-conn-diag oh-conn-diag-left"></div>
+						<div class="oh-conn-v"></div>
+					</div>
+					<div class="oh-conn-line">
+						<div class="oh-conn-diag oh-conn-diag-right"></div>
+						<div class="oh-conn-v"></div>
+					</div>
+				</div>
+
+				<!-- Shared Zone -->
+				<div class="oh-zone oh-zone-shared">
+					<div class="oh-zone-header">
+						<span>🌐</span>
+						<span>SHARED SERVICES</span>
+					</div>
+					<div class="oh-zone-body">
+						<button class="oh-node" onclick={() => selectComponent('shr')}>
+							<span class="oh-node-icon">🗄️</span>
+							<span class="oh-node-label">Shared Health Record</span>
+						</button>
+						<button class="oh-node" onclick={() => selectComponent('terminology')}>
+							<span class="oh-node-icon">📚</span>
+							<span class="oh-node-label">Terminology Server</span>
+						</button>
+					</div>
 				</div>
 			</div>
 
@@ -578,108 +603,246 @@
 		margin: 0 0 20px 0;
 	}
 
-	/* Architecture Diagram */
-	.architecture-diagram {
+	/* OpenHIE Architecture Diagram */
+	.openhie-diagram {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 8px;
 		padding: 20px 0;
 	}
 
-	.diagram-row {
-		display: flex;
-		gap: 12px;
-		flex-wrap: wrap;
-		justify-content: center;
+	/* Zones */
+	.oh-zone {
+		border: 2px solid;
+		border-radius: 12px;
+		padding: 16px;
+		width: 100%;
+		max-width: 640px;
 	}
 
-	.diagram-node {
+	.oh-zone-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 12px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid;
+		font-weight: 700;
+		font-size: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.oh-zone-pos {
+		border-color: #22C55E;
+		background: #F0FDF4;
+	}
+
+	.oh-zone-pos .oh-zone-header {
+		color: #15803D;
+		border-color: #BBF7D0;
+	}
+
+	.oh-zone-interop {
+		border-color: #F59E0B;
+		background: #FFFBEB;
+	}
+
+	.oh-zone-interop .oh-zone-header {
+		color: #B45309;
+		border-color: #FDE68A;
+	}
+
+	.oh-zone-shared {
+		border-color: #3B82F6;
+		background: #EFF6FF;
+	}
+
+	.oh-zone-shared .oh-zone-header {
+		color: #1D4ED8;
+		border-color: #BFDBFE;
+	}
+
+	.oh-zone-body {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	/* Nodes */
+	.oh-node {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 4px;
-		padding: 16px 20px;
-		border: 2px solid #E2E8F0;
-		border-radius: 12px;
+		gap: 2px;
+		padding: 8px 10px;
 		background: white;
+		border: 1px solid #E2E8F0;
+		border-radius: 8px;
 		cursor: pointer;
 		transition: all 0.2s;
-		min-width: 120px;
+		min-width: 90px;
 	}
 
-	.diagram-node:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+	.oh-node:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+		border-color: #CBD5E1;
 	}
 
-	.diagram-node.active {
-		border-color: var(--node-color, #2563EB);
-		background: color-mix(in srgb, var(--node-color, #2563EB) 5%, white);
+	.oh-node-lg {
+		min-width: 160px;
+		padding: 12px 16px;
 	}
 
-	.clinic-node {
-		border-color: color-mix(in srgb, var(--node-color) 30%, #E2E8F0);
+	.oh-node-icon {
+		font-size: 18px;
 	}
 
-	.clinic-node:hover {
-		border-color: var(--node-color);
-	}
-
-	.interop-node {
-		border-color: var(--node-color, #F59E0B);
-		background: color-mix(in srgb, var(--node-color, #F59E0B) 8%, white);
-		min-width: 200px;
-	}
-
-	.backend-node {
-		border-color: var(--node-color);
-		min-width: 180px;
-	}
-
-	.node-icon {
-		font-size: 24px;
-	}
-
-	.node-label {
-		font-size: 13px;
+	.oh-node-label {
+		font-size: 11px;
 		font-weight: 600;
 		color: #1E293B;
 	}
 
-	.node-sub {
-		font-size: 11px;
-		color: #64748B;
+	/* Converging connectors (POS → Interop) */
+	.oh-connectors-converge {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		width: 100%;
+		max-width: 640px;
+		height: 60px;
+		margin: -2px 0;
+		z-index: 1;
 	}
 
-	.diagram-arrow {
-		font-size: 24px;
-		color: #94A3B8;
-	}
-
-	.diagram-split {
+	.oh-connectors-converge .oh-conn-line {
+		position: relative;
+		width: 80px;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		width: 200px;
 	}
 
-	.split-line {
+	.oh-connectors-converge .oh-conn-v {
 		width: 2px;
-		height: 20px;
-		background: #E2E8F0;
+		flex: 1;
+		background: #94A3B8;
 	}
 
-	.split-branches {
+	.oh-connectors-converge .oh-conn-diag {
+		position: absolute;
+		bottom: 0;
+		width: 2px;
+		height: 35px;
+		background: #94A3B8;
+		transform-origin: bottom center;
+	}
+
+	.oh-connectors-converge .oh-conn-diag-left {
+		transform: rotate(35deg);
+		left: 50%;
+		margin-left: -1px;
+	}
+
+	.oh-connectors-converge .oh-conn-diag-mid-left {
+		transform: rotate(12deg);
+		left: 50%;
+		margin-left: -1px;
+	}
+
+	.oh-connectors-converge .oh-conn-diag-mid-right {
+		transform: rotate(-12deg);
+		left: 50%;
+		margin-left: -1px;
+	}
+
+	.oh-connectors-converge .oh-conn-diag-right {
+		transform: rotate(-35deg);
+		left: 50%;
+		margin-left: -1px;
+	}
+
+	.oh-connectors-converge .oh-conn-converge-bar {
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 180px;
+		height: 2px;
+		background: #94A3B8;
+	}
+
+	.oh-connectors-converge .oh-conn-label {
+		position: absolute;
+		top: 4px;
+		font-size: 9px;
+		font-weight: 700;
+		color: #D97706;
+		background: #FEF3C7;
+		padding: 1px 4px;
+		border-radius: 3px;
+		border: 1px solid #FDE68A;
+		z-index: 2;
+	}
+
+	/* Diverging connectors (Interop → Shared) */
+	.oh-connectors-diverge {
+		position: relative;
 		display: flex;
-		justify-content: space-between;
+		justify-content: center;
 		width: 100%;
-		padding: 0 40px;
+		max-width: 640px;
+		height: 50px;
+		margin: -2px 0;
+		z-index: 1;
 	}
 
-	.branch {
-		font-size: 20px;
-		color: #94A3B8;
+	.oh-connectors-diverge .oh-conn-line {
+		position: relative;
+		width: 120px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.oh-connectors-diverge .oh-conn-v {
+		width: 2px;
+		flex: 1;
+		background: #94A3B8;
+	}
+
+	.oh-connectors-diverge .oh-conn-diag {
+		position: absolute;
+		top: 0;
+		width: 2px;
+		height: 28px;
+		background: #94A3B8;
+		transform-origin: top center;
+	}
+
+	.oh-connectors-diverge .oh-conn-diag-left {
+		transform: rotate(-25deg);
+		left: 50%;
+		margin-left: -1px;
+	}
+
+	.oh-connectors-diverge .oh-conn-diag-right {
+		transform: rotate(25deg);
+		left: 50%;
+		margin-left: -1px;
+	}
+
+	.oh-connectors-diverge .oh-conn-diverge-bar {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 100px;
+		height: 2px;
+		background: #94A3B8;
 	}
 
 	/* Component Details */
