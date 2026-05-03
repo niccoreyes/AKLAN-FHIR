@@ -3,12 +3,18 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { fhirClient } from '$services/fhir-client.js';
-	import { APP_NAME } from '$constants';
+	import { APP_NAME, CLINICS } from '$constants';
+	import { appStore } from '$stores/appStore.svelte.js';
+	import EncounterCard from '$components/EncounterCard.svelte';
+	import ObservationCard from '$components/ObservationCard.svelte';
 
 	let patient = $state(null);
 	let resources = $state([]);
 	let isLoading = $state(true);
 	let error = $state('');
+
+	// Get clinic color for theming
+	let clinicColor = $derived(CLINICS.find(c => c.id === appStore.clinicId)?.color || '#2563EB');
 
 	// Get patient ID from URL params
 	let patientId = $derived($page.params.id);
@@ -228,7 +234,23 @@
 						</span>
 					{/if}
 				</div>
-				<div class="patient-actions">
+				<!-- NEW: Patient-Level Quick Actions -->
+				<div class="patient-quick-actions">
+					<a href="/encounter?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn new-encounter">
+						➕ New Encounter
+					</a>
+					<a href="/vitals?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn vitals">
+						🩺 Record Vitals
+					</a>
+					<a href="/medication-request?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn prescribe">
+						💊 Prescribe
+					</a>
+					<a href="/service-request?patient={patient.id}&returnTo=/patient/{patient.id}" class="quick-action-btn labs">
+						🧪 Order Labs
+					</a>
+				</div>
+
+				<div class="patient-actions-secondary">
 					<a href="/patient/edit?id={patient.id}" class="btn-edit-patient">✏️ Edit Patient</a>
 					<button 
 						type="button" 
@@ -242,176 +264,57 @@
 			</div>
 		</div>
 
-		<!-- Extract encounters and observations -->
+		<!-- Extract resources by type for timeline -->
 		{@const encounters = resources.filter(r => r.resourceType === 'Encounter').sort((a, b) => new Date(b.period?.start || 0) - new Date(a.period?.start || 0))}
 		{@const observations = resources.filter(r => r.resourceType === 'Observation')}
+		{@const medications = resources.filter(r => r.resourceType === 'MedicationRequest')}
+		{@const serviceRequests = resources.filter(r => r.resourceType === 'ServiceRequest')}
+		{@const diagnosticReports = resources.filter(r => r.resourceType === 'DiagnosticReport')}
 		
-		<!-- Encounters Section -->
-		{#if encounters.length > 0}
-			<div class="encounters-section">
-				<h3>📋 Encounters ({encounters.length})</h3>
-				<div class="encounters-list">
-					{#each encounters as encounter}
-						{@const linkedObservations = observations.filter(obs => obs.encounter?.reference === `Encounter/${encounter.id}`)}
-						<div class="encounter-card">
-							<div class="encounter-header">
-								<div class="encounter-main">
-									<span class="encounter-type">{encounter.type?.[0]?.text || encounter.type?.[0]?.coding?.[0]?.display || 'Visit'}</span>
-									<span class="encounter-status encounter-status-{encounter.status}">{encounter.status}</span>
-								</div>
-								<span class="encounter-date">{formatDate(encounter.period?.start)}</span>
-							</div>
-							<div class="encounter-details">
-								{#if encounter.reasonCode?.[0]?.text}
-									<div class="encounter-reason">🩺 {encounter.reasonCode[0].text}</div>
-								{/if}
-								<div class="encounter-meta">
-									<span>Class: {encounter.class?.display || encounter.class?.code || 'Unknown'}</span>
-									{#if encounter.id}
-										<span>ID: {encounter.id}</span>
-									{/if}
-								</div>
-							</div>
-							{#if linkedObservations.length > 0}
-								<div class="linked-observations">
-									<div class="linked-header">🩺 {linkedObservations.length} observation{linkedObservations.length > 1 ? 's' : ''}</div>
-									<div class="linked-grid">
-										{#each linkedObservations as obs}
-											<div class="linked-obs">
-												<span class="linked-name">{obs.code?.text || 'Observation'}</span>
-												<span class="linked-value">
-													{#if obs.component}
-														{obs.component[0]?.valueQuantity?.value}/{obs.component[1]?.valueQuantity?.value}
-													{:else if obs.valueQuantity}
-														{obs.valueQuantity.value} {obs.valueQuantity.unit}
-													{:else if obs.valueString}
-														{obs.valueString}
-													{/if}
-												</span>
-											</div>
-										{/each}
-									</div>
-								</div>
-							{/if}
-							<div class="encounter-actions">
-								<a href="/encounter/edit?id={encounter.id}" class="btn-edit">
-									✏️ Edit
-								</a>
-								<a href="/vitals?patient={patientId}&encounter={encounter.id}" class="btn-add-vitals">
-									+ Add Vitals
-								</a>
-								<a href="/medication-request?patient={patientId}&encounter={encounter.id}&returnTo=/patient/{patientId}" class="btn-prescribe">
-									💊 Prescribe
-								</a>
-								<a href="/service-request?patient={patientId}&encounter={encounter.id}&returnTo=/patient/{patientId}" class="btn-order-labs">
-									🧪 Order Labs
-								</a>
-								<button 
-									type="button" 
-									class="btn-delete"
-									onclick={() => deleteResource('Encounter', encounter.id)}
-									disabled={deletingId === encounter.id && deletingType === 'Encounter'}
-								>
-									{deletingId === encounter.id && deletingType === 'Encounter' ? '⏳' : '🗑️'} Delete
-								</button>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-		{/if}
-
-		<!-- Observations Section (show unlinked observations) -->
-		{@const unlinkedObservations = observations.filter(obs => !obs.encounter)}
-		{#if unlinkedObservations.length > 0}
-			<div class="observations-section">
-				<h3>🩺 Unlinked Observations ({unlinkedObservations.length})</h3>
-				<p class="observations-subtitle">These observations are not linked to any encounter</p>
-				<div class="observations-grid">
-					{#each unlinkedObservations as obs}
-						<div class="observation-card">
-							<div class="observation-header">
-								<span class="observation-type">{obs.code?.text || 'Observation'}</span>
-								<div class="observation-actions">
-									<span class="observation-date">{formatDate(obs.effectiveDateTime || obs.issued)}</span>
-									<button 
-										type="button" 
-										class="btn-delete-small"
-										onclick={() => deleteResource('Observation', obs.id)}
-										disabled={deletingId === obs.id && deletingType === 'Observation'}
-										title="Delete observation"
-									>
-										{deletingId === obs.id && deletingType === 'Observation' ? '⏳' : '🗑️'}
-									</button>
-								</div>
-							</div>
-							<div class="observation-value">
-								{#if obs.component}
-									<div class="component-values">
-										{#each obs.component as comp}
-											<div class="component">
-												<span class="comp-name">{comp.code?.text || comp.code?.coding?.[0]?.display || 'Value'}</span>
-												<span class="comp-value">{comp.valueQuantity?.value} {comp.valueQuantity?.unit}</span>
-											</div>
-										{/each}
-									</div>
-								{:else if obs.valueQuantity}
-									<span class="value-large">{obs.valueQuantity.value}</span>
-									<span class="unit">{obs.valueQuantity.unit}</span>
-								{:else if obs.valueString}
-									<span class="value-string">{obs.valueString}</span>
-								{:else if obs.valueCodeableConcept}
-									<span class="value-string">{obs.valueCodeableConcept.text || obs.valueCodeableConcept.coding?.[0]?.display}</span>
-								{:else if obs.valueBoolean !== undefined}
-									<span class="value-string">{obs.valueBoolean ? 'Yes' : 'No'}</span>
-								{:else if obs.valueInteger !== undefined}
-									<span class="value-large">{obs.valueInteger}</span>
-								{/if}
-							</div>
-							{#if obs.note?.[0]?.text}
-								<div class="observation-note">{obs.note[0].text}</div>
-							{/if}
-							{#if obs.code?.coding?.[0]?.code}
-								<div class="code-label">
-									{obs.code?.coding?.[0]?.system?.includes('loinc') ? 'LOINC' : 'Code'}: {obs.code?.coding?.[0]?.code}
-								</div>
-							{/if}
-						</div>
-					{/each}
-				</div>
-			</div>
-		{/if}
-
-		<!-- Timeline -->
-		<div class="timeline-container">
-			<h3>📋 Patient Timeline ({resources.length} records)</h3>
+		<!-- Timeline View: Encounters with linked resources -->
+		<div class="patient-timeline">
+			<h3 class="timeline-header">📋 Patient Timeline</h3>
 			
-			{#if resources.length === 0}
-				<div class="empty-timeline">
-					<p>No clinical records found for this patient.</p>
+			{#if encounters.length > 0}
+				<div class="encounters-timeline">
+					{#each encounters as encounter}
+						{@const encounterObservations = observations.filter(obs => obs.encounter?.reference === `Encounter/${encounter.id}`)}
+						{@const encounterMedications = medications.filter(med => med.encounter?.reference === `Encounter/${encounter.id}`)}
+						{@const encounterServiceRequests = serviceRequests.filter(sr => sr.encounter?.reference === `Encounter/${encounter.id}`)}
+						{@const encounterReports = diagnosticReports.filter(rep => rep.encounter?.reference === `Encounter/${encounter.id}`)}
+						
+						<EncounterCard 
+							{encounter}
+							observations={encounterObservations}
+							medications={encounterMedications}
+							serviceRequests={encounterServiceRequests}
+							diagnosticReports={encounterReports}
+							patientId={patient.id}
+							clinicColor={clinicColor}
+						/>
+					{/each}
 				</div>
 			{:else}
-				<div class="timeline">
-					{#each resources as resource}
-						<div class="timeline-item">
-							<div class="timeline-icon">{getResourceTypeIcon(resource.resourceType)}</div>
-							<div class="timeline-content">
-								<div class="timeline-header">
-									<span class="resource-type">{resource.resourceType}</span>
-									<span class="timeline-date">{formatDate(resource.sortDate)}</span>
-								</div>
-								<div class="timeline-title">{getResourceTitle(resource)}</div>
-								{#if getResourceDetails(resource)}
-									<div class="timeline-details">{getResourceDetails(resource)}</div>
-								{/if}
-								{#if resource.code?.coding?.[0]?.code}
-									<div class="code-label">
-										{resource.code?.coding?.[0]?.system?.includes('snomed') ? 'SNOMED' : resource.code?.coding?.[0]?.system?.includes('loinc') ? 'LOINC' : 'Code'}: {resource.code?.coding?.[0]?.code}
-									</div>
-								{/if}
-							</div>
-						</div>
-					{/each}
+				<!-- No Encounters - Show option to create one -->
+				<div class="no-encounters">
+					<p>No visits recorded for this patient.</p>
+					<a href="/encounter?patient={patient.id}&returnTo=/patient/{patient.id}" class="btn-primary">
+						➕ Record First Visit
+					</a>
+				</div>
+			{/if}
+			
+			<!-- Unlinked Observations Section -->
+			{#if observations.filter(obs => !obs.encounter?.reference).length > 0}
+				{@const unlinkedObservations = observations.filter(obs => !obs.encounter?.reference)}
+				<div class="unlinked-resources">
+					<h4 class="unlinked-header">📊 Standalone Observations ({unlinkedObservations.length})</h4>
+					<p class="unlinked-hint">These observations are not linked to any specific encounter</p>
+					<div class="unlinked-list">
+						{#each unlinkedObservations as obs}
+							<ObservationCard observation={obs} />
+						{/each}
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -582,118 +485,6 @@
 		font-size: 13px;
 	}
 
-	/* Timeline */
-	.timeline-container {
-		padding: 24px;
-		max-width: 900px;
-		margin: 0 auto;
-	}
-
-	.timeline-container h3 {
-		margin: 0 0 20px 0;
-		font-size: 18px;
-		color: #1E293B;
-	}
-
-	.empty-timeline {
-		text-align: center;
-		padding: 40px;
-		color: #64748B;
-		background: white;
-		border-radius: 12px;
-		border: 1px solid #E2E8F0;
-	}
-
-	.timeline {
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-		position: relative;
-	}
-
-	.timeline::before {
-		content: '';
-		position: absolute;
-		left: 24px;
-		top: 0;
-		bottom: 0;
-		width: 2px;
-		background: #E2E8F0;
-	}
-
-	.timeline-item {
-		display: flex;
-		gap: 16px;
-		padding: 16px 0;
-		position: relative;
-	}
-
-	.timeline-icon {
-		width: 48px;
-		height: 48px;
-		background: white;
-		border: 2px solid #E2E8F0;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 20px;
-		flex-shrink: 0;
-		z-index: 1;
-	}
-
-	.timeline-content {
-		flex: 1;
-		background: white;
-		border: 1px solid #E2E8F0;
-		border-radius: 10px;
-		padding: 16px;
-	}
-
-	.timeline-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 8px;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-
-	.resource-type {
-		font-size: 11px;
-		font-weight: 600;
-		color: #64748B;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		background: #F1F5F9;
-		padding: 2px 8px;
-		border-radius: 4px;
-	}
-
-	.timeline-date {
-		font-size: 12px;
-		color: #94A3B8;
-	}
-
-	.timeline-title {
-		font-size: 15px;
-		font-weight: 600;
-		color: #1E293B;
-		margin-bottom: 4px;
-	}
-
-	.timeline-details {
-		font-size: 14px;
-		color: #475569;
-		margin-bottom: 4px;
-	}
-
-	.code-label {
-		font-size: 11px;
-		color: #94A3B8;
-		font-family: monospace;
-	}
-
 	/* Raw FHIR */
 	.raw-fhir {
 		padding: 24px;
@@ -719,419 +510,65 @@
 		overflow-y: auto;
 	}
 
-	/* Observations Section */
-	.observations-section {
-		background: white;
-		border-radius: 12px;
-		border: 1px solid #E2E8F0;
-		padding: 24px;
-		margin-bottom: 24px;
-	}
-
-	.observations-section h3 {
-		font-size: 18px;
-		font-weight: 600;
-		color: #1E293B;
-		margin: 0 0 20px 0;
-		padding-bottom: 12px;
-		border-bottom: 1px solid #E2E8F0;
-	}
-
-	.observations-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 16px;
-	}
-
-	@media (max-width: 640px) {
-		.observations-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.observation-card {
-		background: #F8FAFC;
-		border: 1px solid #E2E8F0;
-		border-radius: 10px;
-		padding: 16px;
-		transition: all 0.2s;
-	}
-
-	.observation-card:hover {
-		border-color: #CBD5E1;
-		background: #F1F5F9;
-	}
-
-	.observation-header {
+	/* NEW: Patient Quick Actions */
+	.patient-quick-actions {
 		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		margin-bottom: 12px;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: 10px;
+		margin: 16px 0;
+		padding: 16px;
+		background: #F8FAFC;
+		border-radius: 10px;
+		border: 1px solid #E2E8F0;
 	}
 
-	.observation-type {
-		font-size: 14px;
+	.quick-action-btn {
+		padding: 10px 16px;
+		border-radius: 8px;
+		font-size: 13px;
 		font-weight: 600;
-		color: #1E293B;
-	}
-
-	.observation-date {
-		font-size: 12px;
-		color: #94A3B8;
+		text-decoration: none;
+		transition: all 0.2s;
 		white-space: nowrap;
 	}
 
-	.observation-value {
-		margin-bottom: 8px;
-	}
-
-	.value-large {
-		font-size: 32px;
-		font-weight: 700;
-		color: #2563EB;
-	}
-
-	.unit {
-		font-size: 14px;
-		color: #64748B;
-		margin-left: 4px;
-	}
-
-	.value-string {
-		font-size: 18px;
-		font-weight: 600;
-		color: #374151;
-	}
-
-	.component-values {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
-	.component {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 8px 12px;
-		background: white;
-		border-radius: 6px;
-	}
-
-	.comp-name {
-		font-size: 13px;
-		color: #64748B;
-	}
-
-	.comp-value {
-		font-size: 16px;
-		font-weight: 600;
-		color: #1E293B;
-	}
-
-	.observation-note {
-		font-size: 13px;
-		color: #64748B;
-		font-style: italic;
-		margin-top: 8px;
-		padding-top: 8px;
-		border-top: 1px dashed #E2E8F0;
-	}
-
-	.code-label {
-		font-size: 11px;
-		color: #94A3B8;
-		font-family: monospace;
-		margin-top: 8px;
-	}
-
-	/* Encounters Section */
-	.encounters-section {
-		background: white;
-		border-radius: 12px;
-		border: 1px solid #E2E8F0;
-		padding: 24px;
-		margin-bottom: 24px;
-	}
-
-	.encounters-section h3 {
-		font-size: 18px;
-		font-weight: 600;
-		color: #1E293B;
-		margin: 0 0 20px 0;
-		padding-bottom: 12px;
-		border-bottom: 1px solid #E2E8F0;
-	}
-
-	.encounters-list {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-
-	.encounter-card {
-		background: #F8FAFC;
-		border: 1px solid #E2E8F0;
-		border-radius: 12px;
-		padding: 16px;
-		transition: all 0.2s;
-	}
-
-	.encounter-card:hover {
-		border-color: #CBD5E1;
-		background: #F1F5F9;
-	}
-
-	.encounter-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		margin-bottom: 12px;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-
-	.encounter-main {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		flex-wrap: wrap;
-	}
-
-	.encounter-type {
-		font-size: 16px;
-		font-weight: 600;
-		color: #1E293B;
-	}
-
-	.encounter-status {
-		font-size: 11px;
-		font-weight: 600;
-		text-transform: uppercase;
-		padding: 2px 8px;
-		border-radius: 4px;
-	}
-
-	.encounter-status-in-progress {
+	.quick-action-btn.new-encounter {
 		background: #DBEAFE;
-		color: #1E40AF;
+		color: #1D4ED8;
 	}
 
-	.encounter-status-finished {
+	.quick-action-btn.new-encounter:hover {
+		background: #BFDBFE;
+	}
+
+	.quick-action-btn.vitals {
 		background: #DCFCE7;
 		color: #166534;
 	}
 
-	.encounter-status-planned {
-		background: #FEF3C7;
-		color: #92400E;
-	}
-
-	.encounter-status-cancelled {
-		background: #F1F5F9;
-		color: #64748B;
-	}
-
-	.encounter-date {
-		font-size: 13px;
-		color: #64748B;
-	}
-
-	.encounter-details {
-		margin-bottom: 12px;
-	}
-
-	.encounter-reason {
-		font-size: 14px;
-		color: #374151;
-		margin-bottom: 6px;
-	}
-
-	.encounter-meta {
-		display: flex;
-		gap: 16px;
-		font-size: 12px;
-		color: #94A3B8;
-		flex-wrap: wrap;
-	}
-
-	.linked-observations {
-		background: white;
-		border-radius: 8px;
-		padding: 12px;
-		margin: 12px 0;
-		border: 1px solid #E2E8F0;
-	}
-
-	.linked-header {
-		font-size: 12px;
-		font-weight: 600;
-		color: #64748B;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-bottom: 8px;
-	}
-
-	.linked-grid {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-
-	.linked-obs {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 6px 12px;
-		background: #EFF6FF;
-		border-radius: 6px;
-		font-size: 13px;
-	}
-
-	.linked-name {
-		font-weight: 500;
-		color: #1E40AF;
-	}
-
-	.linked-value {
-		color: #64748B;
-		font-family: monospace;
-	}
-
-	.encounter-actions {
-		display: flex;
-		justify-content: flex-end;
-		margin-top: 12px;
-		padding-top: 12px;
-		border-top: 1px dashed #E2E8F0;
-	}
-
-	.btn-add-vitals {
-		padding: 8px 16px;
-		background: #EFF6FF;
-		color: #2563EB;
-		border: 1px solid #BFDBFE;
-		border-radius: 6px;
-		font-size: 13px;
-		font-weight: 500;
-		text-decoration: none;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.btn-add-vitals:hover {
-		background: #DBEAFE;
-	}
-
-	.observations-subtitle {
-		font-size: 14px;
-		color: #64748B;
-		margin: -12px 0 16px 0;
-	}
-
-	/* Action buttons */
-	.btn-edit {
-		padding: 8px 16px;
-		background: #FEF3C7;
-		color: #92400E;
-		border: 1px solid #FCD34D;
-		border-radius: 6px;
-		font-size: 13px;
-		font-weight: 500;
-		text-decoration: none;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.btn-edit:hover {
-		background: #FDE68A;
-	}
-
-	.btn-delete {
-		padding: 8px 16px;
-		background: #FEF2F2;
-		color: #DC2626;
-		border: 1px solid #FECACA;
-		border-radius: 6px;
-		font-size: 13px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.btn-delete:hover {
-		background: #FECACA;
-	}
-
-	.btn-delete:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	.btn-prescribe {
-		padding: 8px 16px;
-		background: #DCFCE7;
-		color: #166534;
-		border: 1px solid #86EFAC;
-		border-radius: 6px;
-		font-size: 13px;
-		font-weight: 500;
-		text-decoration: none;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.btn-prescribe:hover {
+	.quick-action-btn.vitals:hover {
 		background: #BBF7D0;
 	}
 
-	.btn-order-labs {
-		padding: 8px 16px;
-		background: #E0E7FF;
-		color: #3730A3;
-		border: 1px solid #A5B4FC;
-		border-radius: 6px;
-		font-size: 13px;
-		font-weight: 500;
-		text-decoration: none;
-		cursor: pointer;
-		transition: all 0.2s;
+	.quick-action-btn.prescribe {
+		background: #FCE7F3;
+		color: #BE185D;
 	}
 
-	.btn-order-labs:hover {
-		background: #C7D2FE;
+	.quick-action-btn.prescribe:hover {
+		background: #FBCFE8;
 	}
 
-	.observation-actions {
-		display: flex;
-		align-items: center;
-		gap: 8px;
+	.quick-action-btn.labs {
+		background: #F3E8FF;
+		color: #7C3AED;
 	}
 
-	.btn-delete-small {
-		padding: 4px 8px;
-		background: #FEF2F2;
-		color: #DC2626;
-		border: 1px solid #FECACA;
-		border-radius: 4px;
-		font-size: 12px;
-		cursor: pointer;
-		transition: all 0.2s;
+	.quick-action-btn.labs:hover {
+		background: #E9D5FF;
 	}
 
-	.btn-delete-small:hover {
-		background: #FECACA;
-	}
-
-	.btn-delete-small:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-	}
-
-	/* Patient Header Actions */
-	.patient-actions {
+	.patient-actions-secondary {
 		display: flex;
 		gap: 12px;
 		margin-top: 16px;
@@ -1139,41 +576,80 @@
 		border-top: 1px solid #E2E8F0;
 	}
 
-	.btn-edit-patient {
-		padding: 10px 20px;
-		background: #FEF3C7;
-		color: #92400E;
-		border: 1px solid #FCD34D;
+	/* NEW: Patient Timeline */
+	.patient-timeline {
+		padding: 20px;
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.timeline-header {
+		font-size: 18px;
+		font-weight: 700;
+		color: #1F2937;
+		margin-bottom: 20px;
+		padding-bottom: 12px;
+		border-bottom: 2px solid #E5E7EB;
+	}
+
+	.encounters-timeline {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.no-encounters {
+		text-align: center;
+		padding: 40px;
+		background: #F9FAFB;
+		border: 2px dashed #D1D5DB;
+		border-radius: 12px;
+	}
+
+	.no-encounters p {
+		color: #6B7280;
+		margin-bottom: 16px;
+		font-size: 15px;
+	}
+
+	.btn-primary {
+		display: inline-block;
+		padding: 12px 24px;
+		background: #2563EB;
+		color: white;
 		border-radius: 8px;
-		font-size: 14px;
-		font-weight: 500;
 		text-decoration: none;
-		cursor: pointer;
-		transition: all 0.2s;
+		font-weight: 600;
+		transition: background 0.2s;
 	}
 
-	.btn-edit-patient:hover {
-		background: #FDE68A;
+	.btn-primary:hover {
+		background: #1D4ED8;
 	}
 
-	.btn-delete-patient {
-		padding: 10px 20px;
-		background: #FEF2F2;
-		color: #DC2626;
-		border: 1px solid #FECACA;
-		border-radius: 8px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s;
+	/* NEW: Unlinked Resources Section */
+	.unlinked-resources {
+		margin-top: 32px;
+		padding-top: 24px;
+		border-top: 2px dashed #E5E7EB;
 	}
 
-	.btn-delete-patient:hover {
-		background: #FECACA;
+	.unlinked-header {
+		font-size: 16px;
+		font-weight: 600;
+		color: #4B5563;
+		margin-bottom: 8px;
 	}
 
-	.btn-delete-patient:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+	.unlinked-hint {
+		font-size: 13px;
+		color: #9CA3AF;
+		margin-bottom: 16px;
+	}
+
+	.unlinked-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
 	}
 </style>
