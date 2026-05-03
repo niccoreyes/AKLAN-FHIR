@@ -5,6 +5,7 @@
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
+	import { deriveUnit } from '$lib/utils/medication-helpers.js';
 
 	// Get return URL from query params
 	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
@@ -102,7 +103,7 @@
 			});
 			patientPrescriptions = result.entry?.map(e => ({
 				id: e.resource.id,
-				medication: e.resource.medicationCodeableConcept?.text || 
+				medication: e.resource.medicationCodeableConcept?.text ||
 					e.resource.medicationCodeableConcept?.coding?.[0]?.display || 'Unknown',
 				dosage: e.resource.dosageInstruction?.[0]?.text || '',
 				quantity: e.resource.dispenseRequest?.quantity?.value || '',
@@ -113,6 +114,7 @@
 			console.error('Load prescriptions error:', e);
 		}
 		loadingPrescriptions = false;
+		return patientPrescriptions;
 	}
 
 	function selectPrescription(rx) {
@@ -120,6 +122,39 @@
 		prescriptionId = rx.id;
 		medication = rx.medication;
 		quantity = rx.quantity || '';
+	}
+
+	async function loadPrescription(rxId) {
+		try {
+			const rx = await fhirClient.read('MedicationRequest', rxId);
+			if (!rx) return;
+
+			// Extract patient reference
+			const patientRef = rx.subject?.reference || '';
+			const pid = patientRef.replace('Patient/', '');
+			if (!pid) return;
+
+			// Fetch patient details to populate name
+			const patientResource = await fhirClient.read('Patient', pid);
+			const pName = patientResource?.name?.[0]?.text ||
+				`${patientResource?.name?.[0]?.family || ''}, ${patientResource?.name?.[0]?.given?.join(' ') || ''}`.trim() ||
+				'Unknown';
+
+			patientId = pid;
+			patientName = pName;
+			patientSearchQuery = pName;
+			patientSearchResults = [];
+
+			// Load prescriptions and auto-select this one
+			const prescriptions = await loadPatientPrescriptions(pid);
+
+			const matched = prescriptions.find(p => p.id === rxId);
+			if (matched) {
+				selectPrescription(matched);
+			}
+		} catch (e) {
+			console.error('Load prescription error:', e);
+		}
 	}
 
 	function clearSelection() {
@@ -154,7 +189,7 @@
 				subject: { reference: `Patient/${patientId}`, display: patientName },
 				performer: [{ actor: { reference: `Practitioner/${appStore.practitionerId}`, display: appStore.userName } }],
 				authorizingPrescription: prescriptionId ? [{ reference: `MedicationRequest/${prescriptionId}` }] : undefined,
-				quantity: quantity ? { value: parseInt(quantity), unit: 'tablet' } : undefined,
+				quantity: quantity ? { value: parseInt(quantity), unit: deriveUnit(medication) || '' } : undefined,
 				daysSupply: daysSupply ? { value: parseInt(daysSupply), unit: 'days' } : undefined,
 				whenHandedOver: new Date().toISOString(),
 				note: note ? [{ text: note }] : undefined

@@ -156,6 +156,14 @@ goto(appStore.buildUrl('/dashboard'))  // Preserves ?w=AK26-A&u=Thomas...
 - ~20 people per group
 - Data isolation via FHIR `meta.tag` = workshop code
 
+### Default Test Credentials
+When writing or running Playwright tests, use these defaults:
+- **Workshop code:** `AK26-A`
+- **User name:** `Thomas`
+- **Example direct URL:** `http://localhost:5173/dashboard?w=AK26-A&u=Thomas&c=rhu-kalibo`
+
+This avoids repeatedly filling the workshop entry form and ensures tests run against a consistent workshop context.
+
 ### Clinic Types
 | Clinic | Icon | Color | Key Capability |
 |--------|------|-------|----------------|
@@ -210,6 +218,38 @@ appStore.addNotification({
 ```
 
 ---
+
+## Testing Workflow (for Agents)
+
+Whenever you implement a feature or fix a bug, **always** run the Playwright tests before declaring the task complete.
+
+### Default Test Credentials
+Use these defaults for all new Playwright tests and manual verification:
+- **Workshop code:** `AK26-A`
+- **User name:** `Thomas`
+- **Clinic IDs:** `rhu-kalibo`, `aklan-hospital`, `rhu-malay`, `kalibo-lab`, `aklan-pharmacy`
+
+### Running Tests
+```bash
+# Run all tests
+npx playwright test
+
+# Run a specific test file
+npx playwright test tests/pharmacy-inbox.spec.js
+
+# Run with UI for debugging
+npx playwright test --ui
+```
+
+### Test Server
+Playwright config starts the dev server automatically (`npm run dev`). If a server is already running on `localhost:5173`, Playwright will reuse it.
+
+### What to Test After Changes
+1. **Page loads without 500 errors** — especially for URL-driven routes like `/inbox?c=aklan-pharmacy`.
+2. **Svelte 5 rune ordering** — never reference a `$derived` or `$state` variable before it is declared in the `<script>` block (causes `ReferenceError: Cannot access 'X' before initialization`).
+3. **Clinic capability tabs** — each clinic shows only the tabs it has permission for, and defaults to the first available tab.
+4. **Cross-page navigation** — links that include `?w=AK26-A&u=Thomas&c=...` preserve context.
+5. **Dispense / diagnostic-report prefill** — when arriving from the inbox with `?rx=` or `?order=`, the form auto-populates patient and prescription/order details.
 
 ## Testing Checklist
 

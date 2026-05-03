@@ -26,18 +26,27 @@
 	const caps = $derived(CLINIC_CAPABILITIES[appStore.clinicId] || {});
 	const urlTab = $derived($page.url.searchParams.get('tab') || 'orders');
 
-	let activeTab = $state(urlTab);
-	let serviceRequests = $state([]);
-	let medicationRequests = $state([]);
-	let diagnosticReports = $state([]);
-	let loading = $state(false);
-	let error = $state(null);
-
 	const tabs = $derived([
 		...(caps.canView?.includes('ServiceRequest') ? [{ id: 'orders', label: 'Lab Orders', icon: '🧪' }] : []),
 		...(caps.canView?.includes('MedicationRequest') ? [{ id: 'rx', label: 'Prescriptions', icon: '💊' }] : []),
 		...(caps.canView?.includes('DiagnosticReport') ? [{ id: 'reports', label: 'Lab Reports', icon: '📄' }] : [])
 	]);
+
+	const computedActiveTab = $derived(tabs.find(t => t.id === urlTab) ? urlTab : tabs[0]?.id || 'orders');
+	let activeTab = $state(computedActiveTab);
+
+	$effect(() => {
+		const isValid = tabs.some(t => t.id === activeTab);
+		if (!isValid) {
+			activeTab = computedActiveTab;
+		}
+	});
+
+	let serviceRequests = $state([]);
+	let medicationRequests = $state([]);
+	let diagnosticReports = $state([]);
+	let loading = $state(false);
+	let error = $state(null);
 
 	async function loadData() {
 		if (!appStore.isConfigured) return;
