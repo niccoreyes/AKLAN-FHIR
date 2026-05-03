@@ -70,6 +70,11 @@
 			error = 'Patient and order type are required';
 			return;
 		}
+		// ENFORCE: Encounter is required for encounter-first architecture
+		if (!encounterId) {
+			error = 'An encounter is required. Please link this order to a visit, or create a new encounter.';
+			return;
+		}
 		if (!appStore.practitionerId) {
 			// Trigger auto-registration if not registered
 			error = 'Connecting to FHIR server...';
@@ -264,9 +269,11 @@
 					{#if patientId}
 						<div class="field-group encounter-selector">
 							<label>
-								Encounter (Optional)
+								Encounter (Required)
 								{#if encounterId}
 									<span class="linked-badge">🔗 Linked</span>
+								{:else}
+									<span class="required-badge">⚠️ Required</span>
 								{/if}
 							</label>
 							
@@ -278,26 +285,49 @@
 							{:else}
 								<button 
 									type="button" 
-									class="btn-select-encounter"
+									class="btn-select-encounter {patientEncounters.length === 0 ? 'btn-create-encounter' : ''}"
 									onclick={() => showEncounterSelector = !showEncounterSelector}
 								>
-									{patientEncounters.length > 0 ? '🔗 Link to Encounter' : 'No encounters available'}
+									{#if patientEncounters.length > 0}
+										🔗 Link to Encounter
+									{:else}
+										⚠️ Create Encounter First
+									{/if}
 								</button>
 								
-								{#if showEncounterSelector && patientEncounters.length > 0}
+								{#if showEncounterSelector}
 									<div class="encounter-dropdown">
-										<div class="dropdown-header">Select an encounter to link</div>
-										{#each patientEncounters as enc}
-											<button 
-												type="button" 
-												class="encounter-option"
-												onclick={() => selectEncounter(enc)}
-											>
-												<span class="enc-type">{enc.type}</span>
-												<span class="enc-date">{new Date(enc.date).toLocaleDateString()}</span>
-												<span class="enc-status">{enc.status}</span>
-											</button>
-										{/each}
+										{#if patientEncounters.length > 0}
+											<div class="dropdown-header">Select an encounter</div>
+											{#each patientEncounters as enc}
+												<button 
+													type="button" 
+													class="encounter-option"
+													onclick={() => selectEncounter(enc)}
+												>
+													<span class="enc-type">{enc.type}</span>
+													<span class="enc-date">{new Date(enc.date).toLocaleDateString()}</span>
+													<span class="enc-status">{enc.status}</span>
+												</button>
+											{/each}
+											<div class="dropdown-divider"></div>
+										{/if}
+										<button 
+											type="button" 
+											class="encounter-option create-new"
+											onclick={() => {
+												const params = new URLSearchParams();
+												params.set('patient', patientId);
+												params.set('returnTo', window.location.pathname + window.location.search);
+												if (appStore.workshopCode) params.set('w', appStore.workshopCode);
+												if (appStore.userName) params.set('u', appStore.userName);
+												if (appStore.clinicId) params.set('c', appStore.clinicId);
+												window.location.href = '/encounter?' + params.toString();
+											}}
+										>
+											<span class="create-icon">➕</span>
+											<span class="create-text">Create New Encounter</span>
+										</button>
 									</div>
 								{/if}
 							{/if}
@@ -569,6 +599,16 @@
 		margin-left: 8px;
 	}
 
+	.required-badge {
+		font-size: 11px;
+		padding: 2px 8px;
+		background: #FEE2E2;
+		color: #DC2626;
+		border-radius: 12px;
+		font-weight: 600;
+		margin-left: 8px;
+	}
+
 	.btn-select-encounter {
 		width: 100%;
 		padding: 10px 12px;
@@ -586,6 +626,17 @@
 		border-color: #3B82F6;
 		color: #3B82F6;
 		background: #EFF6FF;
+	}
+
+	.btn-select-encounter.btn-create-encounter {
+		border-color: #FCA5A5;
+		background: #FEF2F2;
+		color: #DC2626;
+	}
+
+	.btn-select-encounter.btn-create-encounter:hover {
+		border-color: #DC2626;
+		background: #FECACA;
 	}
 
 	.selected-encounter {
@@ -657,6 +708,30 @@
 
 	.encounter-option:last-child {
 		border-bottom: none;
+	}
+
+	.encounter-option.create-new {
+		background: #F0FDF4;
+		border-top: 2px dashed #86EFAC;
+	}
+
+	.encounter-option.create-new:hover {
+		background: #DCFCE7;
+	}
+
+	.create-icon {
+		font-size: 16px;
+	}
+
+	.create-text {
+		font-weight: 600;
+		color: #166534;
+	}
+
+	.dropdown-divider {
+		height: 1px;
+		background: #E5E7EB;
+		margin: 4px 0;
 	}
 
 	.enc-type {
