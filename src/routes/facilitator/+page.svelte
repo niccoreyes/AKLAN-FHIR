@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { fhirClient } from '$services/fhir-client.js';
-	import { WORKSHON_TAG_SYSTEM } from '$constants';
+	import { WORKSHOP_TAG_SYSTEM } from '$constants';
 	import AppHeader from '$components/AppHeader.svelte';
 
 	let workshopTag = $state('');
@@ -37,7 +37,7 @@
 			const counts = {};
 			for (const type of resourceTypes) {
 				try {
-					const result = await fhirClient.search(type, { _tag: `${WORKSHON_TAG_SYSTEM}|${workshopTag}`, _summary: 'count' });
+					const result = await fhirClient.search(type, { _tag: `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`, _summary: 'count' });
 					counts[type] = result.total || 0;
 				} catch (e) {
 					counts[type] = 0;
@@ -47,7 +47,7 @@
 
 			// Fetch participants (Practitioners with this workshop tag)
 			try {
-				const result = await fhirClient.search('Practitioner', { _tag: `${WORKSHON_TAG_SYSTEM}|${workshopTag}`, _count: '50' });
+				const result = await fhirClient.search('Practitioner', { _tag: `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`, _count: '50' });
 				participants = result.entry?.map(e => e.resource) || [];
 			} catch (e) {
 				participants = [];

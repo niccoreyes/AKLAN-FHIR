@@ -55,6 +55,8 @@
 	function switchClinic(clinicId) {
 		appStore.setClinic(clinicId);
 		showClinicSwitcher = false;
+		// Reset registration state for new clinic context
+		hasRegistered = false;
 		// Preserve all workshop parameters when switching clinics
 		const params = new URLSearchParams();
 		if (appStore.workshopCode) params.set('w', appStore.workshopCode);

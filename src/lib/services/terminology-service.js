@@ -1,4 +1,4 @@
-import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+import { FHIR_CONFIG } from '$constants';
 
 /**
  * Service for interacting with the FHIR terminology server (tx.fhirlab.net)

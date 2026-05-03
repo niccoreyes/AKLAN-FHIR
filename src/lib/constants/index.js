@@ -12,7 +12,7 @@ export const FHIR_CONFIG = {
 };
 
 // Workshop tagging
-export const WORKSHON_TAG_SYSTEM = 'https://aklan-fhir.app/workshop';
+export const WORKSHOP_TAG_SYSTEM = 'https://aklan-fhir.app/workshop';
 export const WORKSHOP_IDENTIFIER_SYSTEM = 'https://aklan-fhir.app/workshop';
 
 // Clinics
@@ -180,6 +180,6 @@ export const SNOMED_CODES = {
 
 // ICD-10 codes
 export const ICD10_CODES = {
-	hyptertension: 'I10',
+	hypertension: 'I10',
 	diabetes: 'E11'
 };

@@ -148,10 +148,9 @@
             }],
             text: 'Blood Pressure'
           },
-          subject: { reference: `Patient/${patientId}` },
-          encounter: encounterRef,
-          encounter: encounterRef,
-          effectiveDateTime: now,
+		  subject: { reference: `Patient/${patientId}` },
+		  encounter: encounterRef,
+		  effectiveDateTime: now,
           component: [
             {
               code: {

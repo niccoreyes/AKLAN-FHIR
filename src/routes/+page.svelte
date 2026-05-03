@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { fhirClient } from '$services/fhir-client.js';
-	import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+	import { FHIR_CONFIG, WORKSHOP_TAG_SYSTEM } from '$constants';
 	import { getLoincDisplay, getSnomedDisplay, getRxnormDisplay, getIcd10Display } from '$stores/codeDisplayStore.js';
 	import AppHeader from '$components/AppHeader.svelte';
 
@@ -70,7 +70,7 @@
 		const counts = {};
 		for (const type of resourceTypes) {
 			try {
-				const params = showOnlyTagged && workshopTag ? { _tag: `${WORKSHON_TAG_SYSTEM}|${workshopTag}`, _summary: 'count' } : { _summary: 'count' };
+				const params = showOnlyTagged && workshopTag ? { _tag: `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`, _summary: 'count' } : { _summary: 'count' };
 				const result = await fhirClient.search(type, params);
 				counts[type] = result.total || 0;
 			} catch (e) {
@@ -95,7 +95,7 @@
 			};
 			
 			if (showOnlyTagged && workshopTag) {
-				params._tag = `${WORKSHON_TAG_SYSTEM}|${workshopTag}`;
+				params._tag = `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`;
 			}
 			
 			if (searchQuery) {
@@ -208,7 +208,7 @@
 
 	// Get workshop tag
 	function getWorkshopTag(patient) {
-		return patient.meta?.tag?.find(t => t.system === WORKSHON_TAG_SYSTEM)?.code || '';
+		return patient.meta?.tag?.find(t => t.system === WORKSHOP_TAG_SYSTEM)?.code || '';
 	}
 
 	// Get FHIR Resource ID

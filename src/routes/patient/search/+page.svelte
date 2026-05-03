@@ -5,7 +5,7 @@
   import { appStore } from '$stores/appStore.svelte.js';
   import { fhirClient } from '$services/fhir-client.js';
   import AppHeader from '$components/AppHeader.svelte';
-  import { WORKSHON_TAG_SYSTEM } from '$constants';
+  import { WORKSHOP_TAG_SYSTEM } from '$constants';
 
   // State
   let searchQuery = $state('');
@@ -47,7 +47,7 @@
 
       // Always filter by workshop tag if available
       if (appStore.workshopCode) {
-        params._tag = `${WORKSHON_TAG_SYSTEM}|${appStore.workshopCode}`;
+        params._tag = `${WORKSHOP_TAG_SYSTEM}|${appStore.workshopCode}`;
       }
 
       const result = await fhirClient.searchPaginated('Patient', params);
@@ -83,7 +83,7 @@
 
       // Always filter by workshop code
       if (appStore.workshopCode) {
-        params._tag = `${WORKSHON_TAG_SYSTEM}|${appStore.workshopCode}`;
+        params._tag = `${WORKSHOP_TAG_SYSTEM}|${appStore.workshopCode}`;
       }
 
       const result = await fhirClient.searchPaginated('Patient', params);
@@ -150,7 +150,7 @@
   }
 
   function getWorkshopTag(patient) {
-    return patient.meta?.tag?.find(t => t.system === WORKSHON_TAG_SYSTEM)?.code || '';
+    return patient.meta?.tag?.find(t => t.system === WORKSHOP_TAG_SYSTEM)?.code || '';
   }
 </script>
 

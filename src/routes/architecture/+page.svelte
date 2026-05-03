@@ -1,6 +1,6 @@
 <script>
 	import AppHeader from '$components/AppHeader.svelte';
-	import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+	import { FHIR_CONFIG, WORKSHOP_TAG_SYSTEM } from '$constants';
 
 	// Interactive state
 	let selectedComponent = $state(null);
@@ -152,7 +152,7 @@
   }],
   "meta": {
     "tag": [{
-      "system": "${WORKSHON_TAG_SYSTEM}",
+      "system": "${WORKSHOP_TAG_SYSTEM}",
       "code": "AK26-A"
     }]
   }
@@ -188,7 +188,7 @@
 		{
 			title: 'Search by Workshop',
 			method: 'GET',
-			url: `${FHIR_CONFIG.shrBaseUrl}/Patient?_tag=${encodeURIComponent(WORKSHON_TAG_SYSTEM)}|AK26-A&_count=50`,
+			url: `${FHIR_CONFIG.shrBaseUrl}/Patient?_tag=${encodeURIComponent(WORKSHOP_TAG_SYSTEM)}|AK26-A&_count=50`,
 			body: null
 		}
 	];
@@ -387,7 +387,7 @@
 					<p>Each workshop group has completely isolated data. Resources are tagged with the workshop code in their <code>meta.tag</code> field:</p>
 					<pre class="code-block">{""}"meta": {""}
 {""}  "tag": [{""}
-{""}    "system": "{WORKSHON_TAG_SYSTEM}",""}
+{""}    "system": "{WORKSHOP_TAG_SYSTEM}",""}
 {""}    "code": "AK26-A"{""}
 {""}  ]{""}
 {""}{""}</pre>

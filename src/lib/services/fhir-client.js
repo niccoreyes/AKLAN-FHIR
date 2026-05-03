@@ -1,4 +1,4 @@
-import { FHIR_CONFIG, WORKSHON_TAG_SYSTEM } from '$constants';
+import { FHIR_CONFIG, WORKSHOP_TAG_SYSTEM } from '$constants';
 import { fhirLogger } from '$stores/fhirLogger.js';
 
 /**
@@ -49,7 +49,7 @@ export class FHIRClient {
 			resource.meta = resource.meta || {};
 			resource.meta.tag = resource.meta.tag || [];
 			resource.meta.tag.push({
-				system: WORKSHON_TAG_SYSTEM,
+				system: WORKSHOP_TAG_SYSTEM,
 				code: workshopCode
 			});
 		}
@@ -138,7 +138,7 @@ export class FHIRClient {
 		
 		// Add workshop tag filter if provided
 		if (workshopCode) {
-			searchParams.append('_tag', `${WORKSHON_TAG_SYSTEM}|${workshopCode}`);
+			searchParams.append('_tag', `${WORKSHOP_TAG_SYSTEM}|${workshopCode}`);
 		}
 		
 		// Add other params

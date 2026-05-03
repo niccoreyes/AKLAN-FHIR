@@ -118,7 +118,7 @@ function createLabTestCodesStore() {
 		},
 		refresh: async () => {
 			terminologyService.clearCache();
-			await this.fetch();
+			await labTestCodesStore.fetch();
 		}
 	};
 }
@@ -164,7 +164,7 @@ function createLabUnitsStore() {
 		},
 		refresh: async () => {
 			terminologyService.clearCache();
-			await this.fetch();
+			await labUnitsStore.fetch();
 		}
 	};
 }
