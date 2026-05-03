@@ -127,7 +127,7 @@ test.describe('OpenHIE Mock EHR - Workshop Workflow Tests', () => {
     
     // Cancel and go back
     await page.click('a:has-text("Cancel")');
-    await page.waitForURL('/dashboard');
+    await page.waitForURL('/patient/search');
     
     console.log('✅ Patient registration page OK');
   });

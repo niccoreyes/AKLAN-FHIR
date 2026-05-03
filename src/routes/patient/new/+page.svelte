@@ -109,7 +109,7 @@
 
 <div class="page-container">
   <div class="page-header">
-    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+    <a href="/patient/search" class="back-link">← Back to Patients</a>
     <h1>➕ Register New Patient</h1>
     <p class="subtitle">Create a new patient record in the Shared Health Record</p>
   </div>
@@ -232,7 +232,7 @@
       </div>
 
       <div class="form-actions">
-        <a href="/dashboard" class="btn-cancel">Cancel</a>
+        <a href="/patient/search" class="btn-cancel">Cancel</a>
         <button 
           type="submit" 
           class="btn-submit"

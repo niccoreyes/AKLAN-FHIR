@@ -139,7 +139,11 @@
 
 <div class="page-container">
   <div class="page-header">
-    <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+    {#if patientId}
+      <a href="/patient/{patientId}" class="back-link">← Back to Patient</a>
+    {:else}
+      <a href="/patient/search" class="back-link">← Back to Patients</a>
+    {/if}
     <h1>📋 Record Visit</h1>
     <p class="subtitle">Document a patient encounter</p>
   </div>
@@ -262,7 +266,11 @@
         </div>
 
         <div class="form-actions">
-          <a href="/dashboard" class="btn-cancel">Cancel</a>
+          {#if patientId}
+            <a href="/patient/{patientId}" class="btn-cancel">Cancel</a>
+          {:else}
+            <a href="/patient/search" class="btn-cancel">Cancel</a>
+          {/if}
           <button 
             type="submit" 
             class="btn-submit"

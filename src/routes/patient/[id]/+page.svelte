@@ -154,7 +154,7 @@
 	<!-- Header -->
 	<header class="top-bar">
 		<div class="logo">
-			<a href="/" class="back-link">← Back to Patients</a>
+			<a href="/patient/search" class="back-link">← Back to Patients</a>
 			<h1>{APP_NAME}</h1>
 		</div>
 	</header>
