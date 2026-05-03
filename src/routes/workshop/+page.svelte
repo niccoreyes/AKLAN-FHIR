@@ -277,6 +277,10 @@
 				type="submit"
 				class="submit"
 				disabled={isLoading || !workshopCode || !userName || !selectedClinic}
+				data-loading={isLoading}
+				data-has-workshop={!!workshopCode}
+				data-has-username={!!userName}
+				data-has-clinic={!!selectedClinic}
 			>
 				{#if isLoading}
 					<span class="spinner"></span>

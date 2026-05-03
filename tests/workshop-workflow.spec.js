@@ -275,6 +275,13 @@ test.describe('OpenHIE Mock EHR - Workshop Workflow Tests', () => {
     await page.fill('#workshop-code', workshopCode);
     await page.fill('#first-name', userName);
     await page.click(`.clinic-card:has-text("Aklan Pharmacy")`);
+    // Wait for form state to update and button to be enabled
+    await page.waitForTimeout(1000);
+    // Wait for submit button to be enabled
+    await page.waitForFunction(() => {
+      const btn = document.querySelector('button[type="submit"]');
+      return btn && !btn.disabled;
+    });
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard.*/);
     
@@ -328,6 +335,13 @@ test.describe('OpenHIE Mock EHR - Workshop Workflow Tests', () => {
     await page.fill('#workshop-code', workshopCode);
     await page.fill('#first-name', userName);
     await page.click(`.clinic-card:has-text("RHU Kalibo")`);
+    // Wait for form state to update and button to be enabled
+    await page.waitForTimeout(1000);
+    // Wait for submit button to be enabled
+    await page.waitForFunction(() => {
+      const btn = document.querySelector('button[type="submit"]');
+      return btn && !btn.disabled;
+    });
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard.*/);
 

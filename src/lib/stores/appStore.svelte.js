@@ -64,15 +64,27 @@ export function createAppStore() {
 	// Participant record (Practitioner resource)
 	let practitionerId = $state(null);
 	
+	// Track if we've attempted auto-registration in this session
+	let hasAttemptedRegistration = $state(false);
+	
 	// Derived values
 	const clinic = $derived(CLINICS.find(c => c.id === clinicId) || null);
 	const role = $derived(ROLES.find(r => r.id === roleId) || null);
 	const isConfigured = $derived(workshopCode && userName && clinicId);
 	
-	// Auto-register participant when configured but no practitionerId
+	// Auto-register participant when:
+	// 1. Configured but no practitionerId
+	// 2. Not already attempted in this session
+	// 3. Not on the workshop page (manual registration)
 	$effect(() => {
-		if (isConfigured && !practitionerId && !isLoading) {
+		if (browser && isConfigured && !practitionerId && !isLoading && !hasAttemptedRegistration) {
+			// Don't auto-register if we're on the workshop page
+			if (window.location.pathname === '/workshop') {
+				hasAttemptedRegistration = true; // Mark as attempted so we don't try again
+				return;
+			}
 			console.log('[AppStore] Auto-registering participant...');
+			hasAttemptedRegistration = true;
 			registerParticipant();
 		}
 	});
