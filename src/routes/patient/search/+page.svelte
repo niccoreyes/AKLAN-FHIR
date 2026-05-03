@@ -20,31 +20,67 @@
   let hasMore = $state(false);
 
   // Redirect if not configured
-  onMount(() => {
+  onMount(async () => {
     if (browser && !appStore.isConfigured) {
       goto('/workshop');
-    }
-  });
-
-  async function searchPatients() {
-    if (!searchQuery.trim()) {
-      error = 'Please enter a search term';
       return;
     }
+    
+    // Automatically load all workshop patients on page load
+    await loadWorkshopPatients();
+  });
+  
+  // Load all patients from the workshop
+  async function loadWorkshopPatients() {
+    isLoading = true;
+    error = '';
+    hasSearched = true;
+    searchQuery = ''; // Clear search query to show all
 
+    try {
+      const params = {
+        _count: '50',
+        _sort: '-_lastUpdated'
+      };
+
+      // Always filter by workshop tag if available
+      if (appStore.workshopCode) {
+        params._tag = `${WORKSHON_TAG_SYSTEM}|${appStore.workshopCode}`;
+      }
+
+      const result = await fhirClient.searchPaginated('Patient', params);
+      patients = result.resources;
+      totalCount = result.total;
+      nextPageUrl = result.nextUrl;
+      hasMore = result.hasMore;
+      
+      console.log(`[Patient Search] Loaded ${patients.length} patients for workshop ${appStore.workshopCode}`);
+    } catch (e) {
+      error = e.message || 'Error loading patients';
+      patients = [];
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  async function searchPatients() {
     isLoading = true;
     error = '';
     hasSearched = true;
 
     try {
       const params = {
-        name: searchQuery.trim(),
-        _count: '20',
+        _count: '50',
         _sort: '-_lastUpdated'
       };
 
-      // If group filter is enabled, restrict to workshop
-      if (appStore.groupFilterEnabled && appStore.workshopCode) {
+      // Add name filter if search query provided
+      if (searchQuery.trim()) {
+        params.name = searchQuery.trim();
+      }
+
+      // Always filter by workshop code
+      if (appStore.workshopCode) {
         params._tag = `${WORKSHON_TAG_SYSTEM}|${appStore.workshopCode}`;
       }
 
@@ -123,9 +159,7 @@
     <a href="/dashboard" class="back-link">← Back to Dashboard</a>
     <h1>🔍 Find Patient</h1>
     <p class="subtitle">
-      {appStore.groupFilterEnabled 
-        ? `Searching within workshop: ${appStore.workshopCode}` 
-        : 'Searching all patients in SHR'}
+      Showing all {patients.length} patients from workshop: {appStore.workshopCode}
     </p>
   </div>
 
@@ -134,7 +168,7 @@
       <input 
         type="text" 
         bind:value={searchQuery}
-        placeholder="Enter patient name..."
+        placeholder="Filter patients by name (or leave empty to show all)..."
         class="search-input"
         onkeydown={(e) => e.key === 'Enter' && searchPatients()}
       />
@@ -172,7 +206,7 @@
   {#if hasSearched}
     <div class="results-section">
       <div class="results-header">
-        <h2>Results</h2>
+        <h2>👥 Patient Deck ({appStore.workshopCode})</h2>
         {#if !isLoading}
           <span class="results-count">
             {patients.length} of {totalCount} patient{totalCount !== 1 ? 's' : ''}
@@ -243,11 +277,13 @@
     </div>
   {:else}
     <div class="hint-box">
-      <h4>💡 Search Tips</h4>
+      <h4>📋 Patient Deck</h4>
+      <p>All patients from your workshop are displayed above. You can:</p>
       <ul>
-        <li>Enter the patient's first or last name</li>
-        <li>Search is case-insensitive</li>
-        <li>Use the toggle above to search only within your workshop group</li>
+        <li><strong>View patient details</strong> - Click the "View" button</li>
+        <li><strong>Start an encounter</strong> - Click "Visit" to record a consultation</li>
+        <li><strong>Record vitals</strong> - Click "Vitals" to add measurements</li>
+        <li><strong>Filter the list</strong> - Type a name in the search box above</li>
       </ul>
     </div>
   {/if}

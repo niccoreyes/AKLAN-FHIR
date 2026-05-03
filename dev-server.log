@@ -1,0 +1,1005 @@
+
+> mock-emr@0.0.1 dev
+> vite dev
+
+1:30:21 PM [vite] (client) Forced re-optimization of dependencies
+
+  VITE v8.0.10  ready in 900 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+1:30:23 PM [vite-plugin-svelte] src/routes/+layout.svelte:45:2 Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:89:7 Using `on:submit` to listen to the submit event is deprecated. Use the event attribute `onsubmit` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:92:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:108:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:124:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:135:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:153:4 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:23 PM [vite-plugin-svelte] src/routes/+page.svelte:165:7 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:135:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:176:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:189:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:196:33 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:204:5 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:205:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:208:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:211:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:219:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/+layout.svelte:45:2 Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:89:7 Using `on:submit` to listen to the submit event is deprecated. Use the event attribute `onsubmit` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:92:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:108:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:124:3 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:135:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:153:4 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/+page.svelte:165:7 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:135:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:176:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:189:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:196:33 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:204:5 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:205:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:208:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:211:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:219:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/dashboard/+page.svelte:35:4 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:30:29 PM [vite-plugin-svelte] src/routes/dashboard/+page.svelte:86:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+
+[1;31m[404] GET /favicon.ico[0m
+
+[1;31m[404] GET /patient/search[0m
+1:33:47 PM [vite-plugin-svelte] src/routes/dashboard/+page.svelte:35:4 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+1:33:47 PM [vite-plugin-svelte] src/routes/dashboard/+page.svelte:86:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+
+[1;31m[404] GET /vitals[0m
+
+[1;31m[404] GET /patient/search[0m
+2:07:07 PM [vite] (client) hmr update /src/routes/+page.svelte, /src/routes/developer/+page.svelte, /src/routes/+layout.svelte, /src/routes/dashboard/+page.svelte
+2:07:07 PM [vite] (ssr) page reload src/lib/constants/index.js
+2:09:25 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:192:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+2:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:206:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:17:52 PM [vite-plugin-svelte] src/routes/+page.svelte:236:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:17:52 PM [vite] (client) hmr update /src/routes/+page.svelte, /src/routes/+page.svelte?svelte&type=style&lang.css
+2:17:52 PM [vite] (ssr) page reload src/routes/+page.svelte
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:127:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:168:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:181:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:188:33 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:196:5 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:197:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:200:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:203:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:49 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:211:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:49 PM [vite] (client) hmr update /src/routes/developer/+page.svelte
+2:19:49 PM [vite] (ssr) page reload src/routes/developer/+page.svelte
+2:19:54 PM [vite] (ssr) page reload src/routes/developer/+page.svelte
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:165:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:178:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:185:33 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:193:5 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:194:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:197:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:200:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:55 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:208:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:19:55 PM [vite] (client) hmr update /src/routes/developer/+page.svelte
+2:19:55 PM [vite] (ssr) page reload src/routes/developer/+page.svelte
+2:20:09 PM [vite] (client) page reload src/app.html
+2:20:09 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:22:33 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:24:22 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:24:31 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:24:31 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:24:31 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:24:31 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+2:25:03 PM [vite-plugin-svelte] src/routes/+page.svelte:192:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:03 PM [vite-plugin-svelte] src/routes/+page.svelte:206:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:03 PM [vite-plugin-svelte] src/routes/+page.svelte:236:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:03 PM [vite-plugin-svelte] src/routes/+page.svelte:192:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:03 PM [vite-plugin-svelte] src/routes/+page.svelte:206:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:03 PM [vite-plugin-svelte] src/routes/+page.svelte:236:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:165:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:178:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:185:33 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:193:5 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:194:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:197:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:200:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:25:06 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:208:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+
+[1;31m[404] GET /about[0m
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:165:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:178:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:185:33 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:193:5 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:194:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:197:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:200:32 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:28:40 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:208:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:31:12 PM [vite] (client) page reload playwright-report/index.html
+2:43:23 PM [vite] (client) hmr update /src/routes/+layout.svelte, /src/routes/developer/+page.svelte
+2:43:23 PM [vite] (ssr) page reload src/lib/services/terminology-service.js
+2:43:42 PM [vite-plugin-svelte] src/routes/+layout.svelte:36:2 Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated
+2:43:42 PM [vite] (client) hmr update /src/routes/+layout.svelte
+2:43:42 PM [vite] (ssr) page reload src/routes/+layout.svelte
+2:43:42 PM [vite-plugin-svelte] src/routes/+layout.svelte:36:2 Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated
+2:44:14 PM [vite-plugin-svelte] src/routes/+page.svelte:192:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+2:44:14 PM [vite-plugin-svelte] src/routes/+page.svelte:206:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:44:14 PM [vite-plugin-svelte] src/routes/+page.svelte:237:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:44:14 PM [vite] (client) hmr update /src/routes/+page.svelte
+2:44:14 PM [vite] (ssr) page reload src/routes/+page.svelte
+2:44:14 PM [vite-plugin-svelte] src/routes/+page.svelte:192:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+2:44:14 PM [vite-plugin-svelte] src/routes/+page.svelte:206:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:44:14 PM [vite-plugin-svelte] src/routes/+page.svelte:237:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:45:17 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:45:17 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:45:17 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:45:17 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+2:45:31 PM [vite-plugin-svelte] src/routes/+layout.svelte:36:2 Using `<slot>` to render parent content is deprecated. Use `{@render ...}` tags instead
+https://svelte.dev/e/slot_element_deprecated
+2:45:31 PM [vite-plugin-svelte] src/routes/+page.svelte:192:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+2:45:31 PM [vite-plugin-svelte] src/routes/+page.svelte:206:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:45:31 PM [vite-plugin-svelte] src/routes/+page.svelte:237:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+2:46:14 PM [vite] (client) page reload playwright-report/index.html
+2:47:23 PM [vite] (client) page reload playwright-report/index.html
+2:47:23 PM [vite] (client) page reload playwright-report/index.html
+2:48:38 PM [vite] (client) page reload playwright-report/index.html
+2:48:38 PM [vite] (client) page reload playwright-report/index.html
+2:49:42 PM [vite] (client) page reload playwright-report/index.html
+2:49:42 PM [vite] (client) page reload playwright-report/index.html
+2:50:37 PM [vite] (client) page reload playwright-report/index.html
+2:50:37 PM [vite] (client) page reload playwright-report/index.html
+2:52:19 PM [vite] (client) page reload playwright-report/index.html
+2:52:19 PM [vite] (client) page reload playwright-report/index.html
+2:52:48 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:52:52 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:52:55 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:53:15 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:53:15 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:53:15 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:53:15 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+2:53:18 PM [vite] (ssr) Error when evaluating SSR module /src/routes/workshop/+page.svelte: src/routes/workshop/+page.svelte:123:7 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/workshop/+page.svelte:123:7
+   121 |                class:selected={selectedClinic === clinic.id}
+   122 |                style="--clinic-color: {clinic.color}"
+   123 |                on:click={() => selectClinic(clinic.id)}
+                                                                ^
+   124 |                disabled={isLoading}
+   125 |              >
+2:53:18 PM [vite] (ssr) Error when evaluating SSR module /src/routes/workshop/+page.svelte: src/routes/workshop/+page.svelte:123:7 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/workshop/+page.svelte:123:7
+   121 |                class:selected={selectedClinic === clinic.id}
+   122 |                style="--clinic-color: {clinic.color}"
+   123 |                on:click={() => selectClinic(clinic.id)}
+                                                                ^
+   124 |                disabled={isLoading}
+   125 |              >
+
+[1;31m[500] GET /workshop[0m
+
+
+[1;31m[500] GET /workshop[0m
+
+2:53:21 PM [vite] (ssr) Error when evaluating SSR module /src/routes/workshop/+page.svelte: src/routes/workshop/+page.svelte:123:7 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/workshop/+page.svelte:123:7
+   121 |                class:selected={selectedClinic === clinic.id}
+   122 |                style="--clinic-color: {clinic.color}"
+   123 |                on:click={() => selectClinic(clinic.id)}
+                                                                ^
+   124 |                disabled={isLoading}
+   125 |              >
+
+[1;31m[500] GET /workshop[0m
+
+2:53:21 PM [vite] (ssr) Error when evaluating SSR module /src/routes/workshop/+page.svelte: src/routes/workshop/+page.svelte:123:7 Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax
+https://svelte.dev/e/mixed_event_handler_syntaxes
+  Plugin: vite-plugin-svelte:compile
+  File: src/routes/workshop/+page.svelte:123:7
+   121 |                class:selected={selectedClinic === clinic.id}
+   122 |                style="--clinic-color: {clinic.color}"
+   123 |                on:click={() => selectClinic(clinic.id)}
+                                                                ^
+   124 |                disabled={isLoading}
+   125 |              >
+
+[1;31m[500] GET /workshop[0m
+
+2:53:51 PM [vite] (client) page reload playwright-report/index.html
+2:53:51 PM [vite] (client) page reload playwright-report/index.html
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:54:02 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:54:02 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:54:02 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:54:02 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+2:54:48 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:54:50 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:54:50 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte
+2:54:50 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:55:05 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte
+2:55:05 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:55:24 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:55:24 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:55:24 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:55:24 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+2:55:38 PM [vite] (client) page reload playwright-report/index.html
+
+[1;31m[404] GET /favicon.ico[0m
+
+[1;31m[404] GET /favicon.ico[0m
+
+[1;31m[404] GET /favicon.ico[0m
+3:01:35 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:137:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:01:35 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:139:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:01:35 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:151:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:01:35 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:240:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+
+[1;31m[404] GET /favicon.ico[0m
+
+[1;31m[404] GET /favicon.ico[0m
+3:01:37 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:137:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:01:37 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:139:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:01:37 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:151:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:01:37 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:240:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:02:15 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:174:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:02:22 PM [vite-plugin-svelte] src/routes/patient/[id]/+page.svelte:174:11 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+
+[1;31m[404] GET /favicon.ico[0m
+
+[1;31m[404] GET /favicon.ico[0m
+3:04:15 PM [vite-plugin-svelte] src/routes/+page.svelte:184:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:15 PM [vite-plugin-svelte] src/routes/+page.svelte:198:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:15 PM [vite-plugin-svelte] src/routes/+page.svelte:229:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:15 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:04:15 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:04:18 PM [vite-plugin-svelte] src/routes/+page.svelte:184:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:18 PM [vite-plugin-svelte] src/routes/+page.svelte:198:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:18 PM [vite-plugin-svelte] src/routes/+page.svelte:229:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:04:34 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:04:34 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:04:34 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:04:34 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:04:34 PM [vite-plugin-svelte] src/routes/+page.svelte:184:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:34 PM [vite-plugin-svelte] src/routes/+page.svelte:198:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:04:34 PM [vite-plugin-svelte] src/routes/+page.svelte:229:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:05:56 PM [vite] (client) page reload playwright-report/index.html
+3:07:00 PM [vite] (client) page reload playwright-report/index.html
+3:16:43 PM [vite-plugin-svelte] src/routes/+page.svelte:185:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:43 PM [vite-plugin-svelte] src/routes/+page.svelte:199:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:43 PM [vite-plugin-svelte] src/routes/+page.svelte:230:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:43 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:16:43 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:16:43 PM [vite-plugin-svelte] src/routes/+page.svelte:185:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:43 PM [vite-plugin-svelte] src/routes/+page.svelte:199:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:43 PM [vite-plugin-svelte] src/routes/+page.svelte:230:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:159:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:173:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:204:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:446:1 Unused CSS selector ".logo h1"
+https://svelte.dev/e/css_unused_selector
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:453:1 Unused CSS selector ".logo span"
+https://svelte.dev/e/css_unused_selector
+3:16:56 PM [vite] (client) hmr update /src/routes/+page.svelte, /src/routes/+page.svelte?svelte&type=style&lang.css
+3:16:56 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:159:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:173:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:204:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:446:1 Unused CSS selector ".logo h1"
+https://svelte.dev/e/css_unused_selector
+3:16:56 PM [vite-plugin-svelte] src/routes/+page.svelte:453:1 Unused CSS selector ".logo span"
+https://svelte.dev/e/css_unused_selector
+3:17:18 PM [vite-plugin-svelte] src/routes/+page.svelte:159:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:17:18 PM [vite-plugin-svelte] src/routes/+page.svelte:173:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:17:18 PM [vite-plugin-svelte] src/routes/+page.svelte:204:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:17:18 PM [vite] (client) hmr update /src/routes/+page.svelte?svelte&type=style&lang.css
+3:17:18 PM [vite] (ssr) page reload src/routes/+page.svelte
+
+[1;31m[404] GET /architecture[0m
+
+[1;31m[404] GET /about[0m
+3:19:18 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:170:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+3:19:18 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:183:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+3:19:18 PM [vite] (client) hmr update /src/routes/developer/+page.svelte, /src/routes/developer/+page.svelte?svelte&type=style&lang.css
+3:19:18 PM [vite] (ssr) page reload src/routes/developer/+page.svelte
+3:19:59 PM [vite-plugin-svelte] src/routes/+page.svelte:159:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:19:59 PM [vite-plugin-svelte] src/routes/+page.svelte:173:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:19:59 PM [vite-plugin-svelte] src/routes/+page.svelte:204:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:19:59 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:19:59 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:19:59 PM [vite-plugin-svelte] src/routes/+page.svelte:159:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:19:59 PM [vite-plugin-svelte] src/routes/+page.svelte:173:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:19:59 PM [vite-plugin-svelte] src/routes/+page.svelte:204:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:15 PM [vite-plugin-svelte] src/routes/+page.svelte:196:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:15 PM [vite-plugin-svelte] src/routes/+page.svelte:210:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:15 PM [vite-plugin-svelte] src/routes/+page.svelte:241:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:15 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:20:15 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:20:15 PM [vite-plugin-svelte] src/routes/+page.svelte:196:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:15 PM [vite-plugin-svelte] src/routes/+page.svelte:210:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:15 PM [vite-plugin-svelte] src/routes/+page.svelte:241:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:44 PM [vite-plugin-svelte] src/routes/+page.svelte:196:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:44 PM [vite-plugin-svelte] src/routes/+page.svelte:210:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:44 PM [vite-plugin-svelte] src/routes/+page.svelte:241:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:44 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:20:44 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:20:45 PM [vite-plugin-svelte] src/routes/+page.svelte:196:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:45 PM [vite-plugin-svelte] src/routes/+page.svelte:210:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:20:45 PM [vite-plugin-svelte] src/routes/+page.svelte:241:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:21:09 PM [vite-plugin-svelte] src/routes/+page.svelte:196:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:21:09 PM [vite-plugin-svelte] src/routes/+page.svelte:210:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:21:09 PM [vite-plugin-svelte] src/routes/+page.svelte:241:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:21:09 PM [vite] (client) hmr update /src/routes/+page.svelte?svelte&type=style&lang.css
+3:21:09 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:25:05 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:25:05 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:25:05 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:25:05 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:25:05 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:25:06 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:25:06 PM [vite-plugin-svelte] src/routes/+page.svelte:196:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:25:06 PM [vite-plugin-svelte] src/routes/+page.svelte:210:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:25:06 PM [vite-plugin-svelte] src/routes/+page.svelte:241:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:26:12 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:26:12 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:26:12 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:26:12 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:26:12 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:26:12 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:26:32 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:138:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:26:32 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:140:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:26:32 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:152:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:26:32 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:241:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:26:32 PM [vite] (client) hmr update /src/routes/facilitator/+page.svelte
+3:26:32 PM [vite] (ssr) page reload src/routes/facilitator/+page.svelte
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:128:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:130:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:142:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:231:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:260:1 Unused CSS selector ".top-bar"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:271:1 Unused CSS selector ".logo"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:277:1 Unused CSS selector ".back-link"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:284:1 Unused CSS selector ".back-link:hover"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:288:1 Unused CSS selector ".logo h1"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:295:1 Unused CSS selector ".server-status"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:303:1 Unused CSS selector ".status-dot"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:310:1 Unused CSS selector ".status-dot.connected"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:314:1 Unused CSS selector ".status-dot.error"
+https://svelte.dev/e/css_unused_selector
+3:27:02 PM [vite] (client) hmr update /src/routes/facilitator/+page.svelte, /src/routes/facilitator/+page.svelte?svelte&type=style&lang.css
+3:27:02 PM [vite] (ssr) page reload src/routes/facilitator/+page.svelte
+3:27:51 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:128:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:51 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:130:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:51 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:142:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:51 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:231:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:27:51 PM [vite] (client) hmr update /src/routes/facilitator/+page.svelte, /src/routes/facilitator/+page.svelte?svelte&type=style&lang.css
+3:27:51 PM [vite] (ssr) page reload src/routes/facilitator/+page.svelte
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:28:47 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:28:47 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:28:47 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:28:47 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:29:16 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:29:16 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:29:16 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:29:16 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:29:27 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:170:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+3:29:27 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:183:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:128:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:130:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:142:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:231:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:128:5 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:130:29 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:142:30 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/facilitator/+page.svelte:231:5 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:29:27 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:170:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+3:29:27 PM [vite-plugin-svelte] src/routes/developer/+page.svelte:183:6 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+3:30:01 PM [vite] (client) page reload playwright-report/index.html
+3:31:38 PM [vite] (client) page reload playwright-report/index.html
+3:32:36 PM [vite] (client) page reload playwright-report/index.html
+3:35:09 PM [vite] (client) hmr update /src/routes/developer/+page.svelte, /src/routes/+layout.svelte, /src/routes/dashboard/+page.svelte, /src/routes/workshop/+page.svelte, /src/routes/+page.svelte, /src/routes/facilitator/+page.svelte, /src/routes/patient/[id]/+page.svelte
+3:35:09 PM [vite] (ssr) page reload src/lib/services/fhir-client.js
+3:35:13 PM [vite-plugin-svelte] src/routes/+page.svelte:202:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:13 PM [vite-plugin-svelte] src/routes/+page.svelte:216:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:13 PM [vite-plugin-svelte] src/routes/+page.svelte:247:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:13 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:35:13 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:35:13 PM [vite-plugin-svelte] src/routes/+page.svelte:202:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:13 PM [vite-plugin-svelte] src/routes/+page.svelte:216:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:13 PM [vite-plugin-svelte] src/routes/+page.svelte:247:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:17 PM [vite-plugin-svelte] src/routes/+page.svelte:227:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:17 PM [vite-plugin-svelte] src/routes/+page.svelte:241:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:17 PM [vite-plugin-svelte] src/routes/+page.svelte:272:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:17 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:35:17 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:35:17 PM [vite-plugin-svelte] src/routes/+page.svelte:227:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:17 PM [vite-plugin-svelte] src/routes/+page.svelte:241:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:17 PM [vite-plugin-svelte] src/routes/+page.svelte:272:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:292:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:35:26 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:26 PM [vite-plugin-svelte] src/routes/+page.svelte:292:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:37 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:37 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:37 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:37 PM [vite-plugin-svelte] src/routes/+page.svelte:292:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:307:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:342:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:35:42 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:307:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:42 PM [vite-plugin-svelte] src/routes/+page.svelte:342:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:53 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:53 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:53 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:53 PM [vite-plugin-svelte] src/routes/+page.svelte:307:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:53 PM [vite-plugin-svelte] src/routes/+page.svelte:342:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:53 PM [vite] (client) hmr update /src/routes/+page.svelte?svelte&type=style&lang.css
+3:35:53 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:35:58 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:58 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:58 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:58 PM [vite-plugin-svelte] src/routes/+page.svelte:307:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:58 PM [vite-plugin-svelte] src/routes/+page.svelte:342:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:35:58 PM [vite] (client) hmr update /src/routes/+page.svelte?svelte&type=style&lang.css
+3:35:58 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:36:06 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:06 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:06 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:06 PM [vite-plugin-svelte] src/routes/+page.svelte:307:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:06 PM [vite-plugin-svelte] src/routes/+page.svelte:342:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:06 PM [vite] (client) hmr update /src/routes/+page.svelte?svelte&type=style&lang.css
+3:36:06 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:36:09 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:36:09 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:36:09 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:36:09 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:36:09 PM [vite-plugin-svelte] src/routes/+page.svelte:236:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:09 PM [vite-plugin-svelte] src/routes/+page.svelte:259:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:09 PM [vite-plugin-svelte] src/routes/+page.svelte:261:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:09 PM [vite-plugin-svelte] src/routes/+page.svelte:307:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:09 PM [vite-plugin-svelte] src/routes/+page.svelte:342:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:36:11 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:36:11 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:36:11 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:36:11 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:36:19 PM [vite] (client) page reload playwright-report/index.html
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:244:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:267:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:269:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:315:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:350:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:36:34 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:244:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:267:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:269:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:315:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:34 PM [vite-plugin-svelte] src/routes/+page.svelte:350:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:245:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:268:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:270:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:316:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:351:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite] (client) hmr update /src/routes/+page.svelte
+3:36:37 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:245:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:268:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:270:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:316:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:37 PM [vite-plugin-svelte] src/routes/+page.svelte:351:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:36:40 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:36:40 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:36:40 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:36:40 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:36:40 PM [vite-plugin-svelte] src/routes/+page.svelte:245:6 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:40 PM [vite-plugin-svelte] src/routes/+page.svelte:268:4 Using `on:keydown` to listen to the keydown event is deprecated. Use the event attribute `onkeydown` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:40 PM [vite-plugin-svelte] src/routes/+page.svelte:270:31 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:40 PM [vite-plugin-svelte] src/routes/+page.svelte:316:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:40 PM [vite-plugin-svelte] src/routes/+page.svelte:351:8 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+3:36:47 PM [vite] (client) page reload playwright-report/index.html
+
+[1;31m[404] GET /encounter[0m
+
+[1;31m[404] GET /vitals[0m
+3:42:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:42:15 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+
+[1;31m[404] GET /vitals[0m
+3:42:40 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+
+[1;31m[404] GET /vitals[0m
+3:43:07 PM [vite] (client) hmr update /src/routes/+layout.svelte, /src/routes/dashboard/+page.svelte, /src/routes/workshop/+page.svelte
+3:43:07 PM [vite] (ssr) page reload src/lib/stores/appStore.svelte.js
+
+[1;31m[404] GET /vitals[0m
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:43:10 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:43:10 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:43:10 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:43:10 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+
+[1;31m[404] GET /vitals[0m
+3:43:43 PM [vite] (client) hmr update /src/routes/+layout.svelte, /src/routes/dashboard/+page.svelte, /src/routes/workshop/+page.svelte
+3:43:43 PM [vite] (ssr) page reload src/lib/stores/appStore.svelte.js
+
+[1;31m[404] GET /vitals[0m
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:43:45 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:43:45 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:43:45 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:43:45 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+
+[1;31m[404] GET /vitals[0m
+
+[1;31m[404] GET /encounter[0m
+
+[1;31m[404] GET /vitals[0m
+3:53:02 PM [vite] (client) page reload playwright-report/index.html
+3:53:02 PM [vite] (client) page reload playwright-report/index.html
+
+[1;31m[404] GET /encounter[0m
+
+[1;31m[404] GET /vitals[0m
+
+[1;31m[404] GET /encounter[0m
+
+[1;31m[404] GET /vitals[0m
+3:53:47 PM [vite] (client) page reload playwright-report/index.html
+3:54:14 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:54:14 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:54:14 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:54:14 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+3:54:14 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+3:54:14 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:54:45 PM [vite] (client) page reload playwright-report/index.html
+
+[1;31m[404] GET /vitals[0m
+
+[1;31m[404] GET /vitals[0m
+3:55:27 PM [vite] (client) page reload playwright-report/index.html
+3:55:27 PM [vite] (client) page reload playwright-report/index.html
+
+[1;31m[404] GET /vitals[0m
+
+[1;31m[404] GET /vitals[0m
+3:56:08 PM [vite] (client) page reload playwright-report/index.html
+3:56:52 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+3:56:52 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:56:58 PM [vite] (client) hmr update /src/routes/patient/search/+page.svelte
+3:57:04 PM [vite] (client) hmr update /src/routes/patient/search/+page.svelte
+3:57:11 PM [vite] (client) hmr update /src/routes/patient/search/+page.svelte
+3:57:13 PM [vite] (client) hmr update /src/routes/patient/search/+page.svelte
+3:57:20 PM [vite] (client) hmr update /src/routes/patient/search/+page.svelte
+3:57:22 PM [vite] (client) hmr update /src/routes/patient/search/+page.svelte
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+3:57:24 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:57:24 PM [vite] (client) page reload .svelte-kit/generated/root.js
+3:57:24 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:57:24 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+3:57:37 PM [vite] (client) page reload playwright-report/index.html
+3:57:37 PM [vite] (client) page reload playwright-report/index.html
+3:58:12 PM [vite] (client) page reload playwright-report/index.html
+3:58:12 PM [vite] (client) page reload playwright-report/index.html
+3:58:44 PM [vite] (client) page reload playwright-report/index.html
+3:59:34 PM [vite] (client) page reload playwright-report/index.html
+3:59:35 PM [vite] (client) page reload playwright-report/index.html

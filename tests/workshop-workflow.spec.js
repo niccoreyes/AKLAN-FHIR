@@ -73,11 +73,11 @@ test.describe('OpenHIE Mock EHR - Workshop Workflow Tests', () => {
     
     // Verify page loaded
     await expect(page.locator('h1:has-text("Find Patient")')).toBeVisible();
-    await expect(page.locator('input[placeholder*="Enter patient name"]')).toBeVisible();
+    await expect(page.locator('input[placeholder*="Filter patients"]')).toBeVisible();
     await expect(page.locator('button:has-text("Search")')).toBeVisible();
     
     // Test search functionality
-    await page.fill('input[placeholder*="Enter patient name"]', 'Test');
+    await page.fill('input[placeholder*="Filter patients"]', 'Test');
     await page.click('button:has-text("Search")');
     
     // Wait for results or empty state
