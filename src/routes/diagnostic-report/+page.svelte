@@ -161,6 +161,36 @@
 			console.error('Load patient error:', e);
 		}
 	}
+	
+	// Load patient encounters for selection
+	async function loadPatientEncounters(patientId) {
+		try {
+			const result = await fhirClient.search('Encounter', {
+				patient: `Patient/${patientId}`,
+				_tag: appStore.workshopCode,
+				_count: '20',
+				_sort: '-date'
+			});
+			patientEncounters = result.entry?.map(e => ({
+				id: e.resource.id,
+				type: e.resource.type?.[0]?.text || 
+					  e.resource.type?.[0]?.coding?.[0]?.display || 
+					  e.resource.type?.[0]?.coding?.[0]?.code || 
+					  'Visit',
+				date: e.resource.period?.start,
+				status: e.resource.status
+			})) || [];
+		} catch (e) {
+			console.error('Load encounters error:', e);
+			patientEncounters = [];
+		}
+	}
+	
+	function selectEncounter(encounter) {
+		selectedEncounterId = encounter.id;
+		selectedEncounterName = `${encounter.type} - ${new Date(encounter.date).toLocaleDateString()}`;
+		showEncounterSelector = false;
+	}
 
 	// Map LOINC codes to report types
 	const loincToReportType = {
@@ -327,6 +357,8 @@
 					category: getObservationCategory(),
 					code: { coding: [{ system: 'http://loinc.org', code: r.loinc }] },
 					subject: { reference: `Patient/${patientId}` },
+					// Link to encounter if selected
+					encounter: selectedEncounterId ? { reference: `Encounter/${selectedEncounterId}` } : undefined,
 					performer: [{ reference: `Practitioner/${appStore.practitionerId}` }],
 					effectiveDateTime: new Date().toISOString(),
 					valueQuantity: {
@@ -399,6 +431,12 @@
 
 	let patientSearchQuery = $state('');
 	let patientSearchResults = $state([]);
+	
+	// Encounter selection state
+	let selectedEncounterId = $state('');
+	let patientEncounters = $state([]);
+	let showEncounterSelector = $state(false);
+	let selectedEncounterName = $state('');
 
 	async function onPatientSearch() {
 		if (!patientSearchQuery || patientSearchQuery.length < 2) {
@@ -425,6 +463,12 @@
 		patientName = p.name;
 		patientSearchQuery = p.name;
 		patientSearchResults = [];
+		// Reset encounter selection when patient changes
+		selectedEncounterId = '';
+		selectedEncounterName = '';
+		patientEncounters = [];
+		// Load encounters for this patient
+		loadPatientEncounters(p.id);
 	}
 </script>
 
@@ -461,12 +505,69 @@
 								{/each}
 							</div>
 						{/if}
-						{#if patientId}
-							<p class="selected-patient">Selected: {patientName}</p>
-						{/if}
-					</div>
+					{#if patientId}
+						<p class="selected-patient">Selected: {patientName}</p>
+						
+						<!-- Encounter Selector -->
+						<div class="encounter-section">
+							<label class="encounter-label">Associated Visit (Optional)</label>
+							{#if patientEncounters.length > 0}
+								{#if !selectedEncounterId}
+									<button 
+										type="button" 
+										class="select-encounter-btn"
+										onclick={() => showEncounterSelector = true}
+									>
+										Select encounter to link results...
+									</button>
+								{:else}
+									<div class="selected-encounter">
+										<span class="encounter-name">{selectedEncounterName}</span>
+										<button 
+											type="button" 
+											class="change-encounter-btn"
+											onclick={() => showEncounterSelector = true}
+										>
+											Change
+										</button>
+									</div>
+								{/if}
+								
+								{#if showEncounterSelector}
+									<div class="encounter-dropdown">
+										<div class="encounter-dropdown-header">
+											Select a visit to associate with these lab results
+										</div>
+										{#each patientEncounters as enc}
+											<button 
+												type="button" 
+												class="encounter-option"
+												onclick={() => selectEncounter(enc)}
+											>
+												<div class="encounter-option-main">
+													<span class="encounter-type">{enc.type}</span>
+													<span class="encounter-date">{new Date(enc.date).toLocaleDateString()}</span>
+												</div>
+												<span class="encounter-status">{enc.status}</span>
+											</button>
+										{/each}
+										<button 
+											type="button" 
+											class="skip-encounter-btn"
+											onclick={() => showEncounterSelector = false}
+										>
+											Skip (no encounter)
+										</button>
+									</div>
+								{/if}
+							{:else}
+								<p class="no-encounters">No recent visits found. Results will not be linked to an encounter.</p>
+							{/if}
+						</div>
+					{/if}
+				</div>
 
-					<!-- Linked Order -->
+				<!-- Linked Order -->
 					{#if linkedOrderId}
 						<div class="linked-order">
 							<div class="linked-order-header">
@@ -893,5 +994,161 @@
 		min-height: 100vh;
 		font-size: 16px;
 		color: #6B7280;
+	}
+
+	/* Encounter Selector Styles */
+	.encounter-section {
+		margin-top: 12px;
+		padding-top: 12px;
+		border-top: 1px dashed #E5E7EB;
+	}
+
+	.encounter-label {
+		display: block;
+		font-size: 12px;
+		font-weight: 600;
+		color: #6B7280;
+		margin-bottom: 8px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.select-encounter-btn {
+		width: 100%;
+		padding: 10px 12px;
+		background: #F3F4F6;
+		border: 2px dashed #D1D5DB;
+		border-radius: 8px;
+		color: #6B7280;
+		font-size: 13px;
+		cursor: pointer;
+		text-align: left;
+		transition: all 0.2s;
+	}
+
+	.select-encounter-btn:hover {
+		background: #E5E7EB;
+		border-color: #9CA3AF;
+		color: #374151;
+	}
+
+	.selected-encounter {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px 12px;
+		background: #F0FDF4;
+		border: 1px solid #86EFAC;
+		border-radius: 8px;
+	}
+
+	.encounter-name {
+		font-size: 13px;
+		font-weight: 500;
+		color: #166534;
+	}
+
+	.change-encounter-btn {
+		padding: 4px 10px;
+		background: white;
+		border: 1px solid #22C55E;
+		border-radius: 4px;
+		color: #16A34A;
+		font-size: 12px;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.change-encounter-btn:hover {
+		background: #DCFCE7;
+	}
+
+	.encounter-dropdown {
+		margin-top: 8px;
+		background: white;
+		border: 1px solid #E5E7EB;
+		border-radius: 8px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		overflow: hidden;
+	}
+
+	.encounter-dropdown-header {
+		padding: 10px 12px;
+		background: #F9FAFB;
+		border-bottom: 1px solid #E5E7EB;
+		font-size: 12px;
+		color: #6B7280;
+		font-weight: 500;
+	}
+
+	.encounter-option {
+		width: 100%;
+		padding: 12px;
+		background: white;
+		border: none;
+		border-bottom: 1px solid #F3F4F6;
+		cursor: pointer;
+		text-align: left;
+		transition: background 0.2s;
+	}
+
+	.encounter-option:hover {
+		background: #F9FAFB;
+	}
+
+	.encounter-option:last-of-type {
+		border-bottom: none;
+	}
+
+	.encounter-option-main {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+	}
+
+	.encounter-type {
+		font-weight: 500;
+		color: #111827;
+		font-size: 13px;
+	}
+
+	.encounter-date {
+		font-size: 12px;
+		color: #6B7280;
+	}
+
+	.encounter-status {
+		display: inline-block;
+		padding: 2px 6px;
+		background: #E5E7EB;
+		border-radius: 4px;
+		font-size: 11px;
+		color: #374151;
+		text-transform: capitalize;
+	}
+
+	.skip-encounter-btn {
+		width: 100%;
+		padding: 10px 12px;
+		background: white;
+		border: none;
+		border-top: 1px solid #E5E7EB;
+		color: #9CA3AF;
+		font-size: 12px;
+		cursor: pointer;
+		text-align: center;
+	}
+
+	.skip-encounter-btn:hover {
+		background: #F9FAFB;
+		color: #6B7280;
+	}
+
+	.no-encounters {
+		font-size: 12px;
+		color: #9CA3AF;
+		font-style: italic;
+		margin: 0;
 	}
 </style>
