@@ -145,9 +145,9 @@
 									<div class="card-note">📝 {sr.note[0].text}</div>
 								{/if}
 								{#if caps.canCreate?.includes('DiagnosticReport')}
-									<a href="/diagnostic-report?order={sr.id}&patient={sr.subject?.reference?.split('/')[1]}" class="card-action">
-										📄 Report Results →
-									</a>
+								<a href="/diagnostic-report?order={sr.id}&patient={sr.subject?.reference?.split('/')[1]}&returnTo={encodeURIComponent('/inbox?tab=orders')}" class="card-action">
+									📄 Report Results →
+								</a>
 								{/if}
 							</div>
 						{/each}
@@ -180,9 +180,9 @@
 									<p class="card-date">{formatDate(mr.authoredOn)}</p>
 								</div>
 								{#if caps.canCreate?.includes('MedicationDispense')}
-									<a href="/dispense?rx={mr.id}&patient={mr.subject?.reference?.split('/')[1]}" class="card-action">
-										💊 Dispense →
-									</a>
+								<a href="/dispense?rx={mr.id}&patient={mr.subject?.reference?.split('/')[1]}&returnTo={encodeURIComponent('/inbox?tab=rx')}" class="card-action">
+									💊 Dispense →
+								</a>
 								{/if}
 							</div>
 						{/each}
@@ -195,7 +195,7 @@
 							<span>📄</span>
 							<p>No lab reports yet</p>
 							{#if caps.canCreate?.includes('DiagnosticReport')}
-								<a href="/diagnostic-report" class="create-link">Create report →</a>
+								<a href="/diagnostic-report?returnTo={encodeURIComponent('/inbox?tab=reports')}" class="create-link">Create report →</a>
 							{/if}
 						</div>
 					{:else}

@@ -6,6 +6,9 @@
 	import { CLINICS, CLINIC_CAPABILITIES, LOINC_CODES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 
+	// Get return URL from query params
+	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
+
 	onMount(() => {
 		if (browser && !appStore.isConfigured) {
 			window.location.replace('/');
@@ -132,7 +135,7 @@
 			await fhirClient.create(report, appStore.workshopCode);
 			success = true;
 			setTimeout(() => {
-				window.location.replace('/inbox?tab=reports');
+				window.location.replace(returnTo);
 			}, 1500);
 		} catch (e) {
 			error = e.message;

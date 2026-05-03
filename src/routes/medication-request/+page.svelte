@@ -1,9 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
+
+	// Get return URL from query params
+	const returnTo = $derived($page.url.searchParams.get('returnTo') || '/dashboard');
 
 	onMount(() => {
 		if (browser && !appStore.isConfigured) {
@@ -264,7 +268,7 @@
 			await fhirClient.create(resource, appStore.workshopCode);
 			success = true;
 			setTimeout(() => {
-				window.location.replace('/inbox?tab=rx');
+				window.location.replace(returnTo);
 			}, 1500);
 		} catch (e) {
 			error = e.message;

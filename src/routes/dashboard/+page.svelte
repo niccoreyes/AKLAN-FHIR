@@ -114,7 +114,8 @@
 			<!-- Primary Actions -->
 			<div class="action-grid">
 				{#each visibleActions as action}
-					<a href={action.href} class="action-card">
+					{@const hrefWithReturn = action.href + (action.href.includes('?') ? '&' : '?') + 'returnTo=' + encodeURIComponent('/dashboard')}
+					<a href={hrefWithReturn} class="action-card">
 						<span class="action-icon">{action.icon}</span>
 						<div class="action-text">
 							<strong>{action.label}</strong>
