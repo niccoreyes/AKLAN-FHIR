@@ -1640,3 +1640,37 @@ https://svelte.dev/e/mixed_event_handler_syntaxes
 4:24:00 PM [vite] (client) page reload .svelte-kit/generated/root.js
 4:24:00 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
 4:24:00 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:38:07 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte
+4:38:07 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:38:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:38:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:38:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:38:34 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:38:34 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:38:34 PM [vite-plugin-svelte] src/routes/vitals/+page.svelte:37:35 This reference only captures the initial value of `encounterId`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+4:38:34 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:38:39 PM [vite] (client) hmr update /src/routes/patient/[id]/+page.svelte?svelte&type=style&lang.css
+4:38:39 PM [vite] (ssr) page reload src/routes/patient/[id]/+page.svelte
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/14.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/15.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:38:42 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:38:42 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:38:42 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:38:42 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte

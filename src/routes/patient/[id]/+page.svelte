@@ -228,6 +228,17 @@
 						</span>
 					{/if}
 				</div>
+				<div class="patient-actions">
+					<a href="/patient/edit?id={patient.id}" class="btn-edit-patient">✏️ Edit Patient</a>
+					<button 
+						type="button" 
+						class="btn-delete-patient"
+						onclick={() => deleteResource('Patient', patient.id)}
+						disabled={deletingId === patient.id && deletingType === 'Patient'}
+					>
+						{deletingId === patient.id && deletingType === 'Patient' ? '⏳' : '🗑️'} Delete
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -1075,6 +1086,53 @@
 	}
 
 	.btn-delete-small:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	/* Patient Header Actions */
+	.patient-actions {
+		display: flex;
+		gap: 12px;
+		margin-top: 16px;
+		padding-top: 16px;
+		border-top: 1px solid #E2E8F0;
+	}
+
+	.btn-edit-patient {
+		padding: 10px 20px;
+		background: #FEF3C7;
+		color: #92400E;
+		border: 1px solid #FCD34D;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		text-decoration: none;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-edit-patient:hover {
+		background: #FDE68A;
+	}
+
+	.btn-delete-patient {
+		padding: 10px 20px;
+		background: #FEF2F2;
+		color: #DC2626;
+		border: 1px solid #FECACA;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.btn-delete-patient:hover {
+		background: #FECACA;
+	}
+
+	.btn-delete-patient:disabled {
 		opacity: 0.6;
 		cursor: not-allowed;
 	}
