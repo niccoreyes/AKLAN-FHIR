@@ -3,8 +3,9 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { appStore } from '$stores/appStore.svelte.js';
-	import { CLINICS, ROLES, CLINIC_CAPABILITIES } from '$constants';
+	import { CLINICS, ROLES, CLINIC_CAPABILITIES, WORKSHOP_TAG_SYSTEM, VITAL_SIGNS_LOINC_CODES } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
+	import DashboardPatientGrid from '$components/DashboardPatientGrid.svelte';
 
 	// Get URL params directly for immediate check
 	const urlParams = $derived(browser ? new URL(window.location.href).searchParams : null);
@@ -12,6 +13,11 @@
 	
 	// Check both store state and URL params
 	const isReallyConfigured = $derived(appStore.isConfigured || hasUrlConfig);
+
+	// Patient grid state
+	let dashboardPatients = $state([]);
+	let dashboardPatientsLoading = $state(false);
+	let dashboardPatientsError = $state('');
 
 	// Redirect if not configured (check both store and URL)
 	onMount(() => {
@@ -22,6 +28,7 @@
 			}
 		}, 100);
 		loadInboxCounts();
+		loadDashboardPatients();
 	});
 
 	const clinic = $derived(CLINICS.find(c => c.id === appStore.clinicId));
@@ -89,6 +96,95 @@
 		params.set('c', clinicId); // Set new clinic
 		if (appStore.roleId) params.set('r', appStore.roleId);
 		window.location.href = '/dashboard?' + params.toString();
+	}
+
+	// Extract latest vitals from observations
+	function extractLatestVitals(observations) {
+		const latest = {};
+		const vitalCodes = new Set(VITAL_SIGNS_LOINC_CODES);
+		for (const obs of observations) {
+			const code = obs.code?.coding?.[0]?.code;
+			if (code && vitalCodes.has(code) && !latest[code]) {
+				latest[code] = obs;
+			}
+		}
+		return latest;
+	}
+
+	// Load dashboard patients with batch fetching
+	async function loadDashboardPatients() {
+		if (!appStore.isConfigured) return;
+		dashboardPatientsLoading = true;
+		dashboardPatientsError = '';
+
+		try {
+			// 1. Fetch recent patients (limit 24 for dashboard performance)
+			const tag = appStore.groupFilterEnabled && appStore.workshopCode
+				? `${WORKSHOP_TAG_SYSTEM}|${appStore.workshopCode}`
+				: undefined;
+
+			const patientResult = await fhirClient.searchPaginated('Patient', {
+				_count: '24',
+				_sort: '-_lastUpdated',
+				...(tag ? { _tag: tag } : {})
+			});
+
+			const patients = patientResult.resources;
+			if (patients.length === 0) {
+				dashboardPatients = [];
+				return;
+			}
+
+			// 2. Build comma-separated patient references for batch queries
+			const patientRefs = patients.map(p => `Patient/${p.id}`).join(',');
+
+			// 3. Batch fetch encounters, conditions, and vital observations
+			const [encountersBundle, conditionsBundle, observationsBundle] = await Promise.all([
+				fhirClient.search('Encounter', { patient: patientRefs, _count: '100', _sort: '-date' })
+					.catch(() => ({ entry: [] })),
+				fhirClient.search('Condition', { patient: patientRefs, _count: '100' })
+					.catch(() => ({ entry: [] })),
+				fhirClient.search('Observation', {
+					patient: patientRefs,
+					_count: '100',
+					_sort: '-date',
+					category: 'vital-signs'
+				}).catch(() => ({ entry: [] }))
+			]);
+
+			const encounters = (encountersBundle.entry || []).map(e => e.resource);
+			const conditions = (conditionsBundle.entry || []).map(e => e.resource);
+			const observations = (observationsBundle.entry || []).map(e => e.resource);
+
+			// 4. Enrich patient objects with matched resources
+			dashboardPatients = patients.map(patient => {
+				const patientRef = `Patient/${patient.id}`;
+				const patientEncounters = encounters
+					.filter(e => e.subject?.reference === patientRef || e.patient?.reference === patientRef)
+					.sort((a, b) => new Date(b.period?.start || 0) - new Date(a.period?.start || 0));
+				
+				const patientConditions = conditions
+					.filter(c => c.subject?.reference === patientRef)
+					.filter(c => c.clinicalStatus?.coding?.[0]?.code === 'active' || !c.clinicalStatus);
+
+				const patientObservations = observations
+					.filter(o => o.subject?.reference === patientRef)
+					.sort((a, b) => new Date(b.effectiveDateTime || 0) - new Date(a.effectiveDateTime || 0));
+
+				return {
+					...patient,
+					_latestEncounter: patientEncounters[0] || null,
+					_conditions: patientConditions,
+					_latestVitals: extractLatestVitals(patientObservations)
+				};
+			});
+
+		} catch (e) {
+			console.error('Failed to load dashboard patients:', e);
+			dashboardPatientsError = e.message || 'Failed to load patients';
+		} finally {
+			dashboardPatientsLoading = false;
+		}
 	}
 </script>
 
@@ -161,22 +257,22 @@
 
 			<h1>What do you want to do?</h1>
 
-			<!-- Primary Actions -->
-			<div class="action-grid">
-				{#each visibleActions as action}
-					{@const hrefWithReturn = appStore.buildUrl(action.href, { returnTo: '/dashboard' })}
-					<a href={hrefWithReturn} class="action-card" class:view-action={action.viewAction}>
-						<span class="action-icon">{action.icon}</span>
-						<div class="action-text">
-							<strong>{action.label}</strong>
-							<span>{action.desc}</span>
-						</div>
-					</a>
-				{/each}
-			</div>
+		<!-- Primary Actions -->
+		<div class="action-grid">
+			{#each visibleActions as action}
+				{@const hrefWithReturn = appStore.buildUrl(action.href, { returnTo: '/dashboard' })}
+				<a href={hrefWithReturn} class="action-card" class:view-action={action.viewAction}>
+					<span class="action-icon">{action.icon}</span>
+					<div class="action-text">
+						<strong>{action.label}</strong>
+						<span>{action.desc}</span>
+					</div>
+				</a>
+			{/each}
+		</div>
 
-			<!-- HIE Data Overview -->
-			<div class="hie-section">
+		<!-- HIE Data Overview -->
+		<div class="hie-section">
 				<h2>🔗 HIE Data Overview</h2>
 				<p class="hie-hint">Data visible to <strong>{clinic?.shortName}</strong> across all clinics</p>
 				<div class="hie-stats">
@@ -220,10 +316,18 @@
 								<span class="stat-number">{inboxCounts.medicationDispense}</span>
 								<span class="stat-label">Dispensed</span>
 							</a>
-						{/if}
 					{/if}
-				</div>
+				{/if}
 			</div>
+		</div>
+
+		<!-- Patient Cards Grid -->
+		<DashboardPatientGrid 
+			patients={dashboardPatients} 
+			isLoading={dashboardPatientsLoading}
+			error={dashboardPatientsError}
+			clinicColor={clinic?.color || '#2563EB'}
+		/>
 
 			<!-- Workshop Info -->
 			<div class="workshop-info">
