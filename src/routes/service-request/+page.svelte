@@ -76,7 +76,14 @@
 			await fhirClient.create(resource, appStore.workshopCode);
 			success = true;
 			setTimeout(() => {
-				window.location.replace(returnTo);
+				// Preserve workshop parameters when redirecting
+				const params = new URLSearchParams();
+				if (appStore.workshopCode) params.set('w', appStore.workshopCode);
+				if (appStore.userName) params.set('u', appStore.userName);
+				if (appStore.clinicId) params.set('c', appStore.clinicId);
+				if (appStore.roleId) params.set('r', appStore.roleId);
+				const redirectUrl = returnTo + (returnTo.includes('?') ? '&' : '?') + params.toString();
+				window.location.replace(redirectUrl);
 			}, 1500);
 		} catch (e) {
 			error = e.message;
