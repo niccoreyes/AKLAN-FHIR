@@ -21,10 +21,10 @@
   let success = $state(false);
   let createdPatient = $state(null);
 
-  // Redirect if not configured
+  // Redirect if not configured (use replaceState to avoid back-button issues)
   onMount(() => {
     if (browser && !appStore.isConfigured) {
-      goto('/workshop');
+      window.location.replace('/workshop');
     }
   });
 

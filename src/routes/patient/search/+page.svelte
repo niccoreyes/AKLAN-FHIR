@@ -19,10 +19,10 @@
   let nextPageUrl = $state(null);
   let hasMore = $state(false);
 
-  // Redirect if not configured
+  // Redirect if not configured (use replaceState to avoid back-button issues)
   onMount(async () => {
     if (browser && !appStore.isConfigured) {
-      goto('/workshop');
+      window.location.replace('/workshop');
       return;
     }
     

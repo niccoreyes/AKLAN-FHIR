@@ -5,10 +5,11 @@
 	import { appStore } from '$stores/appStore.svelte.js';
 	import { CLINICS, ROLES } from '$constants';
 
-	// Redirect if not configured
+	// Redirect if not configured (use replaceState to avoid back-button issues)
 	onMount(() => {
 		if (browser && !appStore.isConfigured) {
-			goto('/');
+			// Use window.location.replace to avoid adding to history stack
+			window.location.replace('/');
 		}
 	});
 

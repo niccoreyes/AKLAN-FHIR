@@ -14,10 +14,11 @@
 	let error = $state('');
 	let showRoleToggle = $state(false);
 
-	// Redirect if already configured
+	// Redirect if already configured (use replaceState to avoid back-button issues)
 	onMount(() => {
 		if (browser && appStore.isConfigured) {
-			goto('/dashboard');
+			// Use window.location.replace to avoid adding to history stack
+			window.location.replace('/dashboard');
 		}
 	});
 
