@@ -1,4 +1,4 @@
-import { FHIR_CONFIG } from './index.js';
+import { FHIR_CONFIG } from '$constants';
 
 /**
  * Terminology Service - Fetches codes dynamically from tx.fhirlab.net

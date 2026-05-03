@@ -12,30 +12,32 @@
 		}
 	});
 
-	// Handle URL parameter changes
-	$: if (browser && $page) {
-		const url = new URL($page.url);
-		const params = {
-			w: url.searchParams.get('w') || '',
-			u: url.searchParams.get('u') || '',
-			c: url.searchParams.get('c') || '',
-			r: url.searchParams.get('r') || ''
-		};
-		
-		// Update store if URL params changed
-		if (params.w && params.w !== appStore.workshopCode) {
-			appStore.setWorkshopCode(params.w);
+	// Handle URL parameter changes using $effect
+	$effect(() => {
+		if (browser && $page) {
+			const url = new URL($page.url);
+			const params = {
+				w: url.searchParams.get('w') || '',
+				u: url.searchParams.get('u') || '',
+				c: url.searchParams.get('c') || '',
+				r: url.searchParams.get('r') || ''
+			};
+			
+			// Update store if URL params changed
+			if (params.w && params.w !== appStore.workshopCode) {
+				appStore.setWorkshopCode(params.w);
+			}
+			if (params.u && params.u !== appStore.userName) {
+				appStore.setUserName(params.u);
+			}
+			if (params.c && params.c !== appStore.clinicId) {
+				appStore.setClinic(params.c);
+			}
+			if (params.r && params.r !== appStore.roleId) {
+				appStore.setRole(params.r);
+			}
 		}
-		if (params.u && params.u !== appStore.userName) {
-			appStore.setUserName(params.u);
-		}
-		if (params.c && params.c !== appStore.clinicId) {
-			appStore.setClinic(params.c);
-		}
-		if (params.r && params.r !== appStore.roleId) {
-			appStore.setRole(params.r);
-		}
-	}
+	});
 </script>
 
 <div class="app-container">
