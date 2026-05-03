@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { APP_NAME, CLINICS, CLINIC_CAPABILITIES } from '$constants';
 	import { appStore } from '$stores/appStore.svelte.js';
 
@@ -22,8 +23,8 @@
 	function switchClinic(clinicId) {
 		appStore.setClinic(clinicId);
 		showClinicSwitcher = false;
-		// Reload page to refresh clinic-specific UI
-		window.location.reload();
+		// Navigate to dashboard (accessible by all clinics) to avoid capability check issues
+		window.location.href = '/dashboard';
 	}
 
 	const navItems = [
@@ -48,15 +49,15 @@
 	</div>
 	{#if appStore.isConfigured}
 		<div class="clinic-context">
-			<button 
+			<button
 				class="clinic-switcher-btn"
 				onclick={() => showClinicSwitcher = !showClinicSwitcher}
 				style="--clinic-color: {currentClinic?.color || '#2563EB'}"
-				title="Click to switch clinic"
+				title="Click to switch clinic and experience HIE from different perspectives"
 			>
-				<span>{currentClinic?.icon}</span>
+				<span class="clinic-icon-large">{currentClinic?.icon}</span>
 				<span class="clinic-name">{currentClinic?.shortName}</span>
-				<span class="switch-icon">🔁</span>
+				<span class="switch-indicator">↻</span>
 			</button>
 			{#if showClinicSwitcher}
 				<div class="clinic-dropdown">
@@ -206,32 +207,45 @@
 	.clinic-switcher-btn {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 6px 12px;
-		border-radius: 8px;
+		gap: 8px;
+		padding: 8px 14px;
+		border-radius: 20px;
 		border: 2px solid var(--clinic-color);
-		background: color-mix(in srgb, var(--clinic-color) 8%, white);
+		background: linear-gradient(135deg, color-mix(in srgb, var(--clinic-color) 12%, white) 0%, white 100%);
 		color: var(--clinic-color);
-		font-size: 13px;
-		font-weight: 600;
+		font-size: 14px;
+		font-weight: 700;
 		cursor: pointer;
 		transition: all 0.2s;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 	}
 
 	.clinic-switcher-btn:hover {
-		background: color-mix(in srgb, var(--clinic-color) 15%, white);
+		background: linear-gradient(135deg, color-mix(in srgb, var(--clinic-color) 20%, white) 0%, color-mix(in srgb, var(--clinic-color) 5%, white) 100%);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+	}
+
+	.clinic-switcher-btn:active {
+		transform: translateY(0);
+		box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+	}
+
+	.clinic-icon-large {
+		font-size: 18px;
 	}
 
 	.clinic-name {
-		max-width: 120px;
+		max-width: 140px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	.switch-icon {
-		font-size: 11px;
-		opacity: 0.6;
+	.switch-indicator {
+		font-size: 13px;
+		opacity: 0.7;
+		margin-left: 2px;
 	}
 
 	.clinic-dropdown {
