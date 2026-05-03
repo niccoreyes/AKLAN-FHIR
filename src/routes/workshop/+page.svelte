@@ -6,13 +6,7 @@
 	import { CLINICS, ROLES } from '$constants';
 
 	// Predefined workshop codes
-	const PREDEFINED_WORKSHOPS = [
-		{ code: 'AK26-A', label: 'AK26-A' },
-		{ code: 'AK26-B', label: 'AK26-B' },
-		{ code: 'AK26-C', label: 'AK26-C' },
-		{ code: 'AK26-D', label: 'AK26-D' },
-		{ code: 'AK26-E', label: 'AK26-E' }
-	];
+	const PREDEFINED_WORKSHOPS = ['AK26-A', 'AK26-B', 'AK26-C', 'AK26-D', 'AK26-E'];
 
 	// Form state
 	let workshopCode = $state(appStore.workshopCode || '');
@@ -21,7 +15,79 @@
 	let selectedRole = $state(appStore.roleId || '');
 	let isLoading = $state(false);
 	let error = $state('');
-	let useCustomWorkshop = $state(false);
+
+	// Autocomplete state
+	let showDropdown = $state(false);
+	let highlightedIndex = $state(-1);
+	let filteredWorkshops = $state([]);
+
+	// Filter workshops based on input
+	function filterWorkshops(input) {
+		if (!input) {
+			filteredWorkshops = PREDEFINED_WORKSHOPS;
+			return;
+		}
+		const searchTerm = input.toLowerCase();
+		filteredWorkshops = PREDEFINED_WORKSHOPS.filter(w => 
+			w.toLowerCase().includes(searchTerm)
+		);
+	}
+
+	// Handle input changes
+	function handleWorkshopInput(e) {
+		workshopCode = e.target.value;
+		filterWorkshops(workshopCode);
+		showDropdown = true;
+		highlightedIndex = -1;
+	}
+
+	// Handle keyboard navigation
+	function handleKeydown(e) {
+		if (!showDropdown) return;
+
+		switch (e.key) {
+			case 'ArrowDown':
+				e.preventDefault();
+				highlightedIndex = (highlightedIndex + 1) % filteredWorkshops.length;
+				break;
+			case 'ArrowUp':
+				e.preventDefault();
+				highlightedIndex = highlightedIndex <= 0 ? filteredWorkshops.length - 1 : highlightedIndex - 1;
+				break;
+			case 'Tab':
+			case 'Enter':
+				if (highlightedIndex >= 0 && filteredWorkshops[highlightedIndex]) {
+					e.preventDefault();
+					selectWorkshop(filteredWorkshops[highlightedIndex]);
+				}
+				break;
+			case 'Escape':
+				showDropdown = false;
+				highlightedIndex = -1;
+				break;
+		}
+	}
+
+	// Select a workshop
+	function selectWorkshop(code) {
+		workshopCode = code;
+		showDropdown = false;
+		highlightedIndex = -1;
+	}
+
+	// Handle input focus
+	function handleFocus() {
+		filterWorkshops(workshopCode);
+		showDropdown = true;
+	}
+
+	// Handle input blur (delayed to allow clicks)
+	function handleBlur() {
+		setTimeout(() => {
+			showDropdown = false;
+			highlightedIndex = -1;
+		}, 200);
+	}
 
 	// Redirect if already configured (use replaceState to avoid back-button issues)
 	onMount(() => {
@@ -96,50 +162,57 @@
 		<form onsubmit={handleSubmit} class="form">
 			<!-- Workshop Code -->
 			<div class="field">
-				<label class="label">Workshop Code</label>
+				<label for="workshop-code" class="label">Workshop Code</label>
 				
-				{#if !useCustomWorkshop}
-					<div class="workshop-grid">
+				<!-- Autocomplete Input -->
+				<div class="autocomplete-wrapper">
+					<input
+						id="workshop-code"
+						type="text"
+						value={workshopCode}
+						placeholder="Type or select a workshop code..."
+						class="input"
+						disabled={isLoading}
+						oninput={handleWorkshopInput}
+						onkeydown={handleKeydown}
+						onfocus={handleFocus}
+						onblur={handleBlur}
+						autocomplete="off"
+					/>
+					
+					{#if showDropdown && filteredWorkshops.length > 0}
+						<div class="autocomplete-dropdown">
+							{#each filteredWorkshops as workshop, index}
+								<button
+									type="button"
+									class="dropdown-item"
+									class:highlighted={index === highlightedIndex}
+									onclick={() => selectWorkshop(workshop)}
+								>
+									🏷️ {workshop}
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
+				
+				<!-- Chips -->
+				<div class="chips-container">
+					<span class="chips-label">Quick select:</span>
+					<div class="chips">
 						{#each PREDEFINED_WORKSHOPS as workshop}
 							<button
 								type="button"
-								class="workshop-card"
-								class:selected={workshopCode === workshop.code}
-								onclick={() => workshopCode = workshop.code}
+								class="chip"
+								class:selected={workshopCode === workshop}
+								onclick={() => selectWorkshop(workshop)}
 								disabled={isLoading}
 							>
-								<span class="workshop-icon">🏷️</span>
-								<span class="workshop-name">{workshop.label}</span>
+								{workshop}
 							</button>
 						{/each}
 					</div>
-					<button
-						type="button"
-						class="use-custom-btn"
-						onclick={() => { useCustomWorkshop = true; workshopCode = ''; }}
-						disabled={isLoading}
-					>
-						+ Use Custom Workshop Code
-					</button>
-				{:else}
-					<div class="custom-workshop-input">
-						<input
-							type="text"
-							bind:value={workshopCode}
-							placeholder="Enter custom workshop code"
-							class="input"
-							disabled={isLoading}
-						/>
-						<button
-							type="button"
-							class="back-to-predefined"
-							onclick={() => { useCustomWorkshop = false; workshopCode = ''; }}
-							disabled={isLoading}
-						>
-							← Back to common codes
-						</button>
-					</div>
-				{/if}
+				</div>
 			</div>
 
 			<!-- First Name -->
@@ -527,93 +600,88 @@
 		text-decoration: underline;
 	}
 
-	/* Workshop Selection */
-	.workshop-grid {
-		display: grid;
-		grid-template-columns: repeat(5, 1fr);
-		gap: 8px;
-		margin-bottom: 12px;
+	/* Autocomplete */
+	.autocomplete-wrapper {
+		position: relative;
 	}
 
-	@media (max-width: 480px) {
-		.workshop-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-
-	.workshop-card {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 6px;
-		padding: 12px 8px;
+	.autocomplete-dropdown {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
 		background: white;
-		border: 2px solid #e2e8f0;
-		border-radius: 10px;
+		border: 1px solid #e2e8f0;
+		border-top: none;
+		border-radius: 0 0 10px 10px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		z-index: 100;
+		max-height: 200px;
+		overflow-y: auto;
+	}
+
+	.dropdown-item {
+		display: block;
+		width: 100%;
+		padding: 10px 14px;
+		background: white;
+		border: none;
+		text-align: left;
 		cursor: pointer;
-		transition: all 0.2s;
+		font-size: 14px;
+		transition: background 0.15s;
 	}
 
-	.workshop-card:hover {
-		border-color: #2563eb;
-		background: #f8fafc;
-	}
-
-	.workshop-card.selected {
-		border-color: #2563eb;
+	.dropdown-item:hover,
+	.dropdown-item.highlighted {
 		background: #eff6ff;
-	}
-
-	.workshop-icon {
-		font-size: 20px;
-	}
-
-	.workshop-name {
-		font-size: 13px;
-		font-weight: 600;
-		color: #0f172a;
-	}
-
-	.workshop-card.selected .workshop-name {
 		color: #2563eb;
 	}
 
-	.use-custom-btn {
-		width: 100%;
-		padding: 10px;
-		background: #f1f5f9;
-		border: 1px dashed #cbd5e1;
-		border-radius: 8px;
+	/* Chips */
+	.chips-container {
+		margin-top: 12px;
+	}
+
+	.chips-label {
+		display: block;
+		font-size: 12px;
 		color: #64748b;
+		margin-bottom: 8px;
+		font-weight: 500;
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.chip {
+		padding: 6px 14px;
+		background: #f1f5f9;
+		border: 1px solid #e2e8f0;
+		border-radius: 20px;
 		font-size: 13px;
 		font-weight: 500;
+		color: #475569;
 		cursor: pointer;
 		transition: all 0.2s;
 	}
 
-	.use-custom-btn:hover {
+	.chip:hover {
 		background: #e2e8f0;
-		color: #475569;
+		border-color: #cbd5e1;
 	}
 
-	.custom-workshop-input {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
+	.chip.selected {
+		background: #2563eb;
+		border-color: #2563eb;
+		color: white;
 	}
 
-	.back-to-predefined {
-		align-self: flex-start;
-		padding: 6px 12px;
-		background: transparent;
-		border: none;
-		color: #64748b;
-		font-size: 13px;
-		cursor: pointer;
-		transition: color 0.2s;
-	}
-
-	.back-to-predefined:hover {
-		color: #2563eb;
+	.chip:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>

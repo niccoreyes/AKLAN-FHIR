@@ -1387,3 +1387,109 @@ https://svelte.dev/e/a11y_label_has_associated_control
 https://svelte.dev/e/css_unused_selector
 4:14:49 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:399:1 Unused CSS selector ".toggle-icon"
 https://svelte.dev/e/css_unused_selector
+4:19:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:165:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:19:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:452:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:19:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:465:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:37 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte
+4:19:37 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:19:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:165:4 A form label must be associated with a control
+https://svelte.dev/e/a11y_label_has_associated_control
+4:19:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:452:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:19:37 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:465:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:459:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:472:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:604:1 Unused CSS selector ".workshop-grid"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:612:2 Unused CSS selector ".workshop-grid"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:617:1 Unused CSS selector ".workshop-card"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:630:1 Unused CSS selector ".workshop-card:hover"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:635:1 Unused CSS selector ".workshop-card.selected"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:640:1 Unused CSS selector ".workshop-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:644:1 Unused CSS selector ".workshop-name"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:650:1 Unused CSS selector ".workshop-card.selected .workshop-name"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:654:1 Unused CSS selector ".use-custom-btn"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:667:1 Unused CSS selector ".use-custom-btn:hover"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:672:1 Unused CSS selector ".custom-workshop-input"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:678:1 Unused CSS selector ".back-to-predefined"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:689:1 Unused CSS selector ".back-to-predefined:hover"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte, /src/routes/workshop/+page.svelte?svelte&type=style&lang.css
+4:19:45 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:459:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:472:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:604:1 Unused CSS selector ".workshop-grid"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:612:2 Unused CSS selector ".workshop-grid"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:617:1 Unused CSS selector ".workshop-card"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:630:1 Unused CSS selector ".workshop-card:hover"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:635:1 Unused CSS selector ".workshop-card.selected"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:640:1 Unused CSS selector ".workshop-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:644:1 Unused CSS selector ".workshop-name"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:650:1 Unused CSS selector ".workshop-card.selected .workshop-name"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:654:1 Unused CSS selector ".use-custom-btn"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:667:1 Unused CSS selector ".use-custom-btn:hover"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:672:1 Unused CSS selector ".custom-workshop-input"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:678:1 Unused CSS selector ".back-to-predefined"
+https://svelte.dev/e/css_unused_selector
+4:19:45 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:689:1 Unused CSS selector ".back-to-predefined:hover"
+https://svelte.dev/e/css_unused_selector
+4:19:55 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:459:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:19:55 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:472:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
+4:19:55 PM [vite] (client) hmr update /src/routes/workshop/+page.svelte?svelte&type=style&lang.css
+4:19:55 PM [vite] (ssr) page reload src/routes/workshop/+page.svelte
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/4.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/5.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/6.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/7.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/8.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/9.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/10.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/11.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/12.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/13.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+4:19:57 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+4:19:57 PM [vite] (client) page reload .svelte-kit/generated/root.js
+4:19:57 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+4:19:57 PM [vite] (ssr) page reload .svelte-kit/generated/root.svelte
+4:19:57 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:459:1 Unused CSS selector ".toggle"
+https://svelte.dev/e/css_unused_selector
+4:19:57 PM [vite-plugin-svelte] src/routes/workshop/+page.svelte:472:1 Unused CSS selector ".toggle-icon"
+https://svelte.dev/e/css_unused_selector
