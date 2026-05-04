@@ -65,6 +65,7 @@
 	}
 
 	const navItems = [
+		{ id: 'workshop', label: 'Workshop', href: '/workshop' },
 		{ id: 'clinical', label: 'Clinical View', href: '/' },
 		{ id: 'developer', label: 'Technical Dashboard', href: '/developer' },
 		{ id: 'architecture', label: 'Architecture', href: '/architecture' },
