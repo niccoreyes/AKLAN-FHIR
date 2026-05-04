@@ -64,13 +64,47 @@
 		}
 	}
 
-	const navItems = [
+	const allNavItems = [
 		{ id: 'workshop', label: 'Workshop', href: '/workshop' },
 		{ id: 'clinical', label: 'Clinical View', href: '/' },
 		{ id: 'developer', label: 'Technical Dashboard', href: '/developer' },
 		{ id: 'architecture', label: 'Architecture', href: '/architecture' },
 		{ id: 'about', label: 'About', href: '/about' }
 	];
+
+	// Filter nav items based on workshop state - hide Clinical View when logged in
+	const navItems = $derived(
+		appStore.isConfigured
+			? allNavItems.filter(item => item.id !== 'clinical')
+			: allNavItems
+	);
+
+	// Compute back destination based on current route
+	const backDestination = $derived(() => {
+		const currentPath = $page.url.pathname;
+		
+		// Form pages go back to dashboard
+		const formPages = ['/encounter', '/vitals', '/medication-request',
+						  '/service-request', '/diagnostic-report',
+						  '/dispense', '/condition', '/patient/new',
+						  '/patient/edit', '/encounter/edit'];
+		if (formPages.includes(currentPath)) {
+			return appStore.buildUrl('/dashboard');
+		}
+		
+		// Patient detail goes back to search
+		if (currentPath.startsWith('/patient/') && currentPath !== '/patient/search') {
+			return appStore.buildUrl('/patient/search');
+		}
+		
+		// Inbox goes back to dashboard
+		if (currentPath === '/inbox') {
+			return appStore.buildUrl('/dashboard');
+		}
+		
+		// Default: back to dashboard
+		return appStore.buildUrl('/dashboard');
+	});
 
 	const currentClinic = $derived(CLINICS.find(c => c.id === appStore.clinicId));
 	const currentRole = $derived(ROLES.find(r => r.id === appStore.roleId));
@@ -114,6 +148,14 @@
 			<span>FHIR Fundamentals 2026 - Aklan</span>
 		</div>
 	</div>
+	
+	<!-- Context-aware Back Button - shown when in workshop mode -->
+	{#if appStore.isConfigured}
+		<a href={backDestination()} class="back-btn">
+			<span class="back-icon">←</span>
+			<span class="back-text">Back</span>
+		</a>
+	{/if}
 	
 	{#if appStore.isConfigured}
 		<div class="user-section">
@@ -381,6 +423,38 @@
 	.logo span {
 		font-size: 12px;
 		color: #64748B;
+	}
+
+	/* Back Button */
+	.back-btn {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 16px;
+		border-radius: 8px;
+		text-decoration: none;
+		color: #475569;
+		font-size: 14px;
+		font-weight: 600;
+		background: #F1F5F9;
+		border: 1px solid #E2E8F0;
+		transition: all 0.2s;
+		margin-left: 16px;
+	}
+
+	.back-btn:hover {
+		background: #E2E8F0;
+		color: #1E293B;
+		border-color: #CBD5E1;
+		transform: translateX(-2px);
+	}
+
+	.back-icon {
+		font-size: 16px;
+	}
+
+	.back-text {
+		white-space: nowrap;
 	}
 
 	/* User Section */

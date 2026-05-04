@@ -384,7 +384,7 @@ export function createAppStore() {
 	/**
 	 * Logout - clear all state and redirect to home
 	 */
-	function logout() {
+	async function logout() {
 		if (!browser) return;
 		
 		// Clear registration state
@@ -393,16 +393,7 @@ export function createAppStore() {
 		// Clear localStorage
 		clearStorage();
 		
-		// Clear URL parameters
-		const url = new URL(window.location.href);
-		url.searchParams.delete('w');
-		url.searchParams.delete('u');
-		url.searchParams.delete('c');
-		url.searchParams.delete('r');
-		url.searchParams.delete('v');
-		replaceState(url, {});
-		
-		// Reset store state
+		// Reset store state BEFORE navigation (prevents race conditions)
 		workshopCode = '';
 		userName = '';
 		clinicId = '';
@@ -413,8 +404,17 @@ export function createAppStore() {
 		error = null;
 		hasShownWelcome = false;
 		
-		// Navigate to home
-		window.location.href = '/';
+		// Clear URL parameters and wait for completion
+		const url = new URL(window.location.href);
+		url.searchParams.delete('w');
+		url.searchParams.delete('u');
+		url.searchParams.delete('c');
+		url.searchParams.delete('r');
+		url.searchParams.delete('v');
+		await replaceState(url, {});
+		
+		// Hard reload to root using replace (no history entry, fresh state)
+		window.location.replace('/');
 	}
 	
 	return {
