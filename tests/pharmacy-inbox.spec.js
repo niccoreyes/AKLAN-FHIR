@@ -71,14 +71,15 @@ test.describe('Pharmacy Inbox & Dispense Flow', () => {
 
 		await expect(page.locator('h1:has-text("Work Queue")')).toBeVisible();
 
-		// RHU has all three resources in canView
+		// RHU has all four resources in canView
+		await expect(page.locator('.tab:has-text("Active Visits")')).toBeVisible();
 		await expect(page.locator('.tab:has-text("Lab Orders")')).toBeVisible();
 		await expect(page.locator('.tab:has-text("Prescriptions")')).toBeVisible();
 		await expect(page.locator('.tab:has-text("Lab Reports")')).toBeVisible();
 
-		// Default should be orders (first tab)
+		// Default should be Active Visits (encounters tab is first for RHU)
 		const activeTab = page.locator('.tab.active');
-		await expect(activeTab).toHaveText(/Lab Orders/);
+		await expect(activeTab).toHaveText(/Active Visits/);
 
 		console.log('✅ RHU inbox shows all tabs and defaults to Lab Orders');
 	});

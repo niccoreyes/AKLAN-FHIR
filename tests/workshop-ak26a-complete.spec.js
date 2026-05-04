@@ -30,22 +30,22 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
       id: 'rhu-malay',
       name: 'RHU Malay',
       shortName: 'RHU Malay',
-      actions: ['Register Patient', 'Find Patient', 'Record Visit', 'Record Vitals', 'Order Labs'],
-      restrictedActions: ['Prescribe', 'Lab Reports']
+      actions: ['Register Patient', 'Find Patient', 'Record Visit', 'Record Vitals', 'Order Labs', 'Prescribe', 'View Lab Results', 'View Medications'],
+      restrictedActions: ['Dispense', 'Work Queue']
     },
     {
       id: 'kalibo-lab',
       name: 'Kalibo Medical Laboratory',
       shortName: 'Kalibo Lab',
-      actions: ['Inbox', 'Lab Reports'],
+      actions: ['Work Queue', 'Lab Results'],
       restrictedActions: ['Register Patient', 'Record Visit', 'Record Vitals', 'Order Labs', 'Prescribe']
     },
     {
       id: 'aklan-pharmacy',
       name: 'Aklan Provincial Pharmacy',
       shortName: 'Aklan Pharmacy',
-      actions: ['Inbox', 'Dispense'],
-      restrictedActions: ['Register Patient', 'Record Visit', 'Record Vitals', 'Order Labs', 'Prescribe', 'Lab Reports']
+      actions: ['Work Queue', 'Dispense'],
+      restrictedActions: ['Register Patient', 'Record Visit', 'Record Vitals', 'Order Labs', 'Prescribe', 'Lab Results']
     }
   ];
 
@@ -143,10 +143,10 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
         expect(href).toContain('returnTo=');
       }
 
-      // Verify restricted actions are NOT present
+      // Verify restricted actions are NOT present (check exact label text in <strong>)
       for (const restrictedAction of clinic.restrictedActions) {
-        const restrictedLink = page.locator(`a.action-card:has-text("${restrictedAction}")`);
-        await expect(restrictedLink).not.toBeVisible();
+        const restrictedLink = page.locator(`a.action-card:has(strong:text-is("${restrictedAction}"))`);
+        await expect(restrictedLink).toHaveCount(0);
       }
 
       // Verify bottom navigation
@@ -454,11 +454,11 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
     await page.waitForTimeout(2000);
 
     // Verify lab-specific actions
-    await expect(page.locator('a:has-text("Inbox")')).toBeVisible();
-    await expect(page.locator('a:has-text("Lab Reports")')).toBeVisible();
+    await expect(page.locator('a.action-card:has-text("Work Queue")')).toBeVisible();
+    await expect(page.locator('a.action-card:has-text("Lab Results")')).toBeVisible();
 
     // Navigate to inbox
-    await page.click('a:has-text("Inbox")');
+    await page.click('a.action-card:has-text("Work Queue")');
     await page.waitForURL('**/inbox**');
     await page.waitForTimeout(2000);
 
@@ -474,7 +474,7 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
     // Navigate to diagnostic report
     await page.goto(`/dashboard?w=${workshopCode}&u=${userName}&c=kalibo-lab`);
     await page.waitForTimeout(1500);
-    await page.click('a:has-text("Lab Reports")');
+    await page.click('a.action-card:has-text("Lab Results")');
     await page.waitForTimeout(2000);
 
     const reportUrl = page.url();
@@ -492,11 +492,11 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
     await page.waitForTimeout(2000);
 
     // Verify pharmacy-specific actions
-    await expect(page.locator('a:has-text("Inbox")')).toBeVisible();
-    await expect(page.locator('a:has-text("Dispense")')).toBeVisible();
+    await expect(page.locator('a.action-card:has-text("Work Queue")')).toBeVisible();
+    await expect(page.locator('a.action-card:has-text("Dispense")')).toBeVisible();
 
     // Navigate to inbox
-    await page.click('a:has-text("Inbox")');
+    await page.click('a.action-card:has-text("Work Queue")');
     await page.waitForURL('**/inbox**');
     await page.waitForTimeout(2000);
 
@@ -549,7 +549,7 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
     expect(url).toContain(`u=${userName}`);
 
     // Verify dashboard loaded with new clinic actions
-    await expect(page.locator('text=Aklan Provincial')).toBeVisible();
+    await expect(page.locator('text=Aklan Provincial Hospital')).toBeVisible();
 
     // Switch to pharmacy
     await page.click('.clinic-switcher-btn, .clinic-badge');
@@ -565,8 +565,8 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
     expect(url).toContain('c=aklan-pharmacy');
 
     // Verify pharmacy-specific actions shown
-    await expect(page.locator('a:has-text("Inbox")')).toBeVisible();
-    await expect(page.locator('a:has-text("Dispense")')).toBeVisible();
+    await expect(page.locator('a.action-card:has-text("Work Queue")')).toBeVisible();
+    await expect(page.locator('a.action-card:has-text("Dispense")')).toBeVisible();
 
     console.log('✅ Clinic switching preserves workshop context');
   });
@@ -890,7 +890,7 @@ test.describe('OpenHIE Mock EHR - Complete Workshop Flow (AK26-A + Thomas)', () 
     await page.goto(`/dashboard?w=${workshopCode}&u=${userName}&c=kalibo-lab`);
     await page.waitForTimeout(1500);
     
-    await page.click('a:has-text("Inbox")');
+    await page.click('a.action-card:has-text("Work Queue")');
     await page.waitForTimeout(2000);
     console.log('  Step 5: Lab inbox accessed from lab clinic');
 
