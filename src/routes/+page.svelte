@@ -24,10 +24,30 @@
 	
 	// Pagination state
 	let totalPatientCount = $state(0);
+	let unfilteredTotalCount = $state(0); // Total patients in SHR regardless of filter
 	let nextPageUrl = $state(null);
 	let hasMorePatients = $state(false);
 
 	const resourceTypes = ['Patient', 'Encounter', 'Observation', 'Condition', 'MedicationRequest', 'ServiceRequest', 'DiagnosticReport', 'Practitioner', 'Organization'];
+	
+	// Default workshop filter pattern - AK26-A through AK26-E
+	const DEFAULT_WORKSHOP_TAGS = ['AK26-A', 'AK26-B', 'AK26-C', 'AK26-D', 'AK26-E'];
+	const WORKSHOP_PATTERN = /^ak26-[a-e]$/i;
+	
+	// Helper to check if a tag matches the default AK26 pattern
+	function matchesDefaultWorkshopPattern(tag) {
+		return WORKSHOP_PATTERN.test(tag);
+	}
+	
+	// Helper to build the _tag parameter for FHIR query
+	function buildWorkshopTagParam() {
+		if (workshopTag) {
+			// Manual specific filter
+			return `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`;
+		}
+		// Default: all AK26 workshops (OR query using comma separation)
+		return DEFAULT_WORKSHOP_TAGS.map(t => `${WORKSHOP_TAG_SYSTEM}|${t}`).join(',');
+	}
 	
 	// Helper to get code display from cache or fetch from server
 	async function getCodeDisplay(code, system, fetchFn) {
@@ -70,7 +90,13 @@
 		const counts = {};
 		for (const type of resourceTypes) {
 			try {
-				const params = showOnlyTagged && workshopTag ? { _tag: `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`, _summary: 'count' } : { _summary: 'count' };
+				let params;
+				if (showOnlyTagged) {
+					// Use workshop filter (either specific tag or default AK26 pattern)
+					params = { _tag: buildWorkshopTagParam(), _summary: 'count' };
+				} else {
+					params = { _summary: 'count' };
+				}
 				const result = await fhirClient.search(type, params);
 				counts[type] = result.total || 0;
 			} catch (e) {
@@ -94,8 +120,9 @@
 				_count: '50'
 			};
 			
-			if (showOnlyTagged && workshopTag) {
-				params._tag = `${WORKSHOP_TAG_SYSTEM}|${workshopTag}`;
+			if (showOnlyTagged) {
+				// Use workshop filter (either specific tag or default AK26 pattern)
+				params._tag = buildWorkshopTagParam();
 			}
 			
 			if (searchQuery) {
@@ -251,10 +278,22 @@
 	// Load on mount only
 	onMount(async () => {
 		if (browser) {
+			// Default: show AK26 workshop patients (AK26-A through AK26-E)
+			// User can manually enter a specific workshop code or toggle to see all SHR
 			await checkServer();
-			await Promise.all([fetchPatients(), fetchResourceCounts()]);
+			await Promise.all([fetchPatients(), fetchResourceCounts(), fetchUnfilteredTotal()]);
 		}
 	});
+
+	// Fetch unfiltered total count (all patients in SHR)
+	async function fetchUnfilteredTotal() {
+		try {
+			const result = await fhirClient.search('Patient', { _summary: 'count' });
+			unfilteredTotalCount = result.total || 0;
+		} catch (e) {
+			unfilteredTotalCount = 0;
+		}
+	}
 </script>
 
 <div class="ips-viewer">
@@ -270,27 +309,46 @@
 					<span>Workshop Data Filter</span>
 				</div>
 				<div class="filter-controls">
-					<input 
-						type="text" 
-						bind:value={workshopTag}
-						placeholder="Enter workshop tag (e.g., AK26-A)"
-						class="workshop-tag-input"
-					/>
-					<button 
-						class="filter-toggle {showOnlyTagged ? 'active' : 'inactive'}"
-						on:click={() => { showOnlyTagged = !showOnlyTagged; fetchPatients(); }}
-					>
-						<span class="toggle-indicator"></span>
-						<span class="toggle-label">
-							{showOnlyTagged ? '🎯 Workshop Only' : '🌐 All SHR Data'}
-						</span>
-					</button>
+				<input 
+					type="text" 
+					bind:value={workshopTag}
+					placeholder="Enter workshop tag (e.g., AK26-A)"
+					class="workshop-tag-input"
+					on:keydown={(e) => e.key === 'Enter' && fetchPatients()}
+				/>
+				<button 
+					class="filter-toggle {showOnlyTagged ? 'active' : 'inactive'}"
+					on:click={() => { showOnlyTagged = !showOnlyTagged; fetchPatients(); fetchResourceCounts(); }}
+				>
+					<span class="toggle-indicator"></span>
+					<span class="toggle-label">
+						{#if showOnlyTagged}
+							{#if workshopTag}
+								🎯 {workshopTag}
+							{:else}
+								🎯 AK26 Workshops (A-E)
+							{/if}
+						{:else}
+							🌐 All SHR Data
+						{/if}
+					</span>
+				</button>
 				</div>
 			</div>
 			<p class="filter-description">
-				{showOnlyTagged 
-					? `Showing only patients tagged with "${workshopTag || 'current workshop'}". Toggle to view all patients in the Shared Health Record.`
-					: 'Showing all patients in the Shared Health Record. Toggle to filter by workshop tag.'}
+				{#if isLoading}
+					Loading patient counts...
+				{:else}
+					{#if showOnlyTagged}
+						{#if workshopTag}
+							Showing <strong>{totalPatientCount}</strong> patients tagged with "{workshopTag}" out of {unfilteredTotalCount} total in the Shared Health Record.
+						{:else}
+							Showing <strong>{totalPatientCount}</strong> patients from AK26 workshops (A-E) out of {unfilteredTotalCount} total in the Shared Health Record.
+						{/if}
+					{:else}
+						Showing all <strong>{unfilteredTotalCount}</strong> patients in the Shared Health Record.
+					{/if}
+				{/if}
 			</p>
 		</div>
 
@@ -303,7 +361,7 @@
 				class="search-input"
 				on:keydown={(e) => e.key === 'Enter' && fetchPatients()}
 			/>
-			<button class="refresh-btn" on:click={fetchPatients}>🔄 Refresh</button>
+			<button class="refresh-btn" on:click={() => { fetchPatients(); fetchResourceCounts(); fetchUnfilteredTotal(); }}>🔄 Refresh</button>
 		</div>
 
 		<!-- Two Panel Layout -->
@@ -319,8 +377,12 @@
 							<span class="count-display">
 								<strong>{patients.length}</strong>
 								<span class="count-total">of {totalPatientCount} total</span>
-								{#if showOnlyTagged && workshopTag}
-									<span class="count-tag">🎯 {workshopTag}</span>
+								{#if showOnlyTagged}
+									{#if workshopTag}
+										<span class="count-tag">🎯 {workshopTag}</span>
+									{:else}
+										<span class="count-tag">🎯 AK26 Workshops</span>
+									{/if}
 								{/if}
 							</span>
 						{/if}
@@ -339,8 +401,8 @@
 					</div>
 				{:else if patients.length === 0}
 					<div class="empty-state">
-						<p>👤 No patients found</p>
-						<span>Join a workshop to create patient data!</span>
+						<p>👤 No AK26 workshop patients found</p>
+						<span>Toggle to view all SHR data or join a workshop (AK26-A through AK26-E) to create patient data.</span>
 					</div>
 				{:else}
 					<div class="patient-list">
