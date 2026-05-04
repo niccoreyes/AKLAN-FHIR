@@ -98,6 +98,48 @@
 		return '';
 	}
 
+	// Smart truncation that preserves both start and end of long names
+	function smartTruncate(text, maxLength = 30) {
+		if (!text || text.length <= maxLength) return text;
+		const startLen = Math.floor(maxLength * 0.6); // 60% from start
+		const endLen = Math.floor(maxLength * 0.4); // 40% from end (minimum 3 chars)
+		return text.slice(0, startLen) + '....' + text.slice(-Math.max(endLen, 3));
+	}
+
+	// Parse medication display name into components for preview chip
+	function parseMedicationDisplay(display) {
+		// Extract brand name (content in parentheses)
+		const brandMatch = display.match(/\(([^)]+)\)/);
+		const brandName = brandMatch ? brandMatch[1] : '';
+		
+		// Extract generic name (remove brand)
+		let genericName = display;
+		if (brandMatch) {
+			genericName = genericName.replace(brandMatch[0], '');
+		}
+		// Clean up: remove extra spaces and common conjunctions
+		genericName = genericName.replace(/\s+/g, ' ').trim();
+		genericName = genericName.replace(/\s+(As|And|Plus|With)\s+$/i, '');
+		
+		return { genericName, brandName };
+	}
+
+	// Format medication preview for dropdown: Generic (Brand) Strength
+	function formatMedicationPreview(med, maxGenericLen = 28, maxBrandLen = 18) {
+		// Use the pre-extracted strength from search results, or parse from display as fallback
+		const strength = med.strength || extractStrength(med.display) || '';
+		const { genericName, brandName } = parseMedicationDisplay(med.display);
+		const truncatedGeneric = smartTruncate(genericName, maxGenericLen);
+		const truncatedBrand = brandName ? smartTruncate(brandName, maxBrandLen) : '';
+		
+		return {
+			generic: truncatedGeneric,
+			brand: truncatedBrand,
+			strength,
+			code: med.code
+		};
+	}
+
 	// Search Philippine FDA medications
 	async function searchMedications(query) {
 		if (!query || query.length < 2) {
@@ -114,13 +156,39 @@
 			);
 			if (!response.ok) throw new Error('Search failed');
 			const data = await response.json();
-			// Process results to extract strength
-			medSearchResults = (data.expansion?.contains || []).map(med => ({
-				...med,
-				strength: extractStrength(med.display),
-				form: extractForm(med.display),
-				nameOnly: med.display.replace(/\s*\d+\s*(?:mg|g|ml|mcg).*/i, '').trim()
-			}));
+			// Process results and lookup strength from CodeSystem
+			const meds = (data.expansion?.contains || []);
+			medSearchResults = await Promise.all(
+				meds.map(async (med) => {
+					// Extract strength from display as fallback
+					let strength = extractStrength(med.display);
+					
+					// Lookup dosageStrength from CodeSystem
+					try {
+						const lookup = await fhirClient.lookupCodeProperties(PH_FDA_SYSTEM, med.code);
+						if (lookup.success) {
+							const ds = lookup.properties.get('dosageStrength');
+							if (ds && ds !== 'NA' && !ds.toLowerCase().includes('see reverse') && !ds.toLowerCase().includes('formulation')) {
+								strength = ds;
+							}
+							// Also get form from lookup
+							const df = lookup.properties.get('dosageForm');
+							if (df && df !== 'NA') {
+								med.dosageForm = df;
+							}
+						}
+					} catch (e) {
+						// Silently fail lookup, use extracted strength
+					}
+					
+					return {
+						...med,
+						strength,
+						form: med.dosageForm || extractForm(med.display),
+						nameOnly: med.display.replace(/\s*\d+\s*(?:mg|g|ml|mcg).*/i, '').trim()
+					};
+				})
+			);
 		} catch (e) {
 			console.error('Medication search error:', e);
 			medSearchResults = [];
@@ -590,17 +658,21 @@
 						{#if showDropdown && medSearchResults.length > 0}
 							<div class="search-dropdown med-dropdown">
 								<div class="dropdown-header">🇵🇭 Select from PH FDA Registry</div>
-								{#each medSearchResults as med}
-									<button type="button" class="search-result med-result" onclick={() => selectMedication(med)}>
-										<div class="med-info">
-											<span class="med-name">{med.nameOnly || med.display}</span>
-											{#if med.strength || med.form}
-												<span class="med-strength">{med.strength}{med.strength && med.form ? ' • ' : ''}{med.form}</span>
-											{/if}
-										</div>
-										<span class="med-code">{med.code}</span>
-									</button>
-								{/each}
+										{#each medSearchResults as med}
+											{@const preview = formatMedicationPreview(med)}
+											<button type="button" class="search-result med-result" onclick={() => selectMedication(med)}>
+												<div class="med-preview">
+													<span class="med-generic" title={med.display}>{preview.generic}</span>
+													{#if preview.brand}
+														<span class="med-brand">({preview.brand})</span>
+													{/if}
+													{#if preview.strength}
+														<span class="med-strength-chip">{preview.strength}</span>
+													{/if}
+												</div>
+												<span class="med-code">{preview.code}</span>
+											</button>
+										{/each}
 								<button type="button" class="free-text-option" onclick={enableFreeText}>
 									💡 Use "{medSearchQuery}" as free text (no FDA code)
 								</button>
@@ -802,11 +874,6 @@
 		border-color: var(--clinic-color);
 	}
 
-	.field-group input.readonly {
-		background: #F3F4F6;
-		color: #6B7280;
-	}
-
 	.fda-badge {
 		font-size: 11px;
 		padding: 2px 8px;
@@ -898,20 +965,44 @@
 		background: #F9FAFB;
 	}
 
-	.med-info {
+	/* Preview chip layout for medication dropdown */
+	.med-preview {
 		display: flex;
-		flex-direction: column;
-		gap: 2px;
+		align-items: center;
+		gap: 6px;
+		flex: 1;
+		min-width: 0;
+		margin-right: 8px;
 	}
 
-	.med-name {
+	.med-generic {
 		font-weight: 600;
 		color: #1E293B;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 180px;
 	}
 
-	.med-strength {
+	.med-brand {
 		font-size: 12px;
-		color: #6B7280;
+		color: #475569;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 120px;
+	}
+
+	.med-strength-chip {
+		font-size: 11px;
+		font-weight: 700;
+		color: #047857;
+		background: #D1FAE5;
+		border: 1px solid #6EE7B7;
+		padding: 3px 10px;
+		border-radius: 12px;
+		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.med-code {
@@ -920,6 +1011,8 @@
 		background: #F1F5F9;
 		padding: 2px 8px;
 		border-radius: 4px;
+		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.free-text-option {
@@ -960,13 +1053,6 @@
 		font-size: 13px;
 		font-weight: 600;
 		cursor: pointer;
-	}
-
-	.selected-indicator {
-		margin: 6px 0 0 0;
-		font-size: 13px;
-		color: var(--clinic-color);
-		font-weight: 600;
 	}
 
 	/* Medication Details Box */
