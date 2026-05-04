@@ -13,6 +13,7 @@
 	let showUserMenu = $state(false);
 	let isRegistering = $state(false);
 	let hasRegistered = $state(false);
+	let lguFacilityFilter = $state('all'); // For LGU Health Office - filter by specific facility
 
 	// Auto-register participant when configured but no practitionerId
 	// This handles clinic switching where practitionerId is lost
@@ -109,6 +110,12 @@
 	const currentClinic = $derived(CLINICS.find(c => c.id === appStore.clinicId));
 	const currentRole = $derived(ROLES.find(r => r.id === appStore.roleId));
 	const currentCaps = $derived(CLINIC_CAPABILITIES[appStore.clinicId] || {});
+	const isLGUHealthOffice = $derived(appStore.clinicId === 'lgu-health-office');
+	
+	// Facilities for LGU filter (exclude LGU itself from the list)
+	const facilityFilterOptions = $derived(
+		CLINICS.filter(c => c.id !== 'lgu-health-office')
+	);
 </script>
 
 <!-- Toast Notifications - Fixed position, non-blocking -->
@@ -163,12 +170,21 @@
 			<div class="clinic-context">
 				<button
 					class="clinic-switcher-btn"
+					class:lgu-filter-active={isLGUHealthOffice && lguFacilityFilter !== 'all'}
 					onclick={() => showClinicSwitcher = !showClinicSwitcher}
 					style="--clinic-color: {currentClinic?.color || '#2563EB'}"
 					title="Click to switch clinic and experience HIE from different perspectives"
 				>
 					<span class="clinic-icon-large">{currentClinic?.icon}</span>
-					<span class="clinic-name">{currentClinic?.shortName}</span>
+					<div class="clinic-info">
+						<span class="clinic-name">{currentClinic?.shortName}</span>
+						{#if isLGUHealthOffice && lguFacilityFilter !== 'all'}
+							{@const filteredClinic = CLINICS.find(c => c.id === lguFacilityFilter)}
+							<span class="filter-badge">
+								Viewing: {filteredClinic?.shortName}
+							</span>
+							{/if}
+						</div>
 					<span class="switch-indicator">↻</span>
 				</button>
 				{#if showClinicSwitcher}
@@ -187,6 +203,36 @@
 								</div>
 							</button>
 						{/each}
+						
+						<!-- LGU Health Office: Filter by Facility -->
+						{#if isLGUHealthOffice}
+							<div class="dropdown-divider"></div>
+							<div class="dropdown-header">Filter View by Facility</div>
+							<button 
+								class="clinic-option filter-option"
+								class:active={lguFacilityFilter === 'all'}
+								onclick={() => { lguFacilityFilter = 'all'; showClinicSwitcher = false; }}
+							>
+								<span class="option-icon">📊</span>
+								<div class="option-info">
+									<strong>All Facilities</strong>
+									<span>View data from all clinics</span>
+								</div>
+							</button>
+							{#each facilityFilterOptions as clinic}
+								<button 
+									class="clinic-option filter-option"
+									class:active={lguFacilityFilter === clinic.id}
+									onclick={() => { lguFacilityFilter = clinic.id; showClinicSwitcher = false; }}
+								>
+									<span class="option-icon">{clinic.icon}</span>
+									<div class="option-info">
+										<strong>{clinic.shortName}</strong>
+										<span>View only this facility</span>
+									</div>
+								</button>
+							{/each}
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -756,6 +802,49 @@
 		font-size: 11px;
 		color: #64748B;
 		line-height: 1.3;
+	}
+
+	/* Clinic info container for filter badge */
+	.clinic-info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 2px;
+	}
+
+	.clinic-switcher-btn.lgu-filter-active {
+		background: linear-gradient(135deg, color-mix(in srgb, var(--clinic-color) 25%, white) 0%, color-mix(in srgb, var(--clinic-color) 10%, white) 100%);
+		border-width: 3px;
+	}
+
+	.filter-badge {
+		font-size: 10px;
+		font-weight: 600;
+		color: var(--clinic-color);
+		background: white;
+		padding: 2px 8px;
+		border-radius: 10px;
+		border: 1px solid var(--clinic-color);
+		opacity: 0.9;
+	}
+
+	/* Dropdown divider and filter options */
+	.dropdown-divider {
+		height: 1px;
+		background: #E2E8F0;
+		margin: 8px 12px;
+	}
+
+	.clinic-option.filter-option {
+		padding-left: 20px;
+	}
+
+	.clinic-option.filter-option.active {
+		background: #F0FDF4;
+	}
+
+	.clinic-option.filter-option.active .option-info strong {
+		color: #059669;
 	}
 
 	.clinic-mode {

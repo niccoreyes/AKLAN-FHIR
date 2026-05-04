@@ -61,6 +61,15 @@ export const CLINICS = [
 		color: '#DC2626', // Red
 		icon: '💊',
 		location: 'Kalibo, Aklan'
+	},
+	{
+		id: 'lgu-health-office',
+		name: 'LGU Health Office',
+		shortName: 'LGU Health Office',
+		type: 'Health Office',
+		color: '#059669', // Emerald Green for government
+		icon: '📊',
+		location: 'Kalibo, Aklan'
 	}
 ];
 
@@ -126,14 +135,14 @@ export const PATIENT_CASES = [
 export const CLINIC_CAPABILITIES = {
 	'rhu-kalibo': {
 		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest'],
-		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense'],
-		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'prescribe', 'viewLabs', 'viewMeds'],
+		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense', 'Condition'],
+		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'prescribe', 'viewLabs', 'viewMeds', 'analytics'],
 		description: 'Primary care — register patients, record visits, order labs, view results, refer to hospital'
 	},
 	'aklan-hospital': {
 		canCreate: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport'],
-		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense'],
-		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'prescribe', 'report', 'viewLabs', 'viewMeds'],
+		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense', 'Condition'],
+		primaryActions: ['register', 'search', 'encounter', 'vitals', 'order', 'prescribe', 'report', 'viewLabs', 'viewMeds', 'analytics'],
 		description: 'Secondary care — full clinical services including lab reporting and medication tracking'
 	},
 	'rhu-malay': {
@@ -153,6 +162,12 @@ export const CLINIC_CAPABILITIES = {
 		canView: ['Patient', 'MedicationRequest', 'MedicationDispense'],
 		primaryActions: ['inbox', 'dispense'],
 		description: 'Pharmacy — receive prescriptions, dispense medications'
+	},
+	'lgu-health-office': {
+		canCreate: [], // No direct patient care - monitoring only
+		canView: ['Patient', 'Encounter', 'Observation', 'ServiceRequest', 'MedicationRequest', 'DiagnosticReport', 'MedicationDispense', 'Condition', 'Practitioner'],
+		primaryActions: ['search', 'inbox'], // Minimal actions - population data shown automatically on dashboard
+		description: 'Population health monitoring — oversee all facilities and track disease patterns within the workshop group'
 	}
 };
 
