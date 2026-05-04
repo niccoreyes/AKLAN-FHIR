@@ -495,33 +495,152 @@ export class FHIRClient {
 
 	/**
 	 * Delete all resources with a workshop tag (facilitator reset)
+	 * Deletes in dependency order to avoid referential integrity errors
 	 * @param {string} workshopCode - Workshop code
-	 * @returns {Promise<{deleted: number, errors: number}>}
+	 * @param {Array<string>} specificTypes - Optional: specific resource types to delete (if null, deletes all)
+	 * @param {Function} onProgress - Optional: callback(deleted, errors, currentType, totalInType) for progress updates
+	 * @returns {Promise<{deleted: number, errors: number, details: Object}>}
 	 */
-	async deleteWorkshopResources(workshopCode) {
-		const resourceTypes = ['Patient', 'Encounter', 'Observation', 'Condition', 'MedicationRequest', 'ServiceRequest', 'DiagnosticReport', 'MedicationDispense', 'Practitioner'];
+	async deleteWorkshopResources(workshopCode, specificTypes = null, onProgress = null) {
+		// Deletion order: leaf resources first (those that reference others), 
+		// then work backwards to root resources (those that are referenced)
+		// This prevents referential integrity errors
+		const deletionOrder = [
+			'MedicationDispense',  // refs: MedicationRequest, Patient, Practitioner
+			'DiagnosticReport',    // refs: ServiceRequest, Patient, Practitioner, Observation
+			'MedicationRequest', // refs: Patient, Encounter, Practitioner
+			'ServiceRequest',    // refs: Patient, Encounter, Practitioner
+			'Observation',       // refs: Patient, Encounter
+			'Condition',         // refs: Patient, Encounter
+			'Encounter',         // refs: Patient, Practitioner
+			'Patient',           // refs: (root - referenced by many)
+			'Practitioner'       // refs: (root - referenced by many)
+		];
+
+		// Filter to specific types if requested, but maintain order
+		const resourceTypes = specificTypes 
+			? deletionOrder.filter(t => specificTypes.includes(t))
+			: deletionOrder;
+
 		let deleted = 0;
 		let errors = 0;
+		const details = {};
 
 		for (const resourceType of resourceTypes) {
+			let typeDeleted = 0;
+			let typeErrors = 0;
+			
 			try {
-				const bundle = await this.search(resourceType, {}, workshopCode);
+				// Search without count limit to get all resources
+				const bundle = await this.search(resourceType, { _count: '1000' }, workshopCode);
+				const entries = bundle.entry || [];
 				
-				if (bundle.entry && bundle.entry.length > 0) {
-					for (const entry of bundle.entry) {
+				console.log(`[deleteWorkshopResources] Found ${entries.length} ${resourceType} resources for tag ${workshopCode}`);
+				
+				if (entries.length > 0) {
+					for (const entry of entries) {
 						try {
 							await this.delete(resourceType, entry.resource.id);
 							deleted++;
+							typeDeleted++;
+							
+							if (onProgress) {
+								onProgress(deleted, errors, resourceType, entries.length, typeDeleted);
+							}
 						} catch (e) {
+							console.error(`[deleteWorkshopResources] Error deleting ${resourceType}/${entry.resource.id}:`, e.message);
 							errors++;
+							typeErrors++;
 						}
 					}
 				}
 			} catch (e) {
-				console.error(`Error deleting ${resourceType}:`, e);
+				console.error(`[deleteWorkshopResources] Error searching ${resourceType}:`, e);
+				errors++;
+				typeErrors++;
 			}
+			
+			details[resourceType] = { deleted: typeDeleted, errors: typeErrors };
 		}
 
+		return { deleted, errors, details };
+	}
+
+	/**
+	 * Discover all workshop tags in use on the server
+	 * Scans key resource types and extracts unique tags
+	 * @returns {Promise<Map<string, Object>>} Map of tag code -> { counts: {}, total: number }
+	 */
+	async discoverWorkshopTags() {
+		// Resource types to scan for tags (lightweight approach: just get metadata)
+		const resourceTypes = ['Patient', 'Encounter', 'Practitioner', 'Observation', 'MedicationRequest', 'ServiceRequest', 'DiagnosticReport', 'MedicationDispense', 'Condition'];
+		const tagMap = new Map();
+		
+		for (const resourceType of resourceTypes) {
+			try {
+				// Search with _elements=meta to get just metadata (lightweight)
+				const bundle = await this.search(resourceType, { _elements: 'meta', _count: '1000' });
+				const entries = bundle.entry || [];
+				
+				for (const entry of entries) {
+					const resource = entry.resource;
+					const tags = resource.meta?.tag || [];
+					
+					for (const tag of tags) {
+						// Only count workshop tags
+						if (tag.system === WORKSHOP_TAG_SYSTEM && tag.code) {
+							const tagCode = tag.code;
+							
+							if (!tagMap.has(tagCode)) {
+								tagMap.set(tagCode, { 
+									counts: {}, 
+									total: 0,
+									display: tag.display || tagCode
+								});
+							}
+							
+							const tagData = tagMap.get(tagCode);
+							tagData.counts[resourceType] = (tagData.counts[resourceType] || 0) + 1;
+							tagData.total++;
+						}
+					}
+				}
+			} catch (e) {
+				console.error(`[discoverWorkshopTags] Error scanning ${resourceType}:`, e);
+			}
+		}
+		
+		return tagMap;
+	}
+
+	/**
+	 * Delete resources of a specific type with a specific tag
+	 * @param {string} resourceType - FHIR resource type
+	 * @param {string} tag - Workshop tag code
+	 * @returns {Promise<{deleted: number, errors: number}>}
+	 */
+	async deleteResourcesByTypeAndTag(resourceType, tag) {
+		let deleted = 0;
+		let errors = 0;
+		
+		try {
+			const bundle = await this.search(resourceType, { _count: '1000' }, tag);
+			const entries = bundle.entry || [];
+			
+			for (const entry of entries) {
+				try {
+					await this.delete(resourceType, entry.resource.id);
+					deleted++;
+				} catch (e) {
+					console.error(`[deleteResourcesByTypeAndTag] Error deleting ${resourceType}/${entry.resource.id}:`, e.message);
+					errors++;
+				}
+			}
+		} catch (e) {
+			console.error(`[deleteResourcesByTypeAndTag] Error searching ${resourceType}:`, e);
+			errors++;
+		}
+		
 		return { deleted, errors };
 	}
 }
