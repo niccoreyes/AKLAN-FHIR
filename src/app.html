@@ -7,6 +7,19 @@
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 		<meta name="description" content="OpenHIE Mock EHR - FHIR Fundamentals Workshop" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<script>
+			// Recover from deployment version skew: cached app code can request a
+			// hashed chunk that is no longer on the active Vercel deployment.
+			window.addEventListener('vite:preloadError', (event) => {
+				const key = 'vite-preload-reload-at';
+				const lastReload = Number(sessionStorage.getItem(key) || 0);
+				if (Date.now() - lastReload < 30_000) return;
+				event.preventDefault();
+				sessionStorage.setItem(key, String(Date.now()));
+				window.location.reload();
+			});
+		</script>
 		<title>OpenHIE Mock EHR</title>
 		%sveltekit.head%
 	</head>
