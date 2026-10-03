@@ -3,7 +3,7 @@
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { appStore } from '$stores/appStore.svelte.js';
-	import { CLINICS, CLINIC_CAPABILITIES } from '$constants';
+	import { CLINICS, CLINIC_CAPABILITIES, WORKSHOP_TAG_SYSTEM } from '$constants';
 	import { fhirClient } from '$services/fhir-client.js';
 	import { deriveUnit } from '$lib/utils/medication-helpers.js';
 	import LogsToggle from '$components/LogsToggle.svelte';
@@ -270,17 +270,30 @@
 		isSearchingPatients = true;
 		showPatientDropdown = true;
 		try {
-			const result = await fhirClient.search('Patient', {
-				name: query,
-				_tag: appStore.workshopCode,
+			const queries = [query];
+			// Some FHIR servers treat a multi-word name as an exact phrase. Retry
+			// individual words so names like "Hey Juan" (stored as given/family)
+			// remain discoverable when the phrase itself has no match.
+			if (query.trim().split(/\s+/).length > 1) {
+				queries.push(...query.trim().split(/\s+/));
+			}
+			const bundles = await Promise.all(queries.map(name => fhirClient.search('Patient', {
+				name,
+				_tag: `${WORKSHOP_TAG_SYSTEM}|${appStore.workshopCode}`,
 				_count: '10'
-			});
-			patientSearchResults = result.entry?.map(e => ({
-				id: e.resource.id,
-				name: e.resource.name?.[0]?.text || `${e.resource.name?.[0]?.family}, ${e.resource.name?.[0]?.given?.join(' ')}`,
-				gender: e.resource.gender,
-				birthDate: e.resource.birthDate
-			})) || [];
+			})));
+			const resources = new Map();
+			for (const bundle of bundles) {
+				for (const entry of bundle.entry || []) {
+					resources.set(entry.resource.id, entry.resource);
+				}
+			}
+			patientSearchResults = [...resources.values()].slice(0, 10).map(patient => ({
+				id: patient.id,
+				name: patient.name?.[0]?.text || `${patient.name?.[0]?.family}, ${patient.name?.[0]?.given?.join(' ')}`,
+				gender: patient.gender,
+				birthDate: patient.birthDate
+			}));
 		} catch (e) {
 			console.error('Patient search error:', e);
 			patientSearchResults = [];
@@ -288,12 +301,19 @@
 		isSearchingPatients = false;
 	}
 
-	function selectPatient(p) {
+	async function selectPatient(p) {
 		patientId = p.id;
 		patientName = p.name;
 		patientSearchQuery = p.name;
 		patientSearchResults = [];
 		showPatientDropdown = false;
+		// A newly selected patient must load their encounters too (the URL-prefill
+		// path already does this). Reset any previous patient's encounter first.
+		encounterId = '';
+		encounterName = '';
+		patientEncounters = [];
+		showEncounterSelector = false;
+		await loadPatientEncounters(p.id);
 	}
 
 	function clearPatient() {
@@ -338,8 +358,7 @@
 		try {
 			const result = await fhirClient.search('Encounter', {
 				patient: `Patient/${pid}`,
-				_tag: appStore.workshopCode,
-				_count: '20',
+				_count: '100',
 				_sort: '-date'
 			});
 			patientEncounters = result.entry?.map(e => ({
